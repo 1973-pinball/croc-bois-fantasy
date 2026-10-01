@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState, type MouseEvent } from 'react';
 import { leagueData as previewData } from '@/lib/league-data';
 import type { LeagueData } from '@/lib/types';
+import { ownTeamIds as currentOwnTeamIds } from '@/lib/team-access';
 import identityData from '../../data/identities.json';
 
 const identities = identityData as { leagueId: string; seasonId: string; franchises: Record<string, string>; picks: Record<string, string> };
@@ -10,7 +11,7 @@ type PlannerAssignment = { playerId: number; pickId: string };
 type Session = {
   configured: boolean;
   googleSignInEnabled?: boolean;
-  user: { id: string; email?: string } | null;
+  user: { id: string; email?: string; displayName?: string } | null;
   memberships: { league_id: string; role: string }[];
   assignments: { franchise_id: string; league_id: string; role: string; effective_from: string; effective_to: string | null }[];
 };
@@ -42,6 +43,10 @@ async function readResponse<T>(response: Response): Promise<T> {
 export function useLeagueAccount() {
   const [session, setSession] = useState<Session | null>(null);
   const [sessionLoading, setSessionLoading] = useState(true);
+  const [sessionError, setSessionError] = useState('');
+  const sessionRead = useRef(0);
+  const permissionKey = useRef('');
+  const permissionVersion = useRef(0);
   const [live, setLive] = useState<LiveLeague | null>(null);
   const [connection, setConnection] = useState<'loading' | 'preview' | 'live' | 'error'>('loading');
   const [connectionError, setConnectionError] = useState('');
@@ -66,40 +71,58 @@ export function useLeagueAccount() {
   }, []);
 
   const readSubmissions = useCallback(async (requestedSeason = seasonId) => {
+    const version = permissionVersion.current;
     setLoadingSubmissions(true);
     try {
       const response = await fetch('/api/keepers?seasonId=' + encodeURIComponent(requestedSeason), { cache: 'no-store', credentials: 'same-origin' });
       const result = await readResponse<{ submissions: KeeperSubmission[] }>(response);
+      if (version !== permissionVersion.current) throw new Error('Your account access changed. Refresh to load current keeper submissions.');
       const records = result.submissions.map(item => ({ ...item, keeper_assignments: item.keeper_assignments || [] }));
       setSubmissions(records); setSubmissionsLoaded(true);
       return records;
     } finally { setLoadingSubmissions(false); }
   }, [seasonId]);
 
+  const reloadSession = useCallback(async () => {
+    const read = ++sessionRead.current;
+    try {
+      const body = await readResponse<Session>(await fetch('/api/session', { cache: 'no-store', credentials: 'same-origin' }));
+      if (read !== sessionRead.current) return null;
+      const key = JSON.stringify([body.user?.id, body.memberships, body.assignments]);
+      if (key !== permissionKey.current) {
+        permissionKey.current = key; permissionVersion.current++;
+        setSubmissions([]); setSubmissionsLoaded(false);
+      }
+      setSession(body); setSessionError('');
+      if (!body.user) { setSubmissions([]); setSubmissionsLoaded(false); }
+      return body;
+    } catch {
+      if (read === sessionRead.current) {
+        permissionKey.current = ''; permissionVersion.current++;
+        setSession(null); setSubmissions([]); setSubmissionsLoaded(false);
+        setSessionError('Your account access could not be checked. Refresh to try again.');
+      }
+      return null;
+    } finally { if (read === sessionRead.current) setSessionLoading(false); }
+  }, []);
+
   useEffect(() => {
-    let cancelled = false;
-    const loadSession = async () => {
-      try {
-        const response = await fetch('/api/session', { cache: 'no-store', credentials: 'same-origin' });
-        const body = await response.json();
-        if (cancelled) return;
-        if (response.ok) setSession(body);
-        else setSession({ configured: false, user: null, memberships: [], assignments: [] });
-      } catch { if (!cancelled) setSession({ configured: false, user: null, memberships: [], assignments: [] }); }
-      finally { if (!cancelled) setSessionLoading(false); }
-    };
-    void loadSession(); void reloadLeague();
-    return () => { cancelled = true; };
-  }, [reloadLeague]);
+    void reloadSession(); void reloadLeague();
+    const refresh = () => { if (document.visibilityState === 'visible') void reloadSession(); };
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+    return () => { sessionRead.current++; window.removeEventListener('focus', refresh); document.removeEventListener('visibilitychange', refresh); };
+  }, [reloadSession, reloadLeague]);
 
   useEffect(() => {
     if (!session?.user || connection !== 'live') return;
     let cancelled = false;
     void readSubmissions().catch(error => { if (!cancelled) setActionError(error instanceof Error ? error.message : 'Unable to load saved keeper submissions.'); });
     return () => { cancelled = true; };
-  }, [session?.user?.id, connection, readSubmissions]);
+  }, [session, connection, readSubmissions]);
 
   const commissioner = Boolean(session?.user && session.memberships.some(item => item.league_id === identities.leagueId && item.role === 'commissioner'));
+  const ownTeamIds = session?.user ? currentOwnTeamIds(identities.leagueId, session.memberships, session.assignments, live?.franchiseIds || identities.franchises).filter(id => data.teams.some(team => team.id === id)) : [];
   function franchiseId(teamId: number) { return live?.franchiseIds[String(teamId)] || identities.franchises[String(teamId)]; }
   function canManageTeam(teamId: number) {
     if (!session?.user) return false;
@@ -160,12 +183,12 @@ export function useLeagueAccount() {
     finally { setActionBusy(null); }
   }
 
-  return { data, session, sessionLoading, live, connection, connectionError, submissions, submissionsLoaded, loadingSubmissions, commissioner, actionBusy, actionError, actionNotice, reloadRequired, seasonId, canManageTeam, franchiseId, officialPickId, toPlannerAssignments, submissionFor, refreshOfficial, runAction, openKeeperSelection, reloadLeague };
+  return { data, session, sessionLoading, sessionError, reloadSession, ownTeamIds, live, connection, connectionError, submissions, submissionsLoaded, loadingSubmissions, commissioner, actionBusy, actionError, actionNotice, reloadRequired, seasonId, canManageTeam, franchiseId, officialPickId, toPlannerAssignments, submissionFor, refreshOfficial, runAction, openKeeperSelection, reloadLeague };
 }
 
 export type LeagueAccount = ReturnType<typeof useLeagueAccount>;
 
-export function AccountButton({ account, className = 'sign-in-button', label = 'Sign in' }: { account: LeagueAccount; className?: string; label?: string }) {
+export function AccountButton({ account, className = 'sign-in-button', label = 'Sign in with Google' }: { account: LeagueAccount; className?: string; label?: string }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const [signingOut, setSigningOut] = useState(false);
@@ -179,7 +202,19 @@ export function AccountButton({ account, className = 'sign-in-button', label = '
     if (!account.sessionLoading && account.session?.configured && account.session.googleSignInEnabled === true && !account.session.user) return;
     event.preventDefault(); dialog.current?.showModal();
   }
-  return <><a className={className} href="/auth/login" onClick={open}>{account.session?.user ? 'My account' : label}<span aria-hidden="true">→</span></a><dialog className="account-dialog" ref={dialog} aria-labelledby={titleId}><button className="dialog-close" onClick={() => dialog.current?.close()} aria-label="Close account details">×</button><p className="eyebrow">YOUR LEAGUE ACCOUNT</p><h2 id={titleId}>{account.session?.user ? 'You’re signed in.' : account.sessionLoading ? 'Connecting to the league…' : 'Google sign-in is coming online.'}</h2>{account.session?.user ? <><p>{account.session.user.email || 'Your Google account is connected.'}</p><p>{account.commissioner ? 'You have commissioner access for this league.' : 'Official keeper controls appear when you select a team you currently manage.'}</p></> : <p>{account.sessionLoading ? 'Account access is being checked. Close this window and try again in a moment.' : 'League account setup is still being completed. You can explore the public archive and plan keepers locally in the meantime.'}</p>}<div className="account-dialog-actions"><button className="button button-green" onClick={() => dialog.current?.close()}>Back to the league</button>{account.session?.user && <button className="button button-subtle" onClick={() => void signOut()} disabled={signingOut}>{signingOut ? 'Signing out…' : 'Sign out'}</button>}</div>{signoutError && <p role="alert">{signoutError}</p>}</dialog></>;
+  return <><a className={className} href="/auth/login?next=%2F%3Fview%3Dmy-team" onClick={open}>{account.session?.user ? 'My account' : label}<span aria-hidden="true">→</span></a>
+    <dialog className="account-dialog" ref={dialog} aria-labelledby={titleId}>
+      <button className="dialog-close" onClick={() => dialog.current?.close()} aria-label="Close account details">×</button><p className="eyebrow">YOUR LEAGUE ACCOUNT</p>
+      <h2 id={titleId}>{account.session?.user ? 'You’re signed in.' : account.sessionLoading ? 'Connecting to the league…' : 'Google sign-in is coming online.'}</h2>
+      {account.session?.user ? <>
+        <p>{account.session.user.email || 'Your Google account is connected.'}</p>
+        {account.commissioner && <p>You have commissioner access for this league.</p>}
+        <p>{account.ownTeamIds.length ? 'Your teams: ' + account.data.teams.filter(team => account.ownTeamIds.includes(team.id)).map(team => team.shortName).join(', ') + '.' : 'Request your team in My Team. The commissioner approves access before you can submit keepers or log trades.'}</p>
+        <a className="button button-green" href="/?view=my-team">{account.ownTeamIds.length ? 'Open My Team' : 'Request team access'}</a>
+        <details className="account-identity"><summary>Account ID for setup</summary><code>{account.session.user.id}</code><p>The commissioner uses this verified account ID when setting up initial league administration.</p></details>
+      </> : <p>{account.sessionLoading ? 'Account access is being checked. Close this window and try again in a moment.' : 'League account setup is still being completed. You can explore the public archive and plan keepers locally in the meantime.'}</p>}
+      <div className="account-dialog-actions"><button className="button button-green" onClick={() => dialog.current?.close()}>Back to the league</button>{account.session?.user && <button className="button button-subtle" onClick={() => void signOut()} disabled={signingOut}>{signingOut ? 'Signing out…' : 'Sign out'}</button>}</div>{signoutError && <p role="alert">{signoutError}</p>}
+    </dialog></>;
 }
 
 export function LeagueConnectionNotice({ account }: { account: LeagueAccount }) {

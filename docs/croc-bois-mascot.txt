@@ -1,0 +1,9 @@
+Asset: public/images/croc-bois-mascot.png
+Created: 2026-10-01 with the built-in image_gen tool, transparent background.
+Original generated artwork. The supplied meme was concept guidance, not copied stock artwork.
+Product image references researched for shape and texture:
+https://www.crocs.fr/p/kids-classic-basketball-clog/210156.html
+https://www.wilson.com/en-us/product/evolution-game-basketball-wz10012
+
+Final generation prompt:
+Use case: stylized-concept. Create one original polished humorous mascot/sticker image for Croc Bois Fantasy Basketball: a single green classic Crocs foam clog/sandal, recognizable broad perforated toe box and pivoting heel strap, perched directly on top of a full orange basketball beneath it. Give the shoe the classic internet 'deal with it' meme personality: bold black 8-bit pixel sunglasses with white pixel highlights across the front/upper shoe and a small diagonal white pixel-art smoking joint with a red ember at the front corner, a tiny subtle curl of smoke. The sunglasses and joint must be visibly attached to the shoe like a face, not floating separately. Three-quarter side view so the clog silhouette and basketball are both immediately recognizable; entire shoe and whole basketball visible, centered as one compact composition. Shoe glossy sculpted green with realistic foam surface and black pixel meme accessories; orange basketball with clear black seams and pebbled texture. Clean high quality playful 3D illustration, strong silhouette, green/orange palette matching a basketball league. True transparent background, clean isolated cutout edges, no floor or rectangular background, no words or slogans, no watermarks, no copied stock imagery. User's supplied image was only a concept reference for sunglasses/joint; create the artwork afresh.

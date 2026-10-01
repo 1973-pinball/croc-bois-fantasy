@@ -6,28 +6,8 @@ export type InventoryRule = { id: string; draft_rounds: number };
 export type InventoryFranchise = { id: string; name: string; espn_team_id: number | null };
 export type InventoryParticipant = { season_id: string; franchise_id: string; display_name: string; draft_position: number | null };
 export type InventoryPick = { id: string; season_id: string; original_franchise_id: string; current_owner_id: string; round: number; status: string };
-export type InventoryPage<T> = { data: T[] | null; error: unknown; count?: number | null };
-
-/** Exact counts also handle a server page cap smaller than the requested range. */
-export async function readAllInventoryPages<T>(read: (from: number, to: number) => PromiseLike<InventoryPage<T>>, pageSize = 1000): Promise<T[]> {
-  if (!Number.isInteger(pageSize) || pageSize < 1) throw new Error('Invalid inventory page size');
-  const rows: T[] = [];
-  let expected: number | undefined;
-  for (;;) {
-    const page = await read(rows.length, rows.length + pageSize - 1);
-    if (page.error || !Array.isArray(page.data)) throw new Error('Inventory query failed');
-    if (page.count !== undefined && page.count !== null) {
-      if (!Number.isSafeInteger(page.count) || page.count < 0 || (expected !== undefined && expected !== page.count)) throw new Error('Inventory changed during pagination');
-      expected = page.count;
-    }
-    rows.push(...page.data);
-    if (expected !== undefined) {
-      if (rows.length > expected) throw new Error('Inventory count mismatch');
-      if (rows.length === expected) return rows;
-      if (page.data.length === 0) throw new Error('Inventory pagination ended before the expected count');
-    } else if (page.data.length < pageSize) return rows;
-  }
-}
+export { readAllRows as readAllInventoryPages } from './supabase/pagination';
+export type { QueryPage as InventoryPage } from './supabase/pagination';
 
 export function buildLiveDraftPickGrids(input: {
   seasons: InventorySeason[]; rules: InventoryRule[]; franchises: InventoryFranchise[];

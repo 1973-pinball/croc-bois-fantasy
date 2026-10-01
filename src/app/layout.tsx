@@ -5,7 +5,6 @@ export const metadata: Metadata = {
   title: 'Croc Bois | Fantasy Basketball',
   description: 'The home of Croc Bois Fantasy Basketball. League history, keeper planning, draft picks, and the deals that made it all happen.',
   applicationName: 'Croc Bois',
-  icons: { apple: '/icon-192.png' },
   appleWebApp: { capable: true, statusBarStyle: 'default', title: 'Croc Bois' },
 };
 

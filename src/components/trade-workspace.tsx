@@ -137,7 +137,7 @@ export function TradeWorkspace({ account }: { account: LeagueAccount }) {
   const live = account.connection === 'live' && Boolean(account.live);
   const signedIn = Boolean(account.session?.user);
   const readable = live && signedIn;
-  const canLog = readable && Boolean(account.session?.memberships.some(m => m.league_id === identities.leagueId && ['manager', 'commissioner'].includes(m.role)));
+  const canLog = readable && (account.commissioner || account.ownTeamIds.length > 0);
   const seasonId = account.live?.seasonId;
 
   const loadTrades = useCallback(async (signal?: AbortSignal) => {

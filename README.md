@@ -1,6 +1,6 @@
 # Croc Bois Fantasy Basketball
 
-A public league portal and private keeper workflow for Croc Bois. Next.js, TypeScript, Supabase Postgres and Vercel. Google sign-in is implemented but deliberately disabled until provider setup and manager onboarding are complete.
+A public league portal and private keeper workflow for Croc Bois. Next.js, TypeScript, Supabase Postgres and Vercel. Google sign-in and commissioner-approved team onboarding are implemented and enabled for production. The first commissioner still needs a verified account assignment.
 
 [Open the league app](https://croc-bois-fantasy.vercel.app) · [Delivery roadmap](ROADMAP.md)
 
@@ -53,6 +53,10 @@ The current replay matches 137 of 139 canonical 2025 targets. Giannis differs, a
 
 See [SETUP.md](SETUP.md) for the connected projects, Google OAuth and Vercel setup. Supabase has the reviewed bootstrap data; running the app does not create projects or seed a database. Copy `.env.example` to `.env.local` and supply your project settings.
 
-League Lab includes draft-position history, player preferences, the workbook Graph correlation, and awards. Rebuild its public artifact from local source evidence with `pnpm exec tsx scripts/build-analytics.ts`. Reconstructed original pick owners, incomplete keeper flags, and mismatched wins/trade reporting windows remain visible. Luckbox is pending actual playoff history.
+League Lab includes draft-position history, player preferences, historical wins/trades correlation, and awards. The first-pick award and heatmap use the same year filters. Rebuild its public artifact from local source evidence with `pnpm exec tsx scripts/build-analytics.ts`. Reconstructed original pick owners, incomplete keeper flags, and mismatched wins/trade reporting windows remain visible. Spreadsheet cell references are reserved for the keeper audit.
 
-Implemented workflows include roster/cost review, keeper planning, commissioner approval and locking, public reveal, current-season trade entry/review, obligation resolution, pick ownership and historical draft visibility. Google onboarding, trade vetoes and payment reconciliation, stream lottery operations, periodic ESPN synchronization and full historical migration are tracked in [ROADMAP.md](ROADMAP.md).
+The overview includes years active and basketball trophy podiums for championship and win totals. Wins currently use the recorded 2018–2024 category totals; missing championship years prevent an all-time ranking. The verified 2026 playoff bracket is imported. [Automatic ESPN history sync](docs/ESPN_HISTORY_SYNC.md) stores season results in Supabase, backfills 2018 onward and refreshes recent years daily. A commissioner can trigger another batch in the app. The private ESPN session connection must be configured before automatic fetches succeed; no recurring JSON upload is needed. [Manual export](docs/ESPN_PLAYOFF_EXPORT.md) and [import notes](docs/PLAYOFF_HISTORY.md) remain recovery tools. Missing seasons are never counted as zero.
+
+Implemented workflows include team-access requests and commissioner approval, co-manager access and dated revocation, automatic My Team navigation, roster/cost review, keeper planning, commissioner approval and locking, public reveal, current-season trade entry/review, obligation resolution, pick ownership and historical draft visibility. Live account verification, trade vetoes and payment reconciliation, stream lottery operations, periodic ESPN synchronization and full historical migration are tracked in [ROADMAP.md](ROADMAP.md).
+
+The approved Croc Bois mascot is `public/images/croc-bois-mascot.png`. Its generation prompt and reference notes are in `docs/croc-bois-mascot.txt`. Run `node scripts/render-icons.mjs` to regenerate browser and installation icons from that asset.

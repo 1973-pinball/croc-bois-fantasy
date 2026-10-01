@@ -1,6 +1,7 @@
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import Image from 'next/image';
 import { leagueData as previewData } from '@/lib/league-data';
 import { validatePlanner } from '@/lib/planner';
 import type { LeaguePlayer, Team } from '@/lib/types';
@@ -9,17 +10,22 @@ import { KeeperProfileReview } from './keeper-profile-review';
 import { LeagueAnalytics } from './league-analytics';
 import { TradeWorkspace } from './trade-workspace';
 import { DraftPickGrids, TeamPickInventory } from './draft-pick-grids';
+import { TeamAccessPanel, CommissionerTeamAccess } from './team-access';
+import { LeagueHighlights } from './league-highlights';
+import { summarizeLeagueHistory } from '@/lib/league-highlights';
+import { useEspnHistory, EspnHistoryNotice, EspnHistorySyncPanel } from './espn-history';
 
 const LeagueContext = createContext(previewData);
 
-type View = 'overview' | 'teams' | 'keepers' | 'draft' | 'trades' | 'lab' | 'charter' | 'commissioner';
+type View = 'overview' | 'my-team' | 'teams' | 'keepers' | 'draft' | 'trades' | 'lab' | 'charter' | 'commissioner';
 type Assignment = { playerId: number; pickId: string };
 const navigation: { id: View; label: string; icon: string }[] = [
   { id: 'overview', label: 'League overview', icon: 'home' },
+  { id: 'my-team', label: 'My Team', icon: 'teams' },
   { id: 'teams', label: 'Teams & players', icon: 'teams' },
   { id: 'keepers', label: 'Keeper planner', icon: 'keeper' },
   { id: 'draft', label: 'Draft board', icon: 'draft' },
-  { id: 'trades', label: 'Trade ledger', icon: 'trade' },
+  { id: 'trades', label: 'Trade log', icon: 'trade' },
   { id: 'lab', label: 'League Lab', icon: 'chart' },
   { id: 'charter', label: 'League charter', icon: 'book' },
 ];
@@ -46,13 +52,7 @@ function Icon({ name, size = 20 }: { name: string; size?: number }) {
 }
 
 function CrocMark({ large = false }: { large?: boolean }) {
-  return <svg className={large ? 'croc-mark croc-mark-large' : 'croc-mark'} viewBox="0 0 128 128" fill="none" aria-hidden="true">
-    <circle cx="91" cy="82" r="22" fill="var(--orange)"/>
-    <path d="M70 82h42M91 60v44M76 66c20 8 20 24 0 32M106 66c-20 8-20 24 0 32" stroke="var(--green)" strokeWidth="2.5"/>
-    <path d="M18 68 24 49 37 43 39 32 50 39 64 31 69 41 82 40 100 55 100 65 63 68 69 76 48 85 29 78Z" fill="currentColor"/>
-    <path d="m70 58 5 7 5-7 5 7 5-7" stroke="var(--green)" strokeWidth="3"/>
-    <circle cx="57" cy="47" r="4" fill="var(--green)"/><path d="M29 63h23" stroke="var(--green)" strokeWidth="3" strokeLinecap="round"/>
-  </svg>;
+  return <Image className={large ? 'croc-mark croc-mark-large' : 'croc-mark'} src="/images/croc-bois-mascot.png" alt="" width={512} height={512} sizes={large ? '(max-width: 980px) 170px, 220px' : '64px'}/>;
 }
 
 function TeamAvatar({ team, small = false }: { team: Team; small?: boolean }) {
@@ -96,6 +96,10 @@ function PlayerTable({ players, showTeam = false }: { players: LeaguePlayer[]; s
 export function LeaguePortal() {
   const account = useLeagueAccount();
   const leagueData = account.data;
+  const espnHistory = useEspnHistory();
+  const completedThrough = Math.max(leagueData.season, espnHistory.completedThrough, ...espnHistory.history.seasons.filter(season => season.championFranchiseId).map(season => season.espnSeasonId));
+  const completedYears = Array.from({ length: Math.max(0, completedThrough - 2017) }, (_, index) => 2018 + index);
+  const historyHighlights = summarizeLeagueHistory(espnHistory.history.seasons, completedYears, espnHistory.history.statsOnlySeasons);
   const [view, setView] = useState<View>('overview');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeTeam, setActiveTeam] = useState(leagueData.teams[0]?.id ?? 0);
@@ -105,6 +109,10 @@ export function LeaguePortal() {
   const [plannerNotice, setPlannerNotice] = useState('');
   const [draftYear, setDraftYear] = useState('upcoming');
   const [tradeSearch, setTradeSearch] = useState('');
+  const openedAccount = useRef<string | null>(null);
+  const plannerAccount = useRef<string | null>(null);
+  const ownTeamKey = account.ownTeamIds.join(',');
+  const myTeamView = view === 'my-team' && account.ownTeamIds.includes(activeTeam);
   const team = leagueData.teams.find(item => item.id === activeTeam) || leagueData.teams[0];
   const assignments = assignmentsByTeam[activeTeam] || [];
   const teamPlayers = leagueData.players.filter(player => player.teamId === activeTeam);
@@ -112,6 +120,29 @@ export function LeaguePortal() {
   const eligiblePlayers = leagueData.players.filter(player => player.status === 'eligible');
   const plannerErrors = useMemo(() => validatePlanner(activeTeam, assignments, leagueData), [activeTeam, assignments, leagueData]);
   const heading = navigation.find(item => item.id === view)?.label || 'Commissioner review';
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('view') === 'my-team') setView('my-team');
+  }, []);
+
+  useEffect(() => {
+    if (account.sessionLoading || account.connection === 'loading' || !account.session?.user) return;
+    const key = account.session.user.id + ':' + ownTeamKey;
+    if (openedAccount.current === key) return;
+    openedAccount.current = key;
+    const own = ownTeamKey.split(',').filter(Boolean).map(Number);
+    if (own.length) setActiveTeam(own[0]);
+    setAllTeams(false); setView('my-team'); setSearch('');
+  }, [account.sessionLoading, account.session?.user?.id, account.connection, ownTeamKey]);
+
+  useEffect(() => {
+    if (account.sessionLoading) return;
+    const key = JSON.stringify([account.session?.user?.id, account.session?.memberships, account.session?.assignments]);
+    if (plannerAccount.current !== null && plannerAccount.current !== key) {
+      setAssignmentsByTeam({}); setPlannerNotice('Account access changed. Load your current team’s saved keeper draft before continuing.');
+    }
+    plannerAccount.current = key;
+  }, [account.sessionLoading, account.session]);
 
   useEffect(() => {
     if (!account.submissionsLoaded) return;
@@ -127,7 +158,8 @@ export function LeaguePortal() {
     });
   }, [account.submissionsLoaded, account.submissions, account.session, leagueData]);
 
-  function navigate(next: View) { setView(next); setMobileOpen(false); setSearch(''); setPlannerNotice(''); }
+  function navigate(next: View) { if (next === 'my-team' && account.ownTeamIds.length && !account.ownTeamIds.includes(activeTeam)) setActiveTeam(account.ownTeamIds[0]); if (next === 'my-team') setAllTeams(false); setView(next); setMobileOpen(false); setSearch(''); setPlannerNotice(''); }
+  function openMyTeam(id: number) { if (!account.ownTeamIds.includes(id)) return; setActiveTeam(id); setAllTeams(false); setView('my-team'); setMobileOpen(false); setSearch(''); setPlannerNotice(''); }
   function changeTeam(id: number) { setActiveTeam(id); setPlannerNotice(''); }
   function updateAssignments(next: Assignment[]) { setAssignmentsByTeam(previous => ({ ...previous, [activeTeam]: next })); setPlannerNotice(''); }
   function togglePlayer(player: LeaguePlayer) {
@@ -143,26 +175,34 @@ export function LeaguePortal() {
       <button className="brand" onClick={() => navigate('overview')} aria-label="Croc Bois league overview"><span className="brand-mark"><CrocMark/></span><span className="brand-name">CROC BOIS<span>FANTASY BASKETBALL</span></span></button>
       <div className="sidebar-season"><span className="live-dot"/> THE LEAGUE OFFICE <span className="season-year">{leagueData.season}</span></div>
       <nav>{navigation.map(item => <button key={item.id} className={'nav-item' + (view === item.id ? ' active' : '')} onClick={() => navigate(item.id)} aria-current={view === item.id ? 'page' : undefined}><Icon name={item.icon}/><span>{item.label}</span>{view === item.id && <span className="nav-active-dot"/>}</button>)}<a className="nav-item" href="/audit"><Icon name="check"/><span>Keeper cost audit</span></a></nav>
-      <div className="sidebar-bottom"><div className="sidebar-note"><Icon name="ball" size={25}/><p>Built for the league.<br/><strong>Made for the long game.</strong></p></div><button className={'nav-item commissioner-link' + (view === 'commissioner' ? ' active' : '')} onClick={() => navigate('commissioner')} aria-current={view === 'commissioner' ? 'page' : undefined}><Icon name="shield"/><span>Commissioner review</span></button><div className="sidebar-footer">EST. 2017 <span>KEEP IT CROC.</span></div></div>
+      <div className="sidebar-bottom"><div className="sidebar-note"><CrocMark/><p>Built for the league.<br/><strong>Made for the long game.</strong></p></div><button className={'nav-item commissioner-link' + (view === 'commissioner' ? ' active' : '')} onClick={() => navigate('commissioner')} aria-current={view === 'commissioner' ? 'page' : undefined}><Icon name="shield"/><span>Commissioner review</span></button><div className="sidebar-footer">EST. 2017 <span>KEEP IT CROC.</span></div></div>
     </aside>
     {mobileOpen && <button className="nav-backdrop" onClick={() => setMobileOpen(false)} aria-label="Close navigation"/>}
     <div className="main-shell">
       <header className="topbar"><div className="topbar-left"><button className="icon-button mobile-menu" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle navigation" aria-expanded={mobileOpen}><Icon name="menu"/></button><span className="topbar-league">CROC BOIS</span><span className="breadcrumb-separator">/</span><span className="breadcrumb-current">{heading}</span></div><div className="topbar-right"><span className="public-label"><span/> Public league hub</span><AccountButton account={account}/></div></header>
       <main id="main-content" className="main-content"><LeagueConnectionNotice account={account}/>
+        {account.sessionError && <div className="workflow-message workflow-error" role="alert">{account.sessionError} <button className="text-button" onClick={() => void account.reloadSession()}>Refresh account</button></div>}
+        {view === 'my-team' && <>
+          <PageTitle eyebrow="YOUR LEAGUE HOME" title="My Team" description={myTeamView ? 'Your roster, your picks, and your next move.' : 'Connect your account to the franchise you manage.'}/>
+          {!account.session?.user ? <section className="panel"><h2>Sign in to find your team</h2><p>Use your Google account, request your team, and the commissioner will approve your access.</p><AccountButton account={account} className="button button-green" label="Sign in with Google"/></section> : <TeamAccessPanel account={account} onOpenTeam={openMyTeam}/>}
+          {myTeamView && <div className="filter-controls"><button className="button button-green" onClick={() => navigate('keepers')}>My keeper submissions <Icon name="keeper" size={17}/></button><button className="button button-subtle" onClick={() => navigate('trades')}>Trade tools <Icon name="trade" size={17}/></button></div>}
+        </>}
         {view === 'overview' && <>
           <div className="page-heading"><div><p className="eyebrow">THE OFFICIAL LEAGUE HUB</p><h1>Welcome, croc bois</h1><p className="page-intro">The players, the picks, and the deals that make this league ours.</p></div><span className="season-pill"><Icon name="ball" size={16}/> {leagueData.season} SEASON</span></div>
           <section className="hero-card" aria-labelledby="hero-title"><div className="hero-copy"><span className="hero-kicker"><span/> THE NEXT CHAPTER</span><h2 id="hero-title">Dynasties aren’t built<br/>in a single season.</h2><p>Know what you own. Plan who you keep.<br/>Make your next move count.</p><button className="button button-orange" onClick={() => navigate('keepers')}>Open keeper planner <Icon name="arrow" size={18}/></button></div><div className="hero-art" aria-hidden="true"><div className="court-arc arc-one"/><div className="court-arc arc-two"/><div className="court-line"/><div className="hero-emblem"><CrocMark large/><span>CROC BOIS</span><small>FANTASY BASKETBALL CLUB</small></div><span className="hero-art-year">EST. 2017</span></div></section>
-          <section className="stats-grid" aria-label="League at a glance"><Stat label="FRANCHISES" value={leagueData.teams.length} detail="One very competitive league" icon="teams"/><Stat label="ROSTERED PLAYERS" value={leagueData.players.length} detail="From the imported league snapshot" icon="ball"/><Stat label="DRAFT PICKS" value={leagueData.picks.filter(pick => pick.season === leagueData.season).length} detail="13 rounds. Every pick has a story." icon="draft"/><Stat label="TRADES IN THE ARCHIVE" value={leagueData.trades.length} detail="History, including voided records" icon="trade"/></section>
+          <section className="stats-grid league-history-stats" aria-label="League at a glance"><Stat label="FRANCHISES" value={leagueData.teams.length} detail="One very competitive league" icon="teams"/><Stat label="YEARS ACTIVE" value={completedYears.length} detail="Keeping it croc since 2017" icon="clock"/><Stat label="TRADES IN THE ARCHIVE" value={leagueData.trades.length} detail="History, including voided records" icon="trade"/></section>
+          <EspnHistoryNotice history={espnHistory}/>
+          <LeagueHighlights teams={leagueData.teams} championships={historyHighlights.championships} championshipsComplete={historyHighlights.championshipsComplete} championshipCoverage={`${historyHighlights.championshipYears} of ${completedYears.length} seasons verified · 2017–${completedThrough}`} wins={historyHighlights.wins} winsCoverage={historyHighlights.winsComplete ? `2017–${completedThrough} regular-season category wins · all completed seasons` : `2018–2024 recorded category wins · ESPN backfill: ${historyHighlights.winsYears}/${completedYears.length} seasons stored`}/>
           <div className="overview-columns"><section className="panel league-teams"><div className="panel-header"><div><p className="eyebrow">THE FRANCHISES</p><h2>Meet the league</h2></div><button className="text-button" onClick={() => navigate('teams')}>View all <Icon name="arrow" size={16}/></button></div><div className="team-list">{leagueData.teams.map(item => <button key={item.id} className="team-list-row" onClick={() => { changeTeam(item.id); navigate('teams'); }}><TeamAvatar team={item}/><span className="team-row-name"><strong>{item.name}</strong><small>{item.managers.join(' · ') || item.owner}</small></span><span className="team-player-count">{leagueData.players.filter(player => player.teamId === item.id).length}<small>players</small></span><Icon name="arrow" size={17}/></button>)}</div></section>
             <div className="overview-side"><section className="panel next-move"><div className="panel-header"><div><p className="eyebrow">YOUR NEXT MOVE</p><h2>A little offseason homework.</h2></div><span className="small-icon"><Icon name="keeper"/></span></div><p>Explore your roster’s keeper costs and see how your picks fit together.</p><div className="steps"><div><span>01</span><p>Check your eligible players<small>Cost, tenure, and keeper history</small></p></div><div><span>02</span><p>Match players to your picks<small>You decide which pick goes where</small></p></div><div><span>03</span><p>Review before the deadline<small>Official submission opens after setup</small></p></div></div><button className="button button-green full-width" onClick={() => navigate('keepers')}>Plan my keepers <Icon name="arrow" size={17}/></button></section><section className="snapshot-note"><span className="note-icon"><Icon name="clock"/></span><div><strong>A new home for the league’s history.</strong><p>Imported records are available to explore. Items needing a commissioner’s ruling stay clearly marked.</p><button className="text-button" onClick={() => navigate('commissioner')}>{leagueData.reviewItems.length} items to reconcile <Icon name="arrow" size={15}/></button></div></section></div></div>
-          <section className="panel"><div className="panel-header"><div><p className="eyebrow">FROM THE LEDGER</p><h2>The deals live on.</h2></div><button className="text-button" onClick={() => navigate('trades')}>Open trade archive <Icon name="arrow" size={16}/></button></div><div className="recent-trades">{leagueData.trades.slice(-3).reverse().map(trade => <div className="recent-trade" key={trade.id}><span className="trade-number">#{trade.id}</span><div><strong>{trade.parties.join(' ↔ ') || 'Historical trade'}</strong><p>{trade.summary}</p></div><Status status={trade.status}/></div>)}</div></section>
+          <section className="panel"><div className="panel-header"><div><p className="eyebrow">FROM THE TRADE LOG</p><h2>The deals live on.</h2></div><button className="text-button" onClick={() => navigate('trades')}>Open trade log <Icon name="arrow" size={16}/></button></div><div className="recent-trades">{leagueData.trades.slice(-3).reverse().map(trade => <div className="recent-trade" key={trade.id}><span className="trade-number">#{trade.id}</span><div><strong>{trade.parties.join(' ↔ ') || 'Historical trade'}</strong><p>{trade.summary}</p></div><Status status={trade.status}/></div>)}</div></section>
         </>}
 
-        {view === 'teams' && <>
-          <PageTitle eyebrow="THE FRANCHISES" title="Teams & players" description="A place for every roster, every keeper cost, and every future pick."/>
-          <div className="team-tabs" aria-label="Select a team">{leagueData.teams.map(item => <button key={item.id} className={'team-tab' + (item.id === activeTeam && !allTeams ? ' selected' : '')} onClick={() => { changeTeam(item.id); setAllTeams(false); }}><TeamAvatar team={item} small/><span>{item.shortName}</span></button>)}</div>
+        {(view === 'teams' || myTeamView) && <>
+          {view === 'teams' && <PageTitle eyebrow="THE FRANCHISES" title="Teams & players" description="A place for every roster, every keeper cost, and every future pick."/>}
+          <div className="team-tabs" aria-label="Select a team">{leagueData.teams.filter(item => view === 'teams' || account.ownTeamIds.includes(item.id)).map(item => <button key={item.id} className={'team-tab' + (item.id === activeTeam && !allTeams ? ' selected' : '')} onClick={() => { changeTeam(item.id); setAllTeams(false); }}><TeamAvatar team={item} small/><span>{item.shortName}</span></button>)}</div>
           {team && !allTeams && <section className="team-feature"><TeamAvatar team={team}/><div><p className="eyebrow">FRANCHISE PROFILE</p><h2>{team.name}</h2><p>{team.managers.join(' · ') || team.owner}</p></div><div className="team-feature-stat"><strong>{teamPlayers.length}</strong><span>roster players</span></div><div className="team-feature-stat"><strong>{ownedPicks.length}</strong><span>{leagueData.season} picks</span></div><button className="button button-green" onClick={() => navigate('keepers')}>Plan keepers <Icon name="arrow" size={17}/></button></section>}
-          <section className="panel"><div className="panel-header flexible-header"><div><p className="eyebrow">ROSTER SNAPSHOT</p><h2>{allTeams ? 'The entire player pool' : 'The roster'}</h2></div><div className="filter-controls"><label className="check-label"><input type="checkbox" checked={allTeams} onChange={event => setAllTeams(event.target.checked)}/> All teams</label><SearchInput value={search} onChange={setSearch} placeholder="Find a player…" label="Search roster players"/></div></div><PlayerTable players={leagueData.players.filter(player => (allTeams || player.teamId === activeTeam) && player.name.toLowerCase().includes(search.toLowerCase()))} showTeam={allTeams}/></section>
+          <section className="panel"><div className="panel-header flexible-header"><div><p className="eyebrow">ROSTER SNAPSHOT</p><h2>{allTeams ? 'The entire player pool' : 'The roster'}</h2></div><div className="filter-controls">{view === 'teams' && <label className="check-label"><input type="checkbox" checked={allTeams} onChange={event => setAllTeams(event.target.checked)}/> All teams</label>}<SearchInput value={search} onChange={setSearch} placeholder="Find a player…" label="Search roster players"/></div></div><PlayerTable players={leagueData.players.filter(player => (allTeams || player.teamId === activeTeam) && player.name.toLowerCase().includes(search.toLowerCase()))} showTeam={allTeams}/></section>
           {!allTeams && <TeamPickInventory account={account} teamId={activeTeam}/>}
         </>}
 
@@ -186,13 +226,13 @@ export function LeaguePortal() {
 
         {view === 'trades' && <>
           <PageTitle eyebrow="THE RECEIPTS" title="Every deal has a story." description="Players, picks, the occasional mule rights, and the coveted 3-team-trade."/>
-          <TradeWorkspace account={account}/>
-          <div className="ledger-topline"><div className="ledger-stat"><strong>{leagueData.trades.length}</strong><span>historical trade records</span></div><SearchInput value={tradeSearch} onChange={setTradeSearch} placeholder="Search teams, players, or trade #…" label="Search trade ledger"/></div>
-          <div className="info-banner"><Icon name="book"/><p><strong>The league’s original ledger, preserved.</strong> Written terms remain attached to every record. Complex obligations and ownership changes require reconciliation before they can drive live transactions.</p></div>
+          <TradeWorkspace key={`${account.session?.user?.id || 'guest'}:${account.commissioner}:${ownTeamKey}`} account={account}/>
+          <div className="ledger-topline"><div className="ledger-stat"><strong>{leagueData.trades.length}</strong><span>historical trade records</span></div><SearchInput value={tradeSearch} onChange={setTradeSearch} placeholder="Search teams, players, or trade #…" label="Search trade log"/></div>
+          <div className="info-banner"><Icon name="book"/><p><strong>The league’s original trade log, preserved.</strong> Written terms remain attached to every record. Complex obligations and ownership changes require reconciliation before they can drive live transactions.</p></div>
           <section className="trade-ledger">{[...leagueData.trades].reverse().filter(trade => (trade.id + ' ' + trade.parties.join(' ') + ' ' + trade.summary + ' ' + trade.notes).toLowerCase().includes(tradeSearch.toLowerCase())).map(trade => <details className={'trade-card' + (trade.status === 'voided' ? ' trade-voided' : '')} key={trade.id}><summary><span className="trade-number">#{trade.id}</span><span className="trade-card-body"><strong>{trade.parties.join(' ↔ ') || 'Historical trade'}</strong><span>{trade.summary || 'View original trade terms'}</span></span><Status status={trade.status}/><span className="details-plus" aria-hidden="true">+</span></summary><div className="trade-details"><p className="eyebrow">ORIGINAL TERMS & CONTEXT</p><p>{trade.notes || trade.summary}</p>{trade.status === 'voided' && <div className="void-note">This trade is marked voided in the source record. It is retained for historical visibility.</div>}</div></details>)}{!leagueData.trades.some(trade => (trade.id + ' ' + trade.parties.join(' ') + ' ' + trade.summary + ' ' + trade.notes).toLowerCase().includes(tradeSearch.toLowerCase())) && <div className="panel empty-state">No trades match this search.</div>}</section>
         </>}
 
-        {view === 'lab' && <LeagueAnalytics league={leagueData}/>}
+        {view === 'lab' && <><EspnHistoryNotice history={espnHistory}/><LeagueAnalytics league={leagueData} playoffHistory={espnHistory.history}/></>}
 
         {view === 'charter' && <>
           <PageTitle eyebrow="THE WAY WE PLAY" title="The league charter." description="The rules behind the rivalries. Preserved for everyone in the league."/>
@@ -200,7 +240,7 @@ export function LeaguePortal() {
         </>}
 
         {view === 'commissioner' && <>
-          <PageTitle eyebrow="THE COMMISSIONER’S DESK" title="Get the details right." description="A transparent review queue for the records that need a closer look."/><OfficialReviewPanel account={account}/><KeeperProfileReview account={account}/>
+          <PageTitle eyebrow="THE COMMISSIONER’S DESK" title="Get the details right." description="A transparent review queue for the records that need a closer look."/><CommissionerTeamAccess account={account}/><EspnHistorySyncPanel account={account} history={espnHistory}/><OfficialReviewPanel account={account}/><KeeperProfileReview account={account}/>
           <div className="info-banner"><Icon name="shield"/><p><strong>Read-only migration review.</strong> These are imported data questions, not private keeper submissions. Sign in and commissioner access are required before any official approval or correction can be recorded.</p></div>
           <div className="review-stats"><div><strong>{leagueData.reviewItems.length}</strong><span>items to reconcile</span></div><div><strong>{eligiblePlayers.length}</strong><span>players marked eligible</span></div><div><strong>{leagueData.players.filter(player => player.status === 'review').length}</strong><span>player records need review</span></div></div>
           <section className="panel review-list"><div className="panel-header"><div><p className="eyebrow">BEFORE THE OPENING TIP</p><h2>Reconciliation queue</h2></div><span className="muted small">Original records remain intact</span></div>{leagueData.reviewItems.map(item => <article className="review-item" key={item.id}><span className="review-item-icon"><Icon name="book"/></span><div><h3>{item.player}</h3><p>{item.detail}</p></div><Status status={item.status}/></article>)}{leagueData.reviewItems.length === 0 && <div className="empty-state">No reconciliation items in this snapshot.</div>}</section>

@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "leagueId": 139935,
+  "seasons": [
+    {
+      "draftYear": 2026,
+      "espnSeasonId": 2026,
+      "priorSeasonStartYear": 2025,
+      "playoffTeamCount": 4,
+      "firstChampionshipMatchupPeriod": 19,
+      "participants": [
+        {
+          "espnTeamId": 1,
+          "franchiseId": "1",
+          "qualified": true,
+          "regularSeasonWins": 82
+        },
+        {
+          "espnTeamId": 2,
+          "franchiseId": "2",
+          "qualified": true,
+          "regularSeasonWins": 89
+        },
+        {
+          "espnTeamId": 3,
+          "franchiseId": "3",
+          "qualified": false,
+          "regularSeasonWins": 62
+        },
+        {
+          "espnTeamId": 4,
+          "franchiseId": "4",
+          "qualified": false,
+          "regularSeasonWins": 64
+        },
+        {
+          "espnTeamId": 5,
+          "franchiseId": "5",
+          "qualified": false,
+          "regularSeasonWins": 70
+        },
+        {
+          "espnTeamId": 6,
+          "franchiseId": "6",
+          "qualified": true,
+          "regularSeasonWins": 99
+        },
+        {
+          "espnTeamId": 7,
+          "franchiseId": "7",
+          "qualified": true,
+          "regularSeasonWins": 102
+        },
+        {
+          "espnTeamId": 8,
+          "franchiseId": "8",
+          "qualified": false,
+          "regularSeasonWins": 70
+        }
+      ],
+      "qualifiedFranchiseIds": [
+        "1",
+        "2",
+        "6",
+        "7"
+      ],
+      "source": {
+        "kind": "espn-local-json",
+        "leagueId": 139935,
+        "sha256": "562eed5947f1c8482c22ca8b3df8c0b546a4cbaee3af1cbd0e1626b4cf43359d",
+        "method": "first-complete-winners-bracket",
+        "paths": [
+          "id",
+          "seasonId",
+          "settings.scheduleSettings.playoffTeamCount",
+          "teams[].id",
+          "teams[0].record.overall.wins",
+          "teams[1].record.overall.wins",
+          "teams[2].record.overall.wins",
+          "teams[3].record.overall.wins",
+          "teams[4].record.overall.wins",
+          "teams[5].record.overall.wins",
+          "teams[6].record.overall.wins",
+          "teams[7].record.overall.wins",
+          "schedule[72].{id,matchupPeriodId,playoffTierType,home.teamId,away.teamId,winner}",
+          "schedule[73].{id,matchupPeriodId,playoffTierType,home.teamId,away.teamId,winner}",
+          "schedule[76].{id,matchupPeriodId,playoffTierType,home.teamId,away.teamId,winner}"
+        ],
+        "matchups": [
+          {
+            "id": 73,
+            "homeEspnTeamId": 7,
+            "awayEspnTeamId": 1,
+            "winnerEspnTeamId": 7
+          },
+          {
+            "id": 74,
+            "homeEspnTeamId": 6,
+            "awayEspnTeamId": 2,
+            "winnerEspnTeamId": 2
+          }
+        ],
+        "championship": {
+          "id": 77,
+          "matchupPeriod": 20,
+          "homeEspnTeamId": 7,
+          "awayEspnTeamId": 2,
+          "winnerEspnTeamId": 2
+        }
+      },
+      "championFranchiseId": "2"
+    }
+  ]
+}

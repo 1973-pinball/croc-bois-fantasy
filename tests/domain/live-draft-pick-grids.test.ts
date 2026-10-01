@@ -73,5 +73,5 @@ test('pagination reads beyond 1000 rows and handles a smaller server cap without
   assert.deepEqual(ranges, [[0, 999], [600, 1599], [1200, 2199]]);
   let page = 0;
   await assert.rejects(() => readAllInventoryPages(async () => ({ data: page++ === 0 ? source.slice(0, 1000) : [], count: 1400, error: null })), /before the expected count/);
-  await assert.rejects(() => readAllInventoryPages(async () => ({ data: null, count: null, error: { message: 'database unavailable' } })), /query failed/);
+  await assert.rejects(() => readAllInventoryPages(async () => ({ data: null, count: null, error: { message: 'database unavailable' } })), /query failed/i);
 });
