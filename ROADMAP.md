@@ -6,20 +6,23 @@ The first release should let every manager sign in, review keeper eligibility, s
 
 ## Release status
 
-Repository publication, Supabase provisioning, Google OAuth configuration, and Vercel deployment are pending production verification. The completed items below describe application code and local verification; cloud connection and live account access are a separate release milestone.
+The [public repository](https://github.com/1973-pinball/croc-bois-fantasy) is published. Supabase is provisioned with all four migrations, eight franchises, 111 frozen roster entries/profiles, and 104 picks. The connected public API has been verified. Vercel production verification is in progress.
+
+Google setup is deferred at the commissioner's request. `GOOGLE_OAUTH_ENABLED=false` keeps sign-in unavailable while public browsing works. No account has been granted league access yet, and the season remains in `setup`. Onboarding and real authenticated end-to-end verification remain release requirements for official keeper submissions.
 
 ## Implemented
 
 | Area | What exists now | Current boundary |
 | --- | --- | --- |
 | Public league portal | Responsive dashboard, teams, searchable player costs, pick inventory, historical draft boards, trade archive, charter summary, and keeper-cost audit. | New trade records are not yet connected to the public ledger. |
+| League Lab | Interactive original-pick heatmap, workbook wins/trades scatterplot, player/franchise preference explorer, and evidence-backed awards across 832 draft selections. | Luckbox requires actual prior-season playoff qualification. The Graph sheet mixes reporting windows and contains historical formula adjustments, which are disclosed in the chart. |
 | Keeper planning | Owner-selected player-to-pick assignments, eligibility explanations, duplicate-pick protection, and payment validation. | Signed-out visitors can experiment locally. Official writes require a connected league and an authorized account. |
 | Private keeper workflow | Save/reload drafts; submit; commissioner approve or return with a note; lock; reveal all teams together. Status, revisions, and stale-write protection are connected to the API. | Account assignments, live services, and final data review must be completed before league use. |
 | Commissioner season opening | Review note and authenticated control to open keeper selection. | Deadline administration and a complete team-by-team readiness overview still need work. |
 | Draft display | Upcoming pick ownership, published snake order, revealed keeper assignments, and 2018–2025 draft archives. | No interface yet to conduct the lottery, choose positions, or record ordinary draft selections. Other viewers do not yet receive automatic updates. |
 | Authentication and permissions | Google OAuth routes, session handling, sign-out, current manager assignments, commissioner permissions, and database access policies. | Live Google sign-in and onboarding require configuration and verification. No manager-assignment administration screen yet. |
-| Keeper data review | Authenticated API to correct a keeper profile and record an explanation. | The commissioner queue displays issues but has no correction form yet. |
-| Trade backend | APIs to create multi-team player/pick trades, finalize transfers together, and resolve obligations. Ownership checks and the 24-hour review period are enforced. | No composer, review controls, veto workflow, or obligation-resolution interface. Post-lock keeper payment changes are not implemented. |
+| Keeper data review | Commissioner correction form for cost, tenure, and verification, with before/after values, required explanation, and refreshed approval guards. | Provisional and inferred history still needs commissioner review. Live account testing awaits Google setup. |
+| Trade workspace | Authenticated multi-team player/pick/obligation composer, review queue, commissioner finalization, and obligation-resolution controls. Ownership checks and the 24-hour review period are enforced by the server. | Current-season inventory only. Vetoes, future-pick creation, public live ledger, and post-lock keeper payment changes remain pending. Google/account setup is required before official use. |
 | Rule calculations | Keeper lifecycle, nominal cost independent of payment, pick allocation, snake ordering, and an eight-team lottery calculation preserving the supplied probability table. | Lottery execution is a calculation library, not a saved league operation or stream-ready screen. Expansion needs an approved configuration. |
 | Migration and audit | Eight franchises, 111 roster players, 104 upcoming picks, eight historical draft boards, and 93 historical trade records, including voided records. Cost comparisons retain source evidence and discrepancies. | Displaying history does not certify a complete replay of every past transfer, loan, or keeper rule. |
 | Mobile/PWA foundation | Responsive navigation, web app manifest, app icons, and installation metadata. | Offline mode and push notifications are outside the initial requirement. |
@@ -31,13 +34,12 @@ Local checks cover domain calculations, database workflows, build/type checks, a
 ### Frontend and visual workflows
 
 - Add manager onboarding and commissioner team-assignment controls, including co-managers. Managers should immediately see which franchise they can manage.
-- Add a commissioner form for keeper-cost, tenure, and eligibility corrections using the existing keeper-profile API. Show the original value, proposed change, and required explanation.
 - Add a season overview listing every participating franchise, including teams that have not saved or submitted anything. Show the deadline, submission state, review state, and lock state without revealing private selections to other owners.
 - Finish the connected-account experience: clear loading/errors, accurate season-phase copy, and a practical mobile walkthrough from Google sign-in to submitted keepers.
 
 ### Backend, data, and release work
 
-- Publish the public repository and deploy the application. Provision Supabase, apply migrations and reviewed bootstrap data, configure Google OAuth and production redirects, and connect the Vercel environment.
+- Finish production verification, then configure Google OAuth when the commissioner is ready. Repository publication, Supabase migrations/bootstrap data, and Vercel environment setup are complete.
 - Add authorized operations behind onboarding and team assignment. The underlying membership and dated manager-assignment records already exist.
 - Reconcile current roster ownership, pick ownership, inferred tenure, and remaining provisional keeper profiles. Preserve the frozen end-of-season roster as the eligibility baseline.
 - Store and display the keeper deadline and draft date/time. Keep commissioner locking explicit; the agreed workflow allows edits until the commissioner locks a submission.
@@ -49,9 +51,8 @@ Local checks cover domain calculations, database workflows, build/type checks, a
 
 ### Frontend and visual workflows
 
-- Build the trade composer with multiple participants, available players, specific current/future picks, and written conditions. Show exactly which assets move to each franchise before logging a trade.
-- Connect a live trade ledger and review queue. Add the 24-hour review state, commissioner finalization, agreed veto controls, and visible outstanding obligations. Keep historical and live records distinguishable.
-- Add commissioner resolution controls for loans, options, and other conditions using the existing obligation-resolution API.
+- Extend the connected trade composer to future seasons once their pick inventories exist.
+- Connect finalized live trades to public history and add the agreed veto controls. The authenticated review queue, 24-hour state, commissioner finalization, and obligation-resolution controls are implemented.
 - Build the manually triggered lottery presentation for streaming. Show the configured categories and probabilities, result, and saved run record.
 - Add the separate draft-position selection step: lottery priority determines who chooses next; it does not directly assign draft slots.
 - Add draft-day controls to record selections, show who drafts on behalf of whom in ESPN, track outstanding player transfers, and correct mistakes with a visible history.
@@ -75,6 +76,7 @@ Local checks cover domain calculations, database workflows, build/type checks, a
 ### Frontend and visual workflows
 
 - Add player and franchise history pages linking draft origins, keeper cycles, trades, loans, and pick ownership changes.
+- Supply franchise/season playoff results for Luckbox, and comparable season-level wins/trade totals for a cleaner correlation view. The current League Lab preserves the workbook's historical aggregate rather than inventing missing data.
 - Complete the searchable historical archive, including the full charter and historical rule versions alongside the current rules summary.
 - Add an ESPN import review screen with last-sync status, proposed changes, conflicts, and commissioner resolution.
 - Add season rollover and expansion administration, including manager changes, participating teams, and future pick inventories.

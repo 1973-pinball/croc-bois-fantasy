@@ -5,10 +5,13 @@ import { leagueData as previewData } from '@/lib/league-data';
 import { validatePlanner } from '@/lib/planner';
 import type { LeaguePlayer, Team } from '@/lib/types';
 import { AccountButton, LeagueConnectionNotice, OfficialKeeperControls, OfficialReviewPanel, useLeagueAccount, type LeagueAccount } from './league-account';
+import { KeeperProfileReview } from './keeper-profile-review';
+import { LeagueAnalytics } from './league-analytics';
+import { TradeWorkspace } from './trade-workspace';
 
 const LeagueContext = createContext(previewData);
 
-type View = 'overview' | 'teams' | 'keepers' | 'draft' | 'trades' | 'charter' | 'commissioner';
+type View = 'overview' | 'teams' | 'keepers' | 'draft' | 'trades' | 'lab' | 'charter' | 'commissioner';
 type Assignment = { playerId: number; pickId: string };
 const navigation: { id: View; label: string; icon: string }[] = [
   { id: 'overview', label: 'League overview', icon: 'home' },
@@ -16,6 +19,7 @@ const navigation: { id: View; label: string; icon: string }[] = [
   { id: 'keepers', label: 'Keeper planner', icon: 'keeper' },
   { id: 'draft', label: 'Draft board', icon: 'draft' },
   { id: 'trades', label: 'Trade ledger', icon: 'trade' },
+  { id: 'lab', label: 'League Lab', icon: 'chart' },
   { id: 'charter', label: 'League charter', icon: 'book' },
 ];
 
@@ -26,6 +30,7 @@ function Icon({ name, size = 20 }: { name: string; size?: number }) {
     keeper: <><path d="M6 3h12v18l-6-4-6 4Z"/><path d="m9 10 2 2 4-4"/></>,
     draft: <><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16M15 4v16"/></>,
     trade: <><path d="M4 7h15l-4-4M20 17H5l4 4M19 7l-4 4M5 17l4-4"/></>,
+    chart: <><path d="M3 3v18h18M7 17v-5M12 17V7M17 17V3"/><circle cx="20" cy="7" r="1"/></>,
     book: <><path d="M12 5v15M12 5C8 2 5 3 2 4v15c4-2 7-1 10 1 3-2 6-3 10-1V4c-3-1-6-2-10 1Z"/></>,
     arrow: <><path d="M5 12h14m-5-5 5 5-5 5"/></>,
     search: <><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/></>,
@@ -50,7 +55,7 @@ function CrocMark({ large = false }: { large?: boolean }) {
 }
 
 function TeamAvatar({ team, small = false }: { team: Team; small?: boolean }) {
-  return <span className={'team-avatar' + (small ? ' small' : '')} style={{ '--team-color': team.color } as CSSProperties}>{team.shortName.slice(0, 3)}</span>;
+  return <span className={'team-avatar' + (small ? ' small' : '')} style={{ '--team-color': team.color } as CSSProperties}>{team.shortName}</span>;
 }
 
 function Status({ status }: { status: string }) {
@@ -156,10 +161,13 @@ export function LeaguePortal() {
 
         {view === 'trades' && <>
           <PageTitle eyebrow="THE RECEIPTS" title="Every deal has a story." description="Players, picks, promises, and the occasional very complicated arrangement."/>
+          <TradeWorkspace account={account}/>
           <div className="ledger-topline"><div className="ledger-stat"><strong>{leagueData.trades.length}</strong><span>historical trade records</span></div><SearchInput value={tradeSearch} onChange={setTradeSearch} placeholder="Search teams, players, or trade #…" label="Search trade ledger"/></div>
           <div className="info-banner"><Icon name="book"/><p><strong>The league’s original ledger, preserved.</strong> Written terms remain attached to every record. Complex obligations and ownership changes require reconciliation before they can drive live transactions.</p></div>
           <section className="trade-ledger">{[...leagueData.trades].reverse().filter(trade => (trade.id + ' ' + trade.parties.join(' ') + ' ' + trade.summary + ' ' + trade.notes).toLowerCase().includes(tradeSearch.toLowerCase())).map(trade => <details className={'trade-card' + (trade.status === 'voided' ? ' trade-voided' : '')} key={trade.id}><summary><span className="trade-number">#{trade.id}</span><span className="trade-card-body"><strong>{trade.parties.join(' ↔ ') || 'Historical trade'}</strong><span>{trade.summary || 'View original trade terms'}</span></span><Status status={trade.status}/><span className="details-plus" aria-hidden="true">+</span></summary><div className="trade-details"><p className="eyebrow">ORIGINAL TERMS & CONTEXT</p><p>{trade.notes || trade.summary}</p>{trade.status === 'voided' && <div className="void-note">This trade is marked voided in the source record. It is retained for historical visibility.</div>}</div></details>)}{!leagueData.trades.some(trade => (trade.id + ' ' + trade.parties.join(' ') + ' ' + trade.summary + ' ' + trade.notes).toLowerCase().includes(tradeSearch.toLowerCase())) && <div className="panel empty-state">No trades match this search.</div>}</section>
         </>}
+
+        {view === 'lab' && <LeagueAnalytics league={leagueData}/>}
 
         {view === 'charter' && <>
           <PageTitle eyebrow="THE WAY WE PLAY" title="The league charter." description="The rules behind the rivalries. Preserved for everyone in the league."/>
@@ -167,7 +175,7 @@ export function LeaguePortal() {
         </>}
 
         {view === 'commissioner' && <>
-          <PageTitle eyebrow="THE COMMISSIONER’S DESK" title="Get the details right." description="A transparent review queue for the records that need a closer look."/><OfficialReviewPanel account={account}/>
+          <PageTitle eyebrow="THE COMMISSIONER’S DESK" title="Get the details right." description="A transparent review queue for the records that need a closer look."/><OfficialReviewPanel account={account}/><KeeperProfileReview account={account}/>
           <div className="info-banner"><Icon name="shield"/><p><strong>Read-only migration review.</strong> These are imported data questions, not private keeper submissions. Sign in and commissioner access are required before any official approval or correction can be recorded.</p></div>
           <div className="review-stats"><div><strong>{leagueData.reviewItems.length}</strong><span>items to reconcile</span></div><div><strong>{eligiblePlayers.length}</strong><span>players marked eligible</span></div><div><strong>{leagueData.players.filter(player => player.status === 'review').length}</strong><span>player records need review</span></div></div>
           <section className="panel review-list"><div className="panel-header"><div><p className="eyebrow">BEFORE THE OPENING TIP</p><h2>Reconciliation queue</h2></div><span className="muted small">Original records remain intact</span></div>{leagueData.reviewItems.map(item => <article className="review-item" key={item.id}><span className="review-item-icon"><Icon name="book"/></span><div><h3>{item.player}</h3><p>{item.detail}</p></div><Status status={item.status}/></article>)}{leagueData.reviewItems.length === 0 && <div className="empty-state">No reconciliation items in this snapshot.</div>}</section>

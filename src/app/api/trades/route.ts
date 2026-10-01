@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   if ('response' in auth) return auth.response;
   const seasonId = new URL(request.url).searchParams.get('seasonId');
   if (!z.string().uuid().safeParse(seasonId).success) return json({ error: 'INVALID_SEASON' }, 400);
-  const { data, error } = await auth.client.from('trades').select('id,category,status,terms,effective_at,created_at,review_deadline,application_mode,trade_participants(franchise_id),trade_player_transfers(player_id,from_franchise_id,to_franchise_id,espn_status),trade_pick_transfers(pick_id,from_franchise_id,to_franchise_id),trade_obligations(id,kind,terms,due_at,status,resolution_note)').eq('season_id',seasonId).order('created_at',{ascending:false});
+  const { data, error } = await auth.client.from('trades').select('id,category,status,terms,effective_at,created_at,review_deadline,application_mode,trade_participants(franchise_id),trade_player_transfers(player_id,from_franchise_id,to_franchise_id,espn_status),trade_pick_transfers(pick_id,from_franchise_id,to_franchise_id),trade_obligations(id,kind,terms,from_franchise_id,to_franchise_id,due_at,status,resolution_note)').eq('season_id',seasonId).order('created_at',{ascending:false});
   return error ? rpcError(error) : json({ trades:data });
 }
 

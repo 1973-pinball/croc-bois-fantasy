@@ -9,6 +9,7 @@ const identities = identityData as { leagueId: string; seasonId: string; franchi
 type PlannerAssignment = { playerId: number; pickId: string };
 type Session = {
   configured: boolean;
+  googleSignInEnabled?: boolean;
   user: { id: string; email?: string } | null;
   memberships: { league_id: string; role: string }[];
   assignments: { franchise_id: string; league_id: string; role: string; effective_from: string; effective_to: string | null }[];
@@ -175,7 +176,7 @@ export function AccountButton({ account, className = 'sign-in-button', label = '
     catch { setSignoutError('Sign-out could not be completed. Please try again.'); setSigningOut(false); }
   }
   function open(event: MouseEvent<HTMLAnchorElement>) {
-    if (!account.sessionLoading && account.session?.configured && !account.session.user) return;
+    if (!account.sessionLoading && account.session?.configured && account.session.googleSignInEnabled === true && !account.session.user) return;
     event.preventDefault(); dialog.current?.showModal();
   }
   return <><a className={className} href="/auth/login" onClick={open}>{account.session?.user ? 'My account' : label}<span aria-hidden="true">→</span></a><dialog className="account-dialog" ref={dialog} aria-labelledby={titleId}><button className="dialog-close" onClick={() => dialog.current?.close()} aria-label="Close account details">×</button><p className="eyebrow">YOUR LEAGUE ACCOUNT</p><h2 id={titleId}>{account.session?.user ? 'You’re signed in.' : account.sessionLoading ? 'Connecting to the league…' : 'Google sign-in is coming online.'}</h2>{account.session?.user ? <><p>{account.session.user.email || 'Your Google account is connected.'}</p><p>{account.commissioner ? 'You have commissioner access for this league.' : 'Official keeper controls appear when you select a team you currently manage.'}</p></> : <p>{account.sessionLoading ? 'Account access is being checked. Close this window and try again in a moment.' : 'League account setup is still being completed. You can explore the public archive and plan keepers locally in the meantime.'}</p>}<div className="account-dialog-actions"><button className="button button-green" onClick={() => dialog.current?.close()}>Back to the league</button>{account.session?.user && <button className="button button-subtle" onClick={() => void signOut()} disabled={signingOut}>{signingOut ? 'Signing out…' : 'Sign out'}</button>}</div>{signoutError && <p role="alert">{signoutError}</p>}</dialog></>;

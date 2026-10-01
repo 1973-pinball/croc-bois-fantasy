@@ -1,6 +1,6 @@
 # Croc Bois Fantasy Basketball
 
-A public league portal and private keeper workflow for Croc Bois. Next.js, TypeScript, Supabase Postgres and Google sign-in. Vercel is the deployment target.
+A public league portal and private keeper workflow for Croc Bois. Next.js, TypeScript, Supabase Postgres and Vercel. Google sign-in is implemented but deliberately disabled until provider setup and manager onboarding are complete.
 
 ## Local development
 
@@ -49,6 +49,8 @@ The current replay matches 137 of 139 canonical 2025 targets. Giannis differs, a
 
 ## Cloud setup
 
-See [SETUP.md](SETUP.md) for Supabase, Google OAuth and Vercel setup. These services are not provisioned by running the app. Copy `.env.example` to `.env.local` and supply your project settings.
+See [SETUP.md](SETUP.md) for the connected projects, Google OAuth and Vercel setup. Supabase has the reviewed bootstrap data; running the app does not create projects or seed a database. Copy `.env.example` to `.env.local` and supply your project settings.
 
-Initial release: roster/cost review, keeper planning, commissioner approval and locking, public reveal, pick ownership and historical draft visibility. Live trade entry/reconciliation, stream lottery operations, periodic ESPN synchronization and full historical migration are tracked in [ROADMAP.md](ROADMAP.md).
+League Lab includes draft-position history, player preferences, the workbook Graph correlation, and awards. Rebuild its public artifact from local source evidence with `pnpm exec tsx scripts/build-analytics.ts`. Reconstructed original pick owners, incomplete keeper flags, and mismatched wins/trade reporting windows remain visible. Luckbox is pending actual playoff history.
+
+Implemented workflows include roster/cost review, keeper planning, commissioner approval and locking, public reveal, current-season trade entry/review, obligation resolution, pick ownership and historical draft visibility. Google onboarding, trade vetoes and payment reconciliation, stream lottery operations, periodic ESPN synchronization and full historical migration are tracked in [ROADMAP.md](ROADMAP.md).

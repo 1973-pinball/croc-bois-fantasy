@@ -11,6 +11,11 @@ export function getSupabaseConfig() {
   return { url, key };
 }
 
+/** Server-side release gate: connecting the database does not enable a Google provider. */
+export function isGoogleSignInEnabled(): boolean {
+  return process.env.GOOGLE_OAUTH_ENABLED === 'true';
+}
+
 export const SETUP_MESSAGE =
   'Connect a Supabase project and configure Google sign-in to enable league accounts and saved changes.';
 
