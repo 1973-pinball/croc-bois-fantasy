@@ -8,6 +8,7 @@ import { AccountButton, LeagueConnectionNotice, OfficialKeeperControls, Official
 import { KeeperProfileReview } from './keeper-profile-review';
 import { LeagueAnalytics } from './league-analytics';
 import { TradeWorkspace } from './trade-workspace';
+import { DraftPickGrids, TeamPickInventory } from './draft-pick-grids';
 
 const LeagueContext = createContext(previewData);
 
@@ -141,7 +142,7 @@ export function LeaguePortal() {
           <div className="team-tabs" aria-label="Select a team">{leagueData.teams.map(item => <button key={item.id} className={'team-tab' + (item.id === activeTeam && !allTeams ? ' selected' : '')} onClick={() => { changeTeam(item.id); setAllTeams(false); }}><TeamAvatar team={item} small/><span>{item.shortName}</span></button>)}</div>
           {team && !allTeams && <section className="team-feature"><TeamAvatar team={team}/><div><p className="eyebrow">FRANCHISE PROFILE</p><h2>{team.name}</h2><p>{team.managers.join(' · ') || team.owner}</p></div><div className="team-feature-stat"><strong>{teamPlayers.length}</strong><span>roster players</span></div><div className="team-feature-stat"><strong>{ownedPicks.length}</strong><span>{leagueData.season} picks</span></div><button className="button button-green" onClick={() => navigate('keepers')}>Plan keepers <Icon name="arrow" size={17}/></button></section>}
           <section className="panel"><div className="panel-header flexible-header"><div><p className="eyebrow">ROSTER SNAPSHOT</p><h2>{allTeams ? 'The entire player pool' : 'The roster'}</h2></div><div className="filter-controls"><label className="check-label"><input type="checkbox" checked={allTeams} onChange={event => setAllTeams(event.target.checked)}/> All teams</label><SearchInput value={search} onChange={setSearch} placeholder="Find a player…" label="Search roster players"/></div></div><PlayerTable players={leagueData.players.filter(player => (allTeams || player.teamId === activeTeam) && player.name.toLowerCase().includes(search.toLowerCase()))} showTeam={allTeams}/></section>
-          {!allTeams && <section className="panel"><div className="panel-header"><div><p className="eyebrow">PICK INVENTORY</p><h2>{leagueData.season} draft capital</h2></div><span className="muted small">Original franchise stays with each pick</span></div><div className="pick-inventory">{ownedPicks.map(pick => <div className="inventory-pick" key={pick.id}><span>ROUND</span><strong>{String(pick.round).padStart(2, '0')}</strong><small>via {leagueData.teams.find(item => item.id === pick.originalTeamId)?.shortName || 'Unknown'}</small></div>)}{ownedPicks.length === 0 && <p className="empty-state">No picks in this season’s imported inventory.</p>}</div></section>}
+          {!allTeams && <TeamPickInventory account={account} teamId={activeTeam}/>}
         </>}
 
         {view === 'keepers' && <>
@@ -155,8 +156,11 @@ export function LeaguePortal() {
 
         {view === 'draft' && <>
           <PageTitle eyebrow="ON THE CLOCK" title="The draft room." description="Follow the picks from their original franchise to their next chapter."/>
+          <DraftPickGrids account={account}/>
+          <details className="panel"><summary className="panel-header" style={{ cursor: 'pointer' }}><div><p className="eyebrow">DRAFT SLOTS & PLAYER HISTORY</p><h2>Original-slot draft board</h2></div><span aria-hidden="true">+</span></summary><div style={{ padding: '0 20px 20px' }}>
           <div className="draft-toolbar"><div className="field-label">Season<select aria-label="Select draft season" value={draftYear} onChange={event => setDraftYear(event.target.value)}><option value="upcoming">{leagueData.season} · pick ownership</option>{[...leagueData.drafts].sort((a, b) => b.year - a.year).map(draft => <option value={String(draft.year)} key={draft.year}>{draft.year} · historical draft</option>)}</select></div><div className="draft-legend"><span><i className="legend-kept"/> Keeper</span><span><i className="legend-traded"/> Changed owner</span><span><Icon name="draft" size={16}/> 13 rounds · snake draft</span></div></div>
           {draftYear === 'upcoming' ? <UpcomingDraftBoard account={account}/> : <HistoricalBoard year={Number(draftYear)}/>}
+          </div></details>
         </>}
 
         {view === 'trades' && <>
