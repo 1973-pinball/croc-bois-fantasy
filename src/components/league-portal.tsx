@@ -64,10 +64,31 @@ function Status({ status }: { status: string }) {
   return <span className={'status status-' + status}><span/>{label[status] || status}</span>;
 }
 
+type PlayerSortColumn = 'player' | 'team' | 'cost' | 'tenure';
+
 function PlayerTable({ players, showTeam = false }: { players: LeaguePlayer[]; showTeam?: boolean }) {
   const leagueData = useContext(LeagueContext);
-  return <div className="table-wrap"><table className="data-table"><thead><tr><th>Player</th>{showTeam && <th>Team</th>}<th>Keeper cost</th><th>Tenure</th><th>Eligibility</th></tr></thead><tbody>
-    {players.map(player => <tr key={player.id}><td><strong>{player.name}</strong><span className="cell-note">{player.wasKept ? 'Previously kept' : 'Roster player'}{player.rosterSlot ? ' · ' + player.rosterSlot : ''}</span></td>{showTeam && <td>{leagueData.teams.find(team => team.id === player.teamId)?.shortName || 'Unassigned'}</td>}<td><span className="round-label">{player.baseCost ? 'Round ' + player.baseCost : '—'}</span></td><td>{player.tenure === null ? '—' : player.tenure + ' / 5'}</td><td><Status status={player.status}/><span className="cell-note reason-note">{player.reason}</span></td></tr>)}
+  const [sort, setSort] = useState<{ column: PlayerSortColumn; direction: 'ascending' | 'descending' }>({ column: 'player', direction: 'ascending' });
+  const sortedPlayers = useMemo(() => {
+    const teamNames = new Map(leagueData.teams.map(team => [team.id, team.shortName]));
+    const compareText = (a: string, b: string) => a.localeCompare(b, 'en', { sensitivity: 'base', numeric: true });
+    const value = (player: LeaguePlayer): string | number | null => sort.column === 'player' ? player.name : sort.column === 'team' ? teamNames.get(player.teamId) ?? null : sort.column === 'cost' ? player.baseCost : player.tenure;
+    return [...players].sort((a, b) => {
+      const left = value(a), right = value(b);
+      // Missing values remain last in either direction; ties stay alphabetical.
+      if (left === null && right !== null) return 1;
+      if (right === null && left !== null) return -1;
+      const comparison = left === null || right === null ? 0 : typeof left === 'number' && typeof right === 'number' ? left - right : compareText(String(left), String(right));
+      return comparison * (sort.direction === 'ascending' ? 1 : -1) || compareText(a.name, b.name) || a.id - b.id;
+    });
+  }, [players, leagueData.teams, sort]);
+  function sortableHeader(column: PlayerSortColumn, label: string) {
+    const active = sort.column === column;
+    const nextDirection = active && sort.direction === 'ascending' ? 'descending' : 'ascending';
+    return <th scope="col" aria-sort={active ? sort.direction : 'none'}><button type="button" className="table-sort-button" onClick={() => setSort({ column, direction: nextDirection })} aria-label={`Sort by ${label.toLowerCase()}, ${nextDirection}`}><span>{label}</span><span className="table-sort-indicator" aria-hidden="true">{active ? sort.direction === 'ascending' ? '↑' : '↓' : '↕'}</span></button></th>;
+  }
+  return <div className="table-wrap"><table className="data-table"><thead><tr>{sortableHeader('player', 'Player')}{showTeam && sortableHeader('team', 'Team')}{sortableHeader('cost', 'Keeper cost')}{sortableHeader('tenure', 'Tenure')}<th scope="col">Eligibility</th></tr></thead><tbody>
+    {sortedPlayers.map(player => <tr key={player.id}><td><strong>{player.name}</strong><span className="cell-note">{player.wasKept ? 'Previously kept' : 'Roster player'}{player.rosterSlot ? ' · ' + player.rosterSlot : ''}</span></td>{showTeam && <td>{leagueData.teams.find(team => team.id === player.teamId)?.shortName || 'Unassigned'}</td>}<td><span className="round-label">{player.baseCost ? 'Round ' + player.baseCost : '—'}</span></td><td>{player.tenure === null ? '—' : player.tenure + ' / 5'}</td><td><Status status={player.status}/><span className="cell-note reason-note">{player.reason}</span></td></tr>)}
     {players.length === 0 && <tr><td colSpan={showTeam ? 5 : 4}><div className="empty-state">No players match this search.</div></td></tr>}
   </tbody></table></div>;
 }
