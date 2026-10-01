@@ -1,0 +1,35 @@
+{
+  "name": "croc-bois-fantasy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/domain/*.test.ts tests/db/*.test.ts",
+    "audit:keepers": "tsx scripts/audit-keepers.ts",
+    "import:preview": "tsx scripts/build-preview-data.ts"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.99.0",
+    "next": "16.3.8",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

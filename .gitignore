@@ -1,0 +1,17 @@
+node_modules/
+.next/
+out/
+.vercel/
+.env*
+!.env.example
+.local/
+coverage/
+*.tsbuildinfo
+/*_raw.json
+/croc_bois_139935_2025-26_migration.json
+/espn_2026_scoring_period_160_calendar.json
+/keeper_costs_2025_source.json
+/planning_reconciliation.json
+/build_migration.ps1
+*.xlsx
+*.xls
