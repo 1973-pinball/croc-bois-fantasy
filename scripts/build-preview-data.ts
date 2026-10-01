@@ -56,7 +56,7 @@ assert.equal(players.length,111);
 assert.equal(new Set(players.map(p=>p.id)).size,111);
 const owners:Record<number,string>={1:"Jon",2:"Arod",3:"Wyndham",4:"Sebastian",5:"Shane",6:"Justin & Amber",7:"James",8:"Cars"};
 const colors=["#14634d","#d88042","#5c6654","#637b86","#9d6446","#87714d","#596589","#8b5d74"];
-const teams=roster.teams.map((t:any,i:number)=>({id:t.team_id,name:t.name,owner:owners[t.team_id],shortName:owners[t.team_id],managers:t.team_id===4?["Sebastian Rodriguez (incoming)"]:t.managers.map((m:any)=>m.first_name),color:colors[i]}));
+const teams=roster.teams.map((t:any,i:number)=>({id:t.team_id,name:t.name,owner:owners[t.team_id],shortName:t.abbreviation?.trim() || t.name,managers:t.team_id===4?["Sebastian Rodriguez (incoming)"]:t.managers.map((m:any)=>m.first_name),color:colors[i]}));
 const picks=teams.flatMap((t:any)=>Array.from({length:13},(_,i)=>({id:`2026-${t.id}-${i+1}`,season:2026,round:i+1,originalTeamId:t.id,ownerTeamId:t.id})));
 for(const p of picks) { if(p.originalTeamId===2&&[3,4].includes(p.round))p.ownerTeamId=1; if(p.originalTeamId===1&&p.round===8)p.ownerTeamId=5; }
 assert.equal(picks.length,104);
