@@ -185,7 +185,7 @@ export function LeaguePortal() {
         </>}
 
         {view === 'trades' && <>
-          <PageTitle eyebrow="THE RECEIPTS" title="Every deal has a story." description="Players, picks, promises, and the occasional very complicated arrangement."/>
+          <PageTitle eyebrow="THE RECEIPTS" title="Every deal has a story." description="Players, picks, the occasional mule rights, and the coveted 3-team-trade."/>
           <TradeWorkspace account={account}/>
           <div className="ledger-topline"><div className="ledger-stat"><strong>{leagueData.trades.length}</strong><span>historical trade records</span></div><SearchInput value={tradeSearch} onChange={setTradeSearch} placeholder="Search teams, players, or trade #…" label="Search trade ledger"/></div>
           <div className="info-banner"><Icon name="book"/><p><strong>The league’s original ledger, preserved.</strong> Written terms remain attached to every record. Complex obligations and ownership changes require reconciliation before they can drive live transactions.</p></div>
