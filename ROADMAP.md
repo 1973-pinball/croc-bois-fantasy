@@ -6,7 +6,7 @@ The first release should let every manager sign in, review keeper eligibility, s
 
 ## Release status
 
-The [public repository](https://github.com/1973-pinball/croc-bois-fantasy) is published. Supabase is provisioned with all four migrations, eight franchises, 111 frozen roster entries/profiles, and 104 picks. The connected public API has been verified. Vercel production verification is in progress.
+The [public app](https://croc-bois-fantasy.vercel.app) is deployed on Vercel, and the [repository](https://github.com/1973-pinball/croc-bois-fantasy) is public. Supabase is provisioned with all four migrations, eight franchises, 111 frozen roster entries/profiles, and 104 picks. Production checks verified the homepage, audit page, manifest, connected league API, disabled Google sign-in, and anonymous rejection by the private keeper/trade APIs. All 50 local tests and GitHub CI passed.
 
 Google setup is deferred at the commissioner's request. `GOOGLE_OAUTH_ENABLED=false` keeps sign-in unavailable while public browsing works. No account has been granted league access yet, and the season remains in `setup`. Onboarding and real authenticated end-to-end verification remain release requirements for official keeper submissions.
 
@@ -39,7 +39,7 @@ Local checks cover domain calculations, database workflows, build/type checks, a
 
 ### Backend, data, and release work
 
-- Finish production verification, then configure Google OAuth when the commissioner is ready. Repository publication, Supabase migrations/bootstrap data, and Vercel environment setup are complete.
+- Configure Google OAuth when the commissioner is ready. Repository publication, Supabase migrations/bootstrap data, Vercel environment setup, and public production verification are complete.
 - Add authorized operations behind onboarding and team assignment. The underlying membership and dated manager-assignment records already exist.
 - Reconcile current roster ownership, pick ownership, inferred tenure, and remaining provisional keeper profiles. Preserve the frozen end-of-season roster as the eligibility baseline.
 - Store and display the keeper deadline and draft date/time. Keep commissioner locking explicit; the agreed workflow allows edits until the commissioner locks a submission.

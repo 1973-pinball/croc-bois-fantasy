@@ -2,6 +2,8 @@
 
 A public league portal and private keeper workflow for Croc Bois. Next.js, TypeScript, Supabase Postgres and Vercel. Google sign-in is implemented but deliberately disabled until provider setup and manager onboarding are complete.
 
+[Open the league app](https://croc-bois-fantasy.vercel.app) · [Delivery roadmap](ROADMAP.md)
+
 ## Local development
 
 Requires Node 22+ and pnpm 11.

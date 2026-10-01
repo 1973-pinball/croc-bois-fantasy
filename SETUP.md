@@ -3,9 +3,12 @@
 ## Current league deployment
 
 - Repository: [1973-pinball/croc-bois-fantasy](https://github.com/1973-pinball/croc-bois-fantasy).
+- Public app: [croc-bois-fantasy.vercel.app](https://croc-bois-fantasy.vercel.app).
 - Supabase: [croc-bois-fantasy](https://supabase.com/dashboard/project/jpdawgtemwfipdsvcqlb), project ref `jpdawgtemwfipdsvcqlb`, US East. The four migrations and one-time bootstrap seed have already been applied; do not run the seed again.
 - Vercel: `studiopinball/croc-bois-fantasy`, connected to the repository. Production and Preview have the publishable Supabase settings and Google-disabled release gate.
 - Google provider setup is deferred. No manager or commissioner account is authorized yet; the league is in `setup`.
+
+The future Google Web application's authorized redirect URI is `https://jpdawgtemwfipdsvcqlb.supabase.co/auth/v1/callback`. Production app redirects already allow `https://croc-bois-fantasy.vercel.app/auth/callback`. Enter the client ID and secret directly in the project's Google provider settings, then enable the release flag and complete account assignments.
 
 The instructions below cover configuration and recovery, not a request to create duplicate projects.
 
