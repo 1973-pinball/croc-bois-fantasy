@@ -39,15 +39,15 @@ export function historyRowComplete(row: HistoryRow | undefined): boolean {
 }
 
 /** Two backfill slots and one refresh slot prevent old missing years from starving recent results. */
-export function planHistorySync(rows: readonly HistoryRow[], state: HistorySyncState | null, completedThrough: number, now: Date, retryAuthFailures = false): number[] {
+export function planHistorySync(rows: readonly HistoryRow[], state: HistorySyncState | null, completedThrough: number, now: Date, retrySourceFailures = false): number[] {
   const { expected, current } = historyYearRange(completedThrough, now), time = now.getTime();
   const rowMap = new Map(rows.map(row => [row.espn_season_id, row]));
   const attempted = (year: number) => Date.parse(state?.year_attempts?.[String(year)]?.attemptedAt || '') || 0;
-  const retryAuth = (year: number) => retryAuthFailures && Boolean(state?.failures.some(item => item.seasonId === year && item.code === 'ESPN_AUTH_REQUIRED'));
-  const ready = (year: number) => retryAuth(year) || time - attempted(year) >= RETRY_MS;
+  const retrySource = (year: number) => retrySourceFailures && Boolean(state?.failures.some(item => item.seasonId === year && ['ESPN_AUTH_REQUIRED', 'BRACKET_UNVERIFIED', 'INVALID_SOURCE'].includes(item.code)));
+  const ready = (year: number) => retrySource(year) || time - attempted(year) >= RETRY_MS;
   const priority = (year: number) => year === 2025 ? 0 : year === 2026 ? 1 : 2;
   // An observed wins-only year is still incomplete; rotate it behind never-tried years.
-  const missing = expected.filter(year => !historyRowComplete(rowMap.get(year)) && ready(year)).sort((a, b) => Number(retryAuth(b)) - Number(retryAuth(a)) || attempted(a) - attempted(b) || priority(a) - priority(b) || a - b);
+  const missing = expected.filter(year => !historyRowComplete(rowMap.get(year)) && ready(year)).sort((a, b) => Number(retrySource(b)) - Number(retrySource(a)) || attempted(a) - attempted(b) || priority(a) - priority(b) || a - b);
   const result = missing.slice(0, 2);
   const refresh = [...new Set([completedThrough, current])].filter(year => !result.includes(year) && ready(year)).sort((a, b) => attempted(a) - attempted(b) || a - b);
   if (refresh.length) result.push(refresh[0]);
@@ -77,7 +77,8 @@ function seasonUrl(year: number, legacy: boolean) {
   if (!validYear(year)) throw new Error('Invalid ESPN season');
   const url = new URL(legacy ? `https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/leagueHistory/${ESPN_HISTORY_LEAGUE}` : `https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/${year}/segments/0/leagues/${ESPN_HISTORY_LEAGUE}`);
   if (legacy) url.searchParams.set('seasonId', String(year));
-  for (const view of ['mTeam', 'mSettings', 'mMatchup', 'mStandings']) url.searchParams.append('view', view);
+  // mMatchup alone omits playoffTierType in ESPN's historical responses.
+  for (const view of ['mTeam', 'mSettings', 'mMatchup', 'mMatchupScore', 'mStandings']) url.searchParams.append('view', view);
   return url.href;
 }
 
@@ -172,8 +173,9 @@ export function historyFromRows(rows: readonly HistoryRow[]): PlayoffHistory {
         firstChampionshipMatchupPeriod: value.firstChampionshipMatchupPeriod,
         participants: value.participants.map(team => ({ espnTeamId: team.espnTeamId, franchiseId: team.franchiseId, qualified: team.qualified, ...(team.regularSeasonWins === undefined ? {} : { regularSeasonWins: team.regularSeasonWins }) })),
         qualifiedFranchiseIds: [...value.qualifiedFranchiseIds], ...(value.championFranchiseId ? { championFranchiseId: value.championFranchiseId } : {}),
-        source: { ...publicProvenance(value.source), method: value.source.method, matchups: value.source.matchups.map(game => ({ id: game.id, homeEspnTeamId: game.homeEspnTeamId, awayEspnTeamId: game.awayEspnTeamId, ...(game.winnerEspnTeamId === undefined ? {} : { winnerEspnTeamId: game.winnerEspnTeamId }) })),
-          ...(value.source.championship ? { championship: { id: value.source.championship.id, matchupPeriod: value.source.championship.matchupPeriod, homeEspnTeamId: value.source.championship.homeEspnTeamId, awayEspnTeamId: value.source.championship.awayEspnTeamId, winnerEspnTeamId: value.source.championship.winnerEspnTeamId } } : {}) },
+        source: { ...publicProvenance(value.source), method: value.source.method, matchups: value.source.matchups.map(game => ({ id: game.id, homeEspnTeamId: game.homeEspnTeamId, awayEspnTeamId: game.awayEspnTeamId, ...(game.winnerEspnTeamId === undefined ? {} : { winnerEspnTeamId: game.winnerEspnTeamId }), ...(game.homePoints === undefined ? {} : { homePoints: game.homePoints }), ...(game.awayPoints === undefined ? {} : { awayPoints: game.awayPoints }) })),
+          ...(value.source.championship ? { championship: { id: value.source.championship.id, matchupPeriod: value.source.championship.matchupPeriod, homeEspnTeamId: value.source.championship.homeEspnTeamId, awayEspnTeamId: value.source.championship.awayEspnTeamId, winnerEspnTeamId: value.source.championship.winnerEspnTeamId,
+            ...(value.source.championship.method ? { method: value.source.championship.method, homePoints: value.source.championship.homePoints, awayPoints: value.source.championship.awayPoints, homeFinalRank: value.source.championship.homeFinalRank, awayFinalRank: value.source.championship.awayFinalRank } : {}) } } : {}) },
         ...(value.additionalSourceEvidence ? { additionalSourceEvidence: value.additionalSourceEvidence.map(publicProvenance) } : {}),
       });
     }

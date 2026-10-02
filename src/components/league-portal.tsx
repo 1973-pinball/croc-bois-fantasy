@@ -179,7 +179,7 @@ export function LeaguePortal() {
     </aside>
     {mobileOpen && <button className="nav-backdrop" onClick={() => setMobileOpen(false)} aria-label="Close navigation"/>}
     <div className="main-shell">
-      <header className="topbar"><div className="topbar-left"><button className="icon-button mobile-menu" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle navigation" aria-expanded={mobileOpen}><Icon name="menu"/></button><span className="topbar-league">CROC BOIS</span><span className="breadcrumb-separator">/</span><span className="breadcrumb-current">{heading}</span></div><div className="topbar-right"><span className="public-label"><span/> Public league hub</span><AccountButton account={account}/></div></header>
+      <header className="topbar"><div className="topbar-left"><button className="icon-button mobile-menu" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle navigation" aria-expanded={mobileOpen}><Icon name="menu"/></button><span className="topbar-league">CROC BOIS</span><span className="breadcrumb-separator">/</span><span className="breadcrumb-current">{heading}</span></div><div className="topbar-right"><span className={"public-label" + (account.session?.user?.email ? " account-email" : "")} title={account.session?.user?.email || undefined}><span/>{account.session?.user?.email || "Public league hub"}</span><AccountButton account={account}/></div></header>
       <main id="main-content" className="main-content"><LeagueConnectionNotice account={account}/>
         {account.sessionError && <div className="workflow-message workflow-error" role="alert">{account.sessionError} <button className="text-button" onClick={() => void account.reloadSession()}>Refresh account</button></div>}
         {view === 'my-team' && <>

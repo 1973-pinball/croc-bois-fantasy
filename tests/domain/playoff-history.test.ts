@@ -81,6 +81,38 @@ test('wins stay optional and championships require a declared final between decl
   assert.throws(() => validatePlayoffSeason(tampered), /Champion must be proven/);
 });
 
+test('legacy tied winner fields require positive bracket scores and a complete corroborating final-rank order', () => {
+  const raw = fixture(2018);
+  const finalRanks: Record<number, number> = { 1:2,2:5,3:4,4:7,5:6,6:1,7:3,8:8 };
+  const legacy = { ...raw, teams: raw.teams.map(team => ({ ...team, rankCalculatedFinal: finalRanks[team.id] })), schedule: [
+    { id:76,matchupPeriodId:20,playoffTierType:'WINNERS_BRACKET',winner:'TIE',home:{teamId:7,totalPoints:4},away:{teamId:6,totalPoints:5} },
+    { id:77,matchupPeriodId:20,playoffTierType:'WINNERS_BRACKET',winner:'TIE',home:{teamId:1,totalPoints:5},away:{teamId:3,totalPoints:4} },
+    { id:80,matchupPeriodId:21,playoffTierType:'WINNERS_BRACKET',winner:'TIE',home:{teamId:1,totalPoints:4},away:{teamId:6,totalPoints:5} },
+  ] };
+  const proven = extractPlayoffSeason(legacy, mapping, provenance);
+  assert.equal(proven.championFranchiseId, '6'); assert.equal(proven.source.championship?.method, 'score-and-final-rank');
+  assert.equal(proven.source.championship?.awayFinalRank, 1); assert.equal(proven.source.matchups[0].winnerEspnTeamId, 6);
+  validatePlayoffSeason(proven);
+  for (const points of [0,4,NaN,Infinity]) {
+    const bad = structuredClone(legacy); bad.schedule[0].away.totalPoints = points;
+    assert.equal(extractPlayoffSeason(bad, mapping, provenance).championFranchiseId, undefined);
+  }
+  const inconsistentRank = structuredClone(legacy); inconsistentRank.teams.find(team => team.id===6)!.rankCalculatedFinal = 2;
+  assert.equal(extractPlayoffSeason(inconsistentRank, mapping, provenance).championFranchiseId, undefined);
+  const wrongWinner = structuredClone(legacy); wrongWinner.schedule[0].winner = 'HOME';
+  assert.equal(extractPlayoffSeason(wrongWinner, mapping, provenance).championFranchiseId, undefined);
+  const wrongFinal = structuredClone(legacy); wrongFinal.schedule[2].away.teamId = 7;
+  assert.equal(extractPlayoffSeason(wrongFinal, mapping, provenance).championFranchiseId, undefined);
+  const undecided = structuredClone(legacy); undecided.schedule[2].winner = 'UNDECIDED';
+  assert.equal(extractPlayoffSeason(undecided, mapping, provenance).championFranchiseId, undefined);
+  const tampered = structuredClone(proven); tampered.source.championship!.awayFinalRank = 2;
+  assert.throws(() => validatePlayoffSeason(tampered), /first and second/);
+  const noMethod = structuredClone(proven); delete noMethod.source.championship!.method;
+  assert.throws(() => validatePlayoffSeason(noMethod), /declare.*method/);
+  const missingScore = structuredClone(proven); delete missingScore.source.matchups[0].homePoints;
+  assert.throws(() => validatePlayoffSeason(missingScore), /positive, unequal/);
+});
+
 test('unknown years are not zero; missing coverage suppresses the all-time winner', () => {
   const qualification = extractPlayoffSeason(fixture(2018), mapping, provenance);
   const partial = calculateLuckbox([...orders(2018), ...orders(2019)], [qualification]);

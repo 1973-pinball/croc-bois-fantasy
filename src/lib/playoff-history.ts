@@ -22,8 +22,8 @@ export interface PlayoffSeason {
     leagueId: number; sha256: string; url?: string; capturedAt?: string;
     method: 'first-complete-winners-bracket';
     paths: string[];
-    matchups: { id: number; homeEspnTeamId: number; awayEspnTeamId: number; winnerEspnTeamId?: number }[];
-    championship?: { id: number; matchupPeriod: number; homeEspnTeamId: number; awayEspnTeamId: number; winnerEspnTeamId: number };
+    matchups: { id: number; homeEspnTeamId: number; awayEspnTeamId: number; winnerEspnTeamId?: number; homePoints?: number; awayPoints?: number }[];
+    championship?: { id: number; matchupPeriod: number; homeEspnTeamId: number; awayEspnTeamId: number; winnerEspnTeamId: number; method?: 'score-and-final-rank'; homePoints?: number; awayPoints?: number; homeFinalRank?: number; awayFinalRank?: number };
   };
 }
 export interface StatisticsOnlySeason {
@@ -75,6 +75,18 @@ function wins(value: unknown): number {
 function declaredWinner(matchup: Record<string, unknown>): number | undefined {
   const side = matchup.winner === 'HOME' ? matchup.home : matchup.winner === 'AWAY' ? matchup.away : undefined;
   return side ? integer(record(side, 'Winning side').teamId, 'Winning ESPN team ID') : undefined;
+}
+function scoreWinner(homeId: number, awayId: number, homePoints: unknown, awayPoints: unknown) {
+  if (typeof homePoints !== 'number' || typeof awayPoints !== 'number' || !Number.isFinite(homePoints) || !Number.isFinite(awayPoints) || homePoints <= 0 || awayPoints <= 0 || homePoints === awayPoints) return undefined;
+  return { homePoints, awayPoints, winnerEspnTeamId: homePoints > awayPoints ? homeId : awayId };
+}
+function legacyScoreWinner(matchup: Record<string, unknown>) {
+  const home = record(matchup.home, 'Home side'), away = record(matchup.away, 'Away side');
+  const score = scoreWinner(integer(home.teamId, 'Home ESPN team ID'), integer(away.teamId, 'Away ESPN team ID'), home.totalPoints, away.totalPoints);
+  if (!score) return undefined;
+  const declared = declaredWinner(matchup);
+  if (declared === undefined ? matchup.winner !== 'TIE' : declared !== score.winnerEspnTeamId) return undefined;
+  return score;
 }
 function timestamp(value: string | undefined): string | undefined {
   if (value === undefined) return undefined;
@@ -185,6 +197,29 @@ export function extractPlayoffSeason(raw: unknown, mapping: FranchiseMap, proven
       }
     }
   }
+  // Some legacy ESPN seasons label completed 5–4 category games TIE. Require a
+  // complete score-based bracket AND official final ranks; scores alone are insufficient.
+  if (!result.championFranchiseId) {
+    const scoredSemis = firstRound.map(({ matchup }) => legacyScoreWinner(matchup));
+    const scoredFinalists = scoredSemis.flatMap(game => game ? [game.winnerEspnTeamId] : []);
+    const later = championship.filter(game => game.period > firstPeriod);
+    const ranks = payload.teams.map(value => { const team = record(value, 'ESPN team'); return { id: team.id, rank: team.rankCalculatedFinal }; });
+    const completeRanks = ranks.every(team => typeof team.rank === 'number' && Number.isSafeInteger(team.rank) && team.rank >= 1 && team.rank <= ranks.length) && new Set(ranks.map(team => team.rank)).size === ranks.length;
+    if (scoredFinalists.length === 2 && new Set(scoredFinalists).size === 2 && later.length === 1 && completeRanks) {
+      const final = later[0], home = record(final.matchup.home, 'Final home side'), away = record(final.matchup.away, 'Final away side');
+      const homeId = integer(home.teamId, 'Final home team'), awayId = integer(away.teamId, 'Final away team');
+      const score = legacyScoreWinner(final.matchup), homeRank = ranks.find(team => team.id === homeId)?.rank, awayRank = ranks.find(team => team.id === awayId)?.rank;
+      if (score && homeId !== awayId && scoredFinalists.includes(homeId) && scoredFinalists.includes(awayId) && [homeRank, awayRank].includes(1) && [homeRank, awayRank].includes(2) && ranks.find(team => team.id === score.winnerEspnTeamId)?.rank === 1) {
+        result.championFranchiseId = participants.find(team => team.espnTeamId === score.winnerEspnTeamId)!.franchiseId;
+        result.source.championship = { id: integer(final.matchup.id, 'Final matchup ID'), matchupPeriod: final.period, homeEspnTeamId: homeId, awayEspnTeamId: awayId, ...score, method: 'score-and-final-rank', homeFinalRank: homeRank as number, awayFinalRank: awayRank as number };
+        firstRound.forEach(({ matchup, index }, i) => {
+          Object.assign(result.source.matchups.find(game => game.id === matchup.id)!, scoredSemis[i]);
+          result.source.paths.push(`schedule[${index}].{home.totalPoints,away.totalPoints}`);
+        });
+        result.source.paths.push(`schedule[${final.index}].{id,matchupPeriodId,playoffTierType,home.teamId,away.teamId,winner,home.totalPoints,away.totalPoints}`, 'teams[].rankCalculatedFinal');
+      }
+    }
+  }
   const url = verifiedSourceUrl(provenance.sourceUrl, seasonId, leagueId), capturedAt = timestamp(provenance.capturedAt);
   if (url) result.source.url = url;
   if (capturedAt) result.source.capturedAt = capturedAt;
@@ -220,7 +255,16 @@ export function validatePlayoffSeason(season: PlayoffSeason): void {
     const final = season.source.championship;
     const finalists = season.source.matchups.map(matchup => matchup.winnerEspnTeamId);
     if (!final || finalists.some(id => id === undefined) || final.matchupPeriod <= season.firstChampionshipMatchupPeriod || final.homeEspnTeamId === final.awayEspnTeamId || !finalists.includes(final.homeEspnTeamId) || !finalists.includes(final.awayEspnTeamId) || ![final.homeEspnTeamId, final.awayEspnTeamId].includes(final.winnerEspnTeamId) || season.participants.find(team => team.espnTeamId === final.winnerEspnTeamId)?.franchiseId !== season.championFranchiseId) throw new Error('Champion must be proven by the final between the two recorded semifinal winners.');
+    if (final.method !== undefined && final.method !== 'score-and-final-rank') throw new Error('Unknown championship proof method.');
+    if (final.method === 'score-and-final-rank') {
+      for (const game of [...season.source.matchups, final]) {
+        const score = scoreWinner(game.homeEspnTeamId, game.awayEspnTeamId, game.homePoints, game.awayPoints);
+        if (!score || score.winnerEspnTeamId !== game.winnerEspnTeamId) throw new Error('Legacy championship proof needs positive, unequal scores matching every bracket winner.');
+      }
+      if (![final.homeFinalRank, final.awayFinalRank].includes(1) || ![final.homeFinalRank, final.awayFinalRank].includes(2) || (final.winnerEspnTeamId === final.homeEspnTeamId ? final.homeFinalRank : final.awayFinalRank) !== 1) throw new Error('Legacy championship scores must agree with official first and second place.');
+    } else if ([final.homePoints, final.awayPoints, final.homeFinalRank, final.awayFinalRank, ...season.source.matchups.flatMap(game => [game.homePoints, game.awayPoints])].some(value => value !== undefined)) throw new Error('Score evidence must declare its championship proof method.');
   }
+  if (!season.source.championship && season.source.matchups.some(game => game.homePoints !== undefined || game.awayPoints !== undefined)) throw new Error('Score evidence requires a complete championship proof.');
 }
 
 /** Counts are for covered years only. Missing years always suppress an overall winner. */

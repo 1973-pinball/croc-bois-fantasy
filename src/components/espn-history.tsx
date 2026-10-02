@@ -123,6 +123,7 @@ function dateLabel(value: string | null) {
   return value ? new Date(value).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : 'No successful update yet';
 }
 function safeFailure(code: string) {
+  if (code === 'BRACKET_UNVERIFIED') return 'Win totals are saved; playoff or championship results still need verification.';
   if (/AUTH|PRIVATE|CONNECT|CREDENTIAL|FORBIDDEN/.test(code.toUpperCase())) return 'ESPN access needs to be connected.';
   if (/TIMEOUT|NETWORK|FETCH|RATE|HTTP|UNAVAILABLE/.test(code.toUpperCase())) return 'ESPN could not be reached. Retry later.';
   if (/PENDING|INCOMPLETE|NOT_FINISHED|NOT_COMPLETE/.test(code.toUpperCase())) return 'Complete season results are not available yet.';

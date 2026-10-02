@@ -48,6 +48,20 @@ function stats(year = 2026, sourceHash = hash): History {
   void method; void matchups; void championship;
   return { draftYear: year, espnSeasonId: year, priorSeasonStartYear: year - 1, qualificationStatus: 'unverified', participants: complete.participants.map(({ qualified, ...p }: History) => { void qualified; return p; }), source };
 }
+function legacy(year = 2018): History {
+  const result = full(year);
+  result.firstChampionshipMatchupPeriod = 20;
+  result.qualifiedFranchiseIds = ['1', '3', '6', '7']; result.championFranchiseId = '6';
+  result.participants.forEach((team: History) => { team.qualified = result.qualifiedFranchiseIds.includes(team.franchiseId); });
+  result.source.matchups = [
+    { id: 76, homeEspnTeamId: 7, awayEspnTeamId: 6, winnerEspnTeamId: 6, homePoints: 4, awayPoints: 5 },
+    { id: 77, homeEspnTeamId: 1, awayEspnTeamId: 3, winnerEspnTeamId: 1, homePoints: 5, awayPoints: 4 },
+  ];
+  result.source.championship = { id: 80, matchupPeriod: 21, homeEspnTeamId: 1, awayEspnTeamId: 6, winnerEspnTeamId: 6,
+    method: 'score-and-final-rank', homePoints: 4, awayPoints: 5, homeFinalRank: 2, awayFinalRank: 1 };
+  result.source.paths.push('teams[].rankCalculatedFinal', 'schedule[0].home.totalPoints', 'schedule[0].away.totalPoints');
+  return result;
+}
 function entry(year = 2026, playoff: History | null = full(year), statistics: History | null = null, sourceHash = hash, fetchedAt = new Date().toISOString()) {
   return { espnSeasonId: year, playoffHistory: playoff, statistics, sourceHash, fetchedAt };
 }
@@ -163,4 +177,62 @@ test('a championship upgrade carries omitted prior wins together with their orig
   assert.equal(stored.championFranchiseId, '1'); assert.equal(stored.participants[0].regularSeasonWins, 0);
   assert.equal(stored.additionalSourceEvidence[0].sha256, hash);
   assert.equal(stored.source.sha256, nextHash);
+}));
+
+test('legacy championship proof stores scores and ranks while preserving the existing declared-winner path', () => isolated(async () => {
+  const proof = legacy();
+  await store([entry(2018, proof), entry(2026)]);
+  const historical = (await history(2018)).playoff_history!;
+  assert.equal(historical.championFranchiseId, '6');
+  assert.equal(historical.source.championship.method, 'score-and-final-rank');
+  assert.deepEqual(historical.source.matchups, proof.source.matchups);
+  assert.deepEqual(historical.source.championship, proof.source.championship);
+  assert.equal((await history(2026)).playoff_history?.source.championship.method, undefined);
+  await role('anon');
+  assert.equal((await history(2018)).playoff_history?.source.championship.awayFinalRank, 1);
+  await rejects(() => db.query('select private.validate_espn_declared_history($1::jsonb,$2,$3,$4)', [JSON.stringify(full()), 2026, 139935, true]), /permission denied/);
+}));
+
+test('legacy proof rejects tied, zero, missing, nonfinite and conflicting semifinal or final evidence atomically', () => isolated(async () => {
+  await role('service_role'); const lease = await claim(); assert.ok(lease);
+  const mutations: [string, (season: History) => void][] = [
+    ['semifinal tie', s => { s.source.matchups[0].awayPoints = 4; }],
+    ['semifinal zero', s => { s.source.matchups[0].homePoints = 0; }],
+    ['semifinal missing score', s => { delete s.source.matchups[0].homePoints; }],
+    ['semifinal missing winner', s => { delete s.source.matchups[0].winnerEspnTeamId; }],
+    ['semifinal conflicting winner', s => { s.source.matchups[0].winnerEspnTeamId = 7; }],
+    ['final tie', s => { s.source.championship.awayPoints = 4; }],
+    ['final zero', s => { s.source.championship.homePoints = 0; }],
+    ['negative score', s => { s.source.championship.homePoints = -1; }],
+    ['nonfinite score', s => { s.source.championship.homePoints = Infinity; }],
+    ['string score', s => { s.source.championship.homePoints = '4'; }],
+    ['final missing score', s => { delete s.source.championship.awayPoints; }],
+    ['final conflicting winner', s => { s.source.championship.winnerEspnTeamId = 1; s.championFranchiseId = '1'; }],
+    ['wrong finalist', s => { s.source.championship.homeEspnTeamId = 7; }],
+    ['rank conflict', s => { s.source.championship.homeFinalRank = 1; s.source.championship.awayFinalRank = 2; }],
+    ['duplicate rank', s => { s.source.championship.homeFinalRank = 1; }],
+    ['missing rank', s => { delete s.source.championship.awayFinalRank; }],
+    ['unlisted private field', s => { s.source.matchups[0].ownerEmail = 'private@example.invalid'; }],
+  ];
+  for (const [label, mutate] of mutations) {
+    const invalid = legacy(); mutate(invalid);
+    await rejects(() => finish(lease.leaseToken, [entry(2026), entry(2018, invalid)]), /Legacy|legacy|final must be between semifinal winners/);
+    assert.equal((await db.query('select * from public.espn_season_history')).rows.length, 0, label);
+    assert.equal((await db.query('select * from public.espn_history_snapshots')).rows.length, 0, label);
+  }
+  await finish(lease.leaseToken, [entry(2018, legacy())]);
+}));
+
+test('legacy score fields require the explicit proof method and cannot silently change a verified champion', () => isolated(async () => {
+  await role('service_role'); const lease = await claim(); assert.ok(lease);
+  const unmarked = legacy(); delete unmarked.source.championship.method;
+  await rejects(() => finish(lease.leaseToken, [entry(2018, unmarked)]), /Invalid semifinal evidence/);
+  const unknown = legacy(); unknown.source.championship.method = 'scores-only';
+  await rejects(() => finish(lease.leaseToken, [entry(2018, unknown)]), /Invalid semifinal evidence/);
+  await finish(lease.leaseToken, [entry(2018, legacy())]);
+  const conflicting = legacy(); conflicting.championFranchiseId = '1';
+  Object.assign(conflicting.source.championship, { winnerEspnTeamId: 1, homePoints: 5, awayPoints: 4, homeFinalRank: 1, awayFinalRank: 2 });
+  const retry = await claim(); assert.ok(retry);
+  await rejects(() => finish(retry.leaseToken, [entry(2018, conflicting)]), /Verified champion conflict/);
+  assert.equal((await history(2018)).playoff_history?.championFranchiseId, '6');
 }));

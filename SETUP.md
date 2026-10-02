@@ -6,9 +6,9 @@
 - Public app: [croc-bois-fantasy.vercel.app](https://croc-bois-fantasy.vercel.app).
 - Supabase: [croc-bois-fantasy](https://supabase.com/dashboard/project/jpdawgtemwfipdsvcqlb), project ref `jpdawgtemwfipdsvcqlb`, US East. The one-time bootstrap seed has already been applied; do not run it again. Apply new migrations with `supabase db push`.
 - Vercel: `studiopinball/croc-bois-fantasy`, connected to the repository. Production and Preview have the publishable Supabase settings. Production has `GOOGLE_OAUTH_ENABLED=true`; Preview remains false until its callback URLs are configured.
-- Google is enabled in Supabase, using the `croc_bois_fantasy` OAuth client. The first verified commissioner account still needs trusted assignment; the league is in `setup`.
+- Google is enabled in Supabase, using the `croc_bois_fantasy` OAuth client. The initial verified commissioner and their team assignment are active; the league remains in `setup` pending keeper-data review.
 
-The Google Web application's authorized redirect URI is `https://jpdawgtemwfipdsvcqlb.supabase.co/auth/v1/callback`. Production app redirects allow `https://croc-bois-fantasy.vercel.app/auth/callback`. Client credentials are entered directly in Supabase's Google provider settings, never committed. Complete first-account verification and assignments before official keeper submissions.
+The Google Web application's authorized redirect URI is `https://jpdawgtemwfipdsvcqlb.supabase.co/auth/v1/callback`. Production app redirects allow `https://croc-bois-fantasy.vercel.app/auth/callback`. Client credentials are entered directly in Supabase's Google provider settings, never committed. Initial Google sign-in, commissioner setup and team approval have been verified. Complete the remaining owner assignments and keeper-data review before official submissions.
 
 The instructions below cover configuration and recovery, not a request to create duplicate projects.
 

@@ -49,6 +49,7 @@ test('fixed ESPN fetch has manual redirects and sanitizes qualification, wins an
     calls++;
     const url = new URL(String(input));
     assert.equal(url.hostname, 'lm-api-reads.fantasy.espn.com'); assert.match(url.pathname, /seasons\/2026\/segments\/0\/leagues\/139935$/);
+    assert.equal(url.searchParams.getAll('view').includes('mMatchupScore'), true);
     assert.equal(init?.redirect, 'manual'); assert.equal(init?.cache, 'no-store'); assert.ok(init?.signal);
     assert.equal(new Headers(init?.headers).get('cookie'), 'espn_s2=PRIVATE_COOKIE_SENTINEL; SWID={private}');
     return Response.json(fixture());
@@ -162,4 +163,30 @@ test('valid updated credentials allow manual recovery from a persisted auth fail
   failed.failures.push({ seasonId: 2025, code:'ESPN_AUTH_REQUIRED', message:'Connection required' });
   assert.equal(planHistorySync([], failed, 2026, new Date(now)).includes(2025), false);
   assert.equal(planHistorySync([], failed, 2026, new Date(now), true)[0], 2025);
+});
+
+test('historical score view supplies bracket tiers while tied legacy winners never invent a champion', async () => {
+  const result = await fetchHistorySeason(options(2025, async input => {
+    const raw = fixture(2025);
+    if (!new URL(String(input)).searchParams.getAll('view').includes('mMatchupScore')) raw.schedule.forEach(game => delete (game as { playoffTierType?: string }).playoffTierType);
+    return Response.json(raw);
+  }));
+  assert.equal(result.failure, undefined); assert.equal(result.season?.playoffHistory?.championFranchiseId, '2');
+  const tied = fixture(2018); tied.schedule.forEach(game => { game.winner = 'TIE'; });
+  const legacy = await fetchHistorySeason(options(2018, async () => Response.json(tied)));
+  assert.deepEqual(legacy.season?.playoffHistory?.qualifiedFranchiseIds, ['1','2','6','7']);
+  assert.equal(legacy.season?.playoffHistory?.championFranchiseId, undefined);
+});
+
+test('manual source-repair retry bypasses bracket/source backoff but cron and network backoff remain bounded', () => {
+  const failed = state(Object.fromEntries([2018,2019,2020,2025,2026,2027].map(year => [String(year), { attemptedAt: new Date(now).toISOString(), outcome:'failure' }])));
+  failed.failures = [
+    { seasonId:2018, code:'BRACKET_UNVERIFIED', message:'Needs bracket' },
+    { seasonId:2019, code:'INVALID_SOURCE', message:'Needs source review' },
+    { seasonId:2020, code:'ESPN_UNAVAILABLE', message:'Network unavailable' },
+  ];
+  const automatic = planHistorySync([], failed, 2026, new Date(now));
+  assert.equal(automatic.includes(2018), false); assert.equal(automatic.includes(2019), false);
+  const manual = planHistorySync([], failed, 2026, new Date(now), true);
+  assert.deepEqual(manual.slice(0,2), [2018,2019]); assert.equal(manual.includes(2020), false); assert.ok(manual.length <= 3);
 });

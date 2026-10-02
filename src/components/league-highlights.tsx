@@ -97,12 +97,12 @@ function Podium({ title, standings, ready, coverage, teams }: {
 
   return <section className={`${styles.panel} ${trophy ? styles.championships : styles.wins}`} aria-label={title}>
     <div className={styles.heading}>
-      <div><p className={styles.eyebrow}>{trophy ? 'THE HARDWARE' : 'THE LONG GAME'}</p><h2>{title}</h2></div>
+      <h2>{title}</h2>
       <span className={styles.icon}><HighlightIcon trophy={trophy}/></span>
     </div>
     <p className={styles.coverage}>{coverage}</p>
-    {!available && <div className={styles.pending}><strong>{unavailableMessage}</strong><span>{!ready ? 'Leaders will appear once every season is confirmed.' : 'No leaders ranked from incomplete or uncertain totals.'}</span></div>}
-    <div className={`${styles.podium} ${!available ? styles.unranked : ''}`} aria-label={available ? 'Top three ranks, including ties' : 'Podium awaiting verified standings'}>
+    {!available && <div className={styles.pending}><strong>{unavailableMessage}</strong><span>{!ready ? 'No leaders ranked until every season is confirmed.' : 'Only verified totals are ranked.'}</span></div>}
+    {available && <div className={styles.podium} aria-label="Top three ranks, including ties">
       {[2, 1, 3].map(rank => {
         const group = available ? ranks?.find(item => item.rank === rank) : undefined;
         const tied = Boolean(group && group.entries.length > 1);
@@ -124,8 +124,8 @@ function Podium({ title, standings, ready, coverage, teams }: {
           </div>
         </div>;
       })}
-    </div>
-    <p className={styles.footnote}>{available ? 'Franchise totals · shared ranks include every tied team' : trophy && !ready ? 'Complete history needed before awarding the top spots.' : 'Only verified totals are ranked.'}</p>
+    </div>}
+    {available && <p className={styles.footnote}>Franchise totals · ties share a rank</p>}
   </section>;
 }
 
