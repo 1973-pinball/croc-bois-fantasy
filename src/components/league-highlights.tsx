@@ -27,7 +27,7 @@ export interface HighlightRank {
   entries: HighlightStanding[];
 }
 
-/** Competition ranks preserve ties, including every franchise tied at third. */
+/** Show three distinct totals while preserving competition ranks and every tied franchise. */
 export function rankHighlightStandings(standings: readonly HighlightStanding[]): HighlightRank[] | null {
   const ids = new Set<string>();
   for (const entry of standings) {
@@ -43,7 +43,7 @@ export function rankHighlightStandings(standings: readonly HighlightStanding[]):
     if (previous?.count === entry.count) previous.entries.push(entry);
     else {
       const rank = index + 1;
-      if (rank > 3) break;
+      if (groups.length === 3) break;
       groups.push({ rank, count: entry.count, entries: [entry] });
     }
   }
@@ -55,7 +55,7 @@ const recordedWins: HighlightStanding[] = analytics.winsTrades.observations.map(
   count: item.wins,
   managerLabel: item.historicalOwner,
 }));
-const ordinal = (rank: number) => rank === 1 ? '1st' : rank === 2 ? '2nd' : '3rd';
+const ordinal = (rank: number) => `${rank}${rank % 100 >= 11 && rank % 100 <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' } as Record<number, string>)[rank % 10] || 'th'}`;
 
 function HighlightIcon({ trophy }: { trophy: boolean }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -63,7 +63,7 @@ function HighlightIcon({ trophy }: { trophy: boolean }) {
   </svg>;
 }
 
-function PodiumMedal({ rank }: { rank: number }) {
+function PodiumMedal({ rank }: { rank?: number }) {
   return <svg className={styles.medal} viewBox="0 0 120 130" fill="none" aria-hidden="true">
     <path d="M34 92C17 80 12 58 22 36M28 83l-12-4M23 73l-12-7M21 60l-9-9M23 47l-5-12M86 92c17-12 22-34 12-56M92 83l12-4M97 73l12-7M99 60l9-9M97 47l5-12" stroke="var(--medal-edge)" strokeWidth="3" strokeLinecap="round"/>
     <path d="M36 91c8 7 15 10 24 11 9-1 16-4 24-11" stroke="var(--medal-edge)" strokeWidth="2" strokeLinecap="round"/>
@@ -102,13 +102,13 @@ function Podium({ title, standings, ready, coverage, teams }: {
     </div>
     <p className={styles.coverage}>{coverage}</p>
     {!available && <div className={styles.pending}><strong>{unavailableMessage}</strong><span>{!ready ? 'No leaders ranked until every season is confirmed.' : 'Only verified totals are ranked.'}</span></div>}
-    {available && <div className={styles.podium} aria-label="Top three ranks, including ties">
-      {[2, 1, 3].map(rank => {
-        const group = available ? ranks?.find(item => item.rank === rank) : undefined;
+    {available && <div className={styles.podium} aria-label="Top three totals, including ties">
+      {[1, 0, 2].map(position => {
+        const group = ranks?.[position];
         const tied = Boolean(group && group.entries.length > 1);
-        return <div key={rank} className={`${styles.place} ${rank === 1 ? styles.first : rank === 2 ? styles.second : styles.third}`} data-rank={group?.rank}>
+        return <div key={position} className={`${styles.place} ${position === 0 ? styles.first : position === 1 ? styles.second : styles.third}`} data-rank={group?.rank}>
           <div className={styles.competitors}>
-            {group && <PodiumMedal rank={rank}/>}
+            <PodiumMedal rank={group?.rank}/>
             {group ? group.entries.map(entry => {
               const team = teams.find(item => String(item.id) === String(entry.franchiseId))!;
               return <div className={styles.competitor} key={entry.franchiseId}>
@@ -118,9 +118,9 @@ function Podium({ title, standings, ready, coverage, teams }: {
             }) : <span className={styles.placeholder} aria-hidden="true">—</span>}
           </div>
           <div className={styles.step}>
-            <span className={styles.rank}>{group ? `${tied ? 'T' : ''}${ordinal(rank)}` : '—'}</span>
+            <span className={styles.rank}>{group ? `${tied ? 'T' : ''}${ordinal(group.rank)}` : '—'}</span>
             <strong className={styles.value}>{group ? group.count.toLocaleString('en-US') : '—'}</strong>
-            <span className={styles.unit}>{group ? trophy ? group.count === 1 ? 'title' : 'titles' : 'wins' : ' '}</span>
+            <span className={styles.unit}>{group ? `${trophy ? group.count === 1 ? 'title' : 'titles' : 'wins'}${tied ? ' each' : ''}` : ' '}</span>
           </div>
         </div>;
       })}
