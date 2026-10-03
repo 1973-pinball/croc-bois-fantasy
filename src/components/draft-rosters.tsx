@@ -22,17 +22,20 @@ function RosterSlot({ slot, reserve = false }: { slot: DraftRosterSlot; reserve?
   </li>;
 }
 
-export function DraftRosters({ board, preferredFranchiseId }: { board: DraftBoard; preferredFranchiseId?: string }) {
+export function DraftRosters({ board, preferredFranchiseId, compact = false }: { board: DraftBoard; preferredFranchiseId?: string; compact?: boolean }) {
   const id = useId();
-  const [choice, setChoice] = useState(preferredFranchiseId || board.teams[0]?.franchiseId || '');
+  // Keep the automatic default live as account access loads; only user choices are pinned.
+  const [choice, setChoice] = useState<string | null>(null);
   const summary = useMemo(() => buildDraftRosters(board, settings, eligibility), [board]);
-  const selectedId = board.teams.some(team => team.franchiseId === choice) ? choice : board.teams[0]?.franchiseId;
+  const selectedId = board.teams.find(team => team.franchiseId === choice)?.franchiseId
+    ?? board.teams.find(team => team.franchiseId === preferredFranchiseId)?.franchiseId
+    ?? board.teams[0]?.franchiseId;
   const team = summary.teams.find(item => item.franchiseId === selectedId);
   const pendingOrder = !board.orderComplete;
   const pendingKeepers = !board.keepersRevealedAt;
   const issues = [...new Set([...summary.issues, ...(team?.issues || [])])];
   const seasonLabel = `${settings.espnSeasonId - 1}–${String(settings.espnSeasonId).slice(-2)}`;
-  return <section className={`panel ${styles.panel}`} aria-labelledby={`${id}-title`}>
+  return <section className={`panel ${styles.panel} ${compact ? styles.compact : ''}`} aria-labelledby={`${id}-title`}>
     <div className={styles.header}><div><h2 id={`${id}-title`}>Draft rosters</h2><p>Public keepers and draft selections, fitted to ESPN’s roster slots.</p></div><label className={styles.teamSelect} style={franchiseColorStyle(selectedId)}>View team<select value={selectedId || ''} onChange={event => setChoice(event.target.value)}>{board.teams.map(item => <option key={item.franchiseId} value={item.franchiseId}>{item.displayName}</option>)}</select></label></div>
     <div className={styles.body}>
       {(pendingOrder || pendingKeepers) && <p className={styles.notice}>{pendingOrder ? 'Draft order is pending. Rosters fill here once the order is published, keepers are revealed, and draft picks are recorded.' : 'Public keepers appear here after keeper reveal. Recorded draft picks then fill the remaining lineup slots.'} Counts show only players currently visible on the public board.</p>}

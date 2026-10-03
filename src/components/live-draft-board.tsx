@@ -120,7 +120,7 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
   const [availableOnly, setAvailableOnly] = useState(false);
   const [shortlistOnly, setShortlistOnly] = useState(false);
   const [shortlist, setShortlist] = useState<{ key: string; ids: number[] }>({ key: '', ids: [] });
-  const [workspaceView, setWorkspaceView] = useState<'board' | 'players' | 'rosters'>('board');
+  const [workspaceView, setWorkspaceView] = useState<'players' | 'rosters'>('players');
   const [previewBoard, setPreviewBoard] = useState(false);
   const [presenting, setPresenting] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
@@ -151,7 +151,6 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
     correctionRef.current?.focus();
     correctionRef.current?.scrollIntoView({ block: 'center', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
   }, [editingPickId]);
-  useEffect(() => { if (openOrderEditor) setWorkspaceView('board'); }, [openOrderEditor]);
 
   function toggleShortlist(playerId: number) {
     if (!shortlistKey) return;
@@ -272,7 +271,9 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
 
   function resetSelection() { setSelected(null); setEditingPickId(null); setEditingRevision(null); setChangeNote(''); void reload(); }
 
-  return <><section ref={sectionRef} className={`panel ${styles.panel} ${presenting ? styles.presenting : ''}`} aria-labelledby="live-draft-title">
+  const preferredFranchiseId = account.ownTeamIds.map(teamId => board?.teams.find(team => team.espnTeamId === teamId)?.franchiseId).find(Boolean);
+
+  return <section ref={sectionRef} className={`panel ${styles.panel} ${presenting ? styles.presenting : ''}`} aria-labelledby="live-draft-title">
     <div className="panel-header">
       <div><p className="eyebrow">THE NEXT CHAPTER · {board?.draftYear || account.data.season}</p><h2 id="live-draft-title">Live draft board</h2></div>
       <div className={styles.liveStatus}><span aria-hidden="true" className={error || account.connection !== 'live' ? styles.offlineDot : styles.liveDot}/>{loading ? 'Connecting…' : error ? 'Refresh needed' : account.connection !== 'live' ? 'Viewing board · official actions paused' : 'Updates every 5 seconds'}<button className="text-button" disabled={busy || loading || refreshing} onClick={() => void reload()}>{refreshing ? 'Refreshing…' : 'Refresh'}</button><button ref={presentationButtonRef} className="text-button" onClick={() => void togglePresentation()}>{presenting ? 'Exit presentation' : 'Present board'}</button></div>
@@ -284,9 +285,8 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
     {error && <div className={styles.error} role="alert">{error} {board && 'The last loaded board remains visible.'}</div>}
     {account.commissioner && account.connection !== 'live' && <p className={styles.error} role="status">Official draft actions are paused until the live league connection is restored. <button className="text-button" onClick={() => void account.reloadLeague()}>Refresh league connection</button></p>}
     {notice && <p className={styles.success} role="status">{notice}</p>}
-    <div className={styles.workspaceSwitch} role="group" aria-label="Draft workspace">{(['board', 'players', 'rosters'] as const).map(view => <button key={view} type="button" aria-pressed={workspaceView === view} onClick={() => setWorkspaceView(view)}>{view === 'board' ? 'Board' : view === 'players' ? 'Players' : 'Rosters'}</button>)}</div>
-    <div className={`${styles.layout} ${workspaceView === 'rosters' ? styles.workspaceHidden : ''}`}>
-      <div className={`${styles.boardArea} ${workspaceView !== 'board' ? styles.workspaceHidden : ''}`}>
+    <div className={styles.layout}>
+      <div className={styles.boardArea}>
         {!board?.orderComplete && <div className={styles.unpublished}><h3>Draft order is unpublished</h3><p>The choice-priority lottery decides who chooses first. The board fills after the agreed slots are published.</p><button type="button" className="button button-subtle" aria-expanded={previewBoard} aria-controls="draft-board-preview" onClick={() => setPreviewBoard(value => !value)}>{previewBoard ? 'Hide empty board preview' : `Preview ${count * rounds} draft slots`}</button></div>}
         <div id="draft-board-preview" hidden={!board?.orderComplete && !previewBoard && !presenting}>
         <div className={styles.legend}><span><i className={styles.keeperSwatch}/>Kept</span><span><i className={styles.draftedSwatch}/>Drafted</span><span><i className={styles.nextSwatch}/>Next pick</span><small>{board?.draftFormat === 'linear' ? 'Linear' : 'Snake'} · {rounds} rounds</small></div>
@@ -324,7 +324,10 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
         <p className={styles.footnote}>{lastRead ? `Last checked ${lastRead}. ` : ''}Keeper eligibility belongs to the player’s current franchise. Ineligible keepers can still be drafted.</p>
         {board && <DraftOrderEditor key={identity} board={board} account={account} busy={busy || Boolean(error)} open={openOrderEditor} publish={draft => send({ action: 'set_order', seasonId, expectedRevision: draft.revision, franchiseIds: draft.ids, note: draft.note }, 'Draft order published.')}/>}
       </div>
-      <aside className={`${styles.playerPanel} ${workspaceView !== 'players' ? styles.workspaceHidden : ''}`} aria-labelledby="draft-player-pool-title">
+      <aside className={styles.sidePanel} aria-label="Draft tools">
+        <div className={styles.workspaceSwitch} role="group" aria-label="Draft tools view">{(['players', 'rosters'] as const).map(view => <button key={view} type="button" aria-pressed={workspaceView === view} aria-controls={`draft-tools-${view}`} onClick={() => setWorkspaceView(view)}>{view === 'players' ? 'Players' : 'Rosters'}</button>)}</div>
+        <div id="draft-tools-players" className={`${styles.sidePanelBody} ${workspaceView !== 'players' ? styles.workspaceHidden : ''}`}>
+      <section className={styles.playerPanel} aria-labelledby="draft-player-pool-title">
         <p className="eyebrow">SCOUTING THE FIELD</p><h3 id="draft-player-pool-title">Player pool</h3>
         <p className={styles.rankingSource}>{catalog.rankingSource.label}<br/>{catalog.espnSeasonId - 1}–{String(catalog.espnSeasonId).slice(-2)} · updated {catalog.fetchedAt.slice(0, 10)}</p>
         <div className={styles.categories}>{catalog.categories.map(category => <span key={category.id}>{category.label}</span>)}</div>
@@ -357,7 +360,12 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
           {!filteredPlayers.length && <p className={styles.footnote}>No players match these filters.</p>}
         </div>
         <p className={styles.footnote}>ESPN’s supplied ROTO category ranking. Players without a supplied rank follow alphabetically. Keeper labels use the league’s current confirmed profiles.</p>
+      </section>
+        </div>
+        <div id="draft-tools-rosters" className={`${styles.sidePanelBody} ${workspaceView !== 'rosters' ? styles.workspaceHidden : ''}`}>
+          {board ? <DraftRosters compact key={`${seasonId}:${account.session?.user?.id || 'public'}`} board={board} preferredFranchiseId={preferredFranchiseId}/> : <p className={styles.rosterLoading} role="status">{loading ? 'Loading draft rosters…' : 'Draft rosters will appear when the board is available.'}</p>}
+        </div>
       </aside>
     </div>
-  </section>{board && <div className={workspaceView !== 'rosters' ? styles.workspaceHidden : ''}><DraftRosters key={`${seasonId}:${account.session?.user?.id || 'public'}:${account.ownTeamIds.join(',')}`} board={board} preferredFranchiseId={board.teams.find(team => team.espnTeamId !== null && account.ownTeamIds.includes(team.espnTeamId))?.franchiseId}/></div>}</>;
+  </section>;
 }

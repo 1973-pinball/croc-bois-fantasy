@@ -40,6 +40,13 @@
 .source { border-top: 1px solid var(--line); margin: 15px 0 0; padding-top: 10px; overflow-wrap: anywhere; }
 .source a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 .source span { display: block; }
+.compact { margin-top: 0; border: 0; border-radius: 0; background: transparent; }
+.compact .header { flex-direction: column; align-items: stretch; padding: 20px 16px 16px; }
+.compact .teamSelect { width: 100%; }
+.compact .body { padding: 16px; }
+.compact .slots { grid-template-columns: minmax(0, 1fr); }
+.compact .teamSummary { padding: 11px; gap: 9px 16px; }
+.compact .teamSummary h3 { flex-basis: 100%; font-size: 14px; }
 @media (max-width: 650px) {
   .header { align-items: stretch; flex-direction: column; gap: 12px; padding: 15px; }
   .header h2 { font-size: 21px; }
