@@ -124,7 +124,7 @@ function LotteryPanel({ account }: { account: LeagueAccount }) {
           </div>
           <div className={styles.actionCard}>
             <span className={styles.stateLabel}>{lottery.hasRun ? 'OFFICIAL DRAW SAVED' : 'ONE OFFICIAL DRAW'}</span>
-            <h3>{lottery.hasRun ? 'Choice order is saved.' : 'Who gets first choice?'}</h3>
+            <h3>{lottery.hasRun ? 'Choice order is saved' : 'Who gets first choice?'}</h3>
             <p>Each franchise receives one choice priority. Teams are drawn one at a time using their starting weights. After each draw, that team is removed and the remaining weights determine the next choice.</p>
             {lottery.hasRun ? <p className={styles.privateNote}>The saved choice order is visible here only to the commissioner. Share Lottery Results creates a replay link for anyone with the link. Draft slots have not been assigned by this draw.</p> : <>
               <p>Generating saves one official result with its audit record. This panel cannot reroll it or publish draft slots.</p>

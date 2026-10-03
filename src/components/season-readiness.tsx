@@ -122,7 +122,7 @@ export function SeasonReadinessPanel({ account }: { account: LeagueAccount }) {
   const locked = teams.filter(team => team.status === 'locked').length;
   const unreviewed = teams.reduce((sum, team) => sum + team.profileCounts.provisional + team.profileCounts.unresolved + team.profileCounts.missing, 0);
   return <section className={`panel ${styles.panel}`} aria-labelledby={`${id}-title`}>
-    <div className="panel-header"><div><p className="eyebrow">COMMISSIONER · SEASON READINESS</p><h2 id={`${id}-title`}>Every team, every step.</h2></div><button type="button" className="text-button" disabled={!allowed || loading || Boolean(account.actionBusy)} onClick={() => void refresh()}>{loading ? 'Refreshing…' : 'Refresh season overview'}</button></div>
+    <div className="panel-header"><div><p className="eyebrow">COMMISSIONER · SEASON READINESS</p><h2 id={`${id}-title`}>Every team, every step</h2></div><button type="button" className="text-button" disabled={!allowed || loading || Boolean(account.actionBusy)} onClick={() => void refresh()}>{loading ? 'Refreshing…' : 'Refresh season overview'}</button></div>
     <div className={styles.body}><p className={styles.help}>Track every participating franchise, including teams that have not saved a draft. Individual selections stay in the private review workspace below.</p>
       {!allowed && <p className={styles.warning}>Connect to live league records to inspect season readiness.</p>}
       {error && <p className={styles.error} role="alert">{error} {readiness && 'The last loaded overview may be out of date.'}</p>}

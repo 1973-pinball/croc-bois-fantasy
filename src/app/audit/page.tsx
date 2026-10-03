@@ -9,7 +9,7 @@ export default function AuditPage() {
  const exceptions=audit.replay2025.rows.filter(row=>row.status!=="match");
  return <LeaguePortal report={<div className="audit-content">
  <p className="eyebrow">HISTORICAL KEEPER CHECK</p>
- <h1 style={{margin:"10px 0 18px"}}>Show the math.</h1>
+ <h1 style={{margin:"10px 0 18px"}}>Show the math</h1>
  <p style={{maxWidth:800,fontSize:18,lineHeight:1.6}}>Independent calculations reproduce <strong>{totals.matched} of {totals.total}</strong> canonical 2025 keeper-cost records. One record differs and one player has conflicting source costs. Your later rulings remain separate from the historical comparison.</p>
  <section className="panel" style={{margin:"28px 0",padding:24}}>
  <p className="eyebrow">UPCOMING SEASON · REVIEW UPDATED OCTOBER 3, 2026</p><h2 style={{margin:"10px 0 16px"}}>2026 keeper readiness review</h2>

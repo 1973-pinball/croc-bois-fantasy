@@ -215,7 +215,7 @@ export function AccountButton({ account, className = 'sign-in-button', label = '
   return <><a className={className} href="/auth/login?next=%2F%3Fview%3Dmy-team" onClick={open}>{account.session?.user ? 'My account' : label}<span aria-hidden="true">→</span></a>
     <dialog className="account-dialog" ref={dialog} aria-labelledby={titleId}>
       <button className="dialog-close" onClick={() => dialog.current?.close()} aria-label="Close account details">×</button><p className="eyebrow">YOUR LEAGUE ACCOUNT</p>
-      <h2 id={titleId}>{account.session?.user ? 'You’re signed in.' : account.sessionLoading ? 'Connecting to the league…' : 'Google sign-in is coming online.'}</h2>
+      <h2 id={titleId}>{account.session?.user ? 'You’re signed in' : account.sessionLoading ? 'Connecting to the league…' : 'Google sign-in is coming online'}</h2>
       {account.session?.user ? <>
         <p>{account.session.user.email || 'Your Google account is connected.'}</p>
         <p>Your sign-in is remembered on this device.</p>
@@ -281,7 +281,7 @@ export function OfficialKeeperControls({ account, teamId, draft, onLoad, onSaved
     {saveAvailable && !submitAvailable && <p>You can save and reload your private draft during setup. Submit for review opens when the commissioner opens keeper selection.</p>}
     {account.loadingSubmissions && <p role="status">Loading your saved submission…</p>}
     {locked && <p>The commissioner has locked this submission. Local changes will not alter your official keepers.</p>}
-    {conflict && !busy && <div className="workflow-message workflow-error" role="alert"><strong>Saved keepers changed.</strong><p>{draft?.baseRevision === null || !draft ? 'This local plan has not loaded the saved keeper draft.' : `This plan is based on revision ${draft.baseRevision}; the saved draft is now revision ${current?.revision ?? 0}.`} Your local selections are preserved. Load the latest saved draft to replace them before saving or submitting.</p></div>}
+    {conflict && !busy && <div className="workflow-message workflow-error" role="alert"><strong>Saved keepers changed</strong><p>{draft?.baseRevision === null || !draft ? 'This local plan has not loaded the saved keeper draft.' : `This plan is based on revision ${draft.baseRevision}; the saved draft is now revision ${current?.revision ?? 0}.`} Your local selections are preserved. Load the latest saved draft to replace them before saving or submitting.</p></div>}
     {dirty && !locked && !conflict && <p className="unsaved-notice">You have local changes. Save them before submitting.</p>}
     <WorkflowFeedback account={account}/>
     <div className="official-buttons">
