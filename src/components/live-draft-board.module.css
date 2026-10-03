@@ -10,7 +10,7 @@
 .summary dl { display: flex; gap: 22px; margin: 0; flex-shrink: 0; }
 .summary dt { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
 .summary dd { font-family: var(--heading); font-size: 25px; margin: 0; color: var(--green); }
-.layout { padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+.layout { padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) 374px; gap: 20px; align-items: start; }
 .boardArea { min-width: 0; }
 .sidePanel { min-width: 0; position: sticky; top: 88px; border: 1px solid var(--line); border-radius: 7px; background: #f7f8f0; overflow: hidden; }
 .sidePanelBody { max-height: min(920px, calc(100svh - 180px)); overflow-y: auto; scrollbar-gutter: stable; }
