@@ -11,7 +11,7 @@ For this private league, the importer needs the `espn_s2` and `SWID` cookies fro
 3. In [Vercel environment settings](https://vercel.com/studiopinball/croc-bois-fantasy/settings/environment-variables), add two **Production** secrets:
    - `ESPN_S2`: the exact `espn_s2` value.
    - `ESPN_SWID`: the exact `SWID` value, including its braces if present.
-4. Redeploy after saving the environment changes. Open **Commissioner review → ESPN history** and choose **Update ESPN history** to verify the connection and start backfill.
+4. Redeploy after saving the environment changes. Open **Commissioner Tools → ESPN history** and choose **Update ESPN history** to verify the connection and start backfill.
 
 The Supabase server key and random cron secret are configured separately by the app administrator. Neither is sent to the browser. If ESPN expires the session, replace the two ESPN values and redeploy. The app displays the connection failure and retains previously saved results.
 

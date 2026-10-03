@@ -1,0 +1,274 @@
+{
+  "version": 1,
+  "leagueId": 139935,
+  "espnSeasonId": 2027,
+  "source": {
+    "sha256": "df19b73400bfbfbb8bcbfa977a14bb4aa5d116fabd99eee8df13d9cda66857e8",
+    "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2027/segments/0/leagues/139935?view=mSettings&view=mRoster",
+    "capturedAt": "2026-10-03T18:55:24.238Z"
+  },
+  "slotDefinitionsSource": {
+    "sha256": "dc7761c0567294c32b3e94a2b8800e60ae39700aecece7dd22c4148591fe48cc",
+    "url": "https://cdn1.espn.net/kona/35f16ade75be-1.504/_next/static/commons/main-396c1392ce19efb16ea8.js",
+    "capturedAt": "2026-10-03T18:55:24.834Z"
+  },
+  "positionLimitsSource": {
+    "sha256": "90348df194ff510422eea3d30dcc597041cdaf1e40dc851059418a383c2eaea1",
+    "url": "https://cdn1.espn.net/kona/35f16ade75be-1.504/_next/27514705-2eb8-41bf-9d0a-d8d273e5d124/page/basketball/league/settings.js",
+    "capturedAt": "2026-10-03T18:55:24.871Z"
+  },
+  "slots": [
+    {
+      "slotId": 0,
+      "label": "PG",
+      "count": 1,
+      "kind": "normal"
+    },
+    {
+      "slotId": 1,
+      "label": "SG",
+      "count": 1,
+      "kind": "normal"
+    },
+    {
+      "slotId": 2,
+      "label": "SF",
+      "count": 1,
+      "kind": "normal"
+    },
+    {
+      "slotId": 3,
+      "label": "PF",
+      "count": 1,
+      "kind": "normal"
+    },
+    {
+      "slotId": 4,
+      "label": "C",
+      "count": 1,
+      "kind": "normal"
+    },
+    {
+      "slotId": 5,
+      "label": "G",
+      "count": 1,
+      "kind": "normal"
+    },
+    {
+      "slotId": 6,
+      "label": "F",
+      "count": 1,
+      "kind": "normal"
+    },
+    {
+      "slotId": 11,
+      "label": "UTIL",
+      "count": 3,
+      "kind": "normal"
+    },
+    {
+      "slotId": 12,
+      "label": "BE",
+      "count": 3,
+      "kind": "normal"
+    },
+    {
+      "slotId": 13,
+      "label": "IR",
+      "count": 1,
+      "kind": "reserve"
+    }
+  ],
+  "slotDefinitions": [
+    {
+      "slotId": 0,
+      "label": "PG",
+      "name": "Point Guard",
+      "bench": false,
+      "reserve": false,
+      "lineupSlotEligible": true
+    },
+    {
+      "slotId": 1,
+      "label": "SG",
+      "name": "Shooting Guard",
+      "bench": false,
+      "reserve": false,
+      "lineupSlotEligible": true
+    },
+    {
+      "slotId": 2,
+      "label": "SF",
+      "name": "Small Forward",
+      "bench": false,
+      "reserve": false,
+      "lineupSlotEligible": true
+    },
+    {
+      "slotId": 3,
+      "label": "PF",
+      "name": "Power Forward",
+      "bench": false,
+      "reserve": false,
+      "lineupSlotEligible": true
+    },
+    {
+      "slotId": 4,
+      "label": "C",
+      "name": "Center",
+      "bench": false,
+      "reserve": false,
+      "lineupSlotEligible": true
+    },
+    {
+      "slotId": 5,
+      "label": "G",
+      "name": "Guard",
+      "bench": false,
+      "reserve": false,
+      "lineupSlotEligible": true
+    },
+    {
+      "slotId": 6,
+      "label": "F",
+      "name": "Forward",
+      "bench": false,
+      "reserve": false,
+      "lineupSlotEligible": true
+    },
+    {
+      "slotId": 7,
+      "label": "SG/SF",
+      "name": "Shooting Guard/Small Forward",
+      "bench": false,
+      "reserve": false,
+      "lineupSlotEligible": true
+    },
+    {
+      "slotId": 8,
+      "label": "G/F",
+      "name": "Guard/Forward",
+      "bench": false,
+      "reserve": false,
+      "lineupSlotEligible": true
+    },
+    {
+      "slotId": 9,
+      "label": "PF/C",
+      "name": "Power Forward/Center",
+      "bench": false,
+      "reserve": false,
+      "lineupSlotEligible": true
+    },
+    {
+      "slotId": 10,
+      "label": "F/C",
+      "name": "Forward/Center",
+      "bench": false,
+      "reserve": false,
+      "lineupSlotEligible": true
+    },
+    {
+      "slotId": 11,
+      "label": "UTIL",
+      "name": "Util",
+      "bench": false,
+      "reserve": false,
+      "lineupSlotEligible": true
+    },
+    {
+      "slotId": 12,
+      "label": "BE",
+      "name": "Bench",
+      "bench": true,
+      "reserve": false,
+      "lineupSlotEligible": true
+    },
+    {
+      "slotId": 13,
+      "label": "IR",
+      "name": "Injured Reserve",
+      "bench": false,
+      "reserve": true,
+      "lineupSlotEligible": true
+    },
+    {
+      "slotId": 14,
+      "label": "INV",
+      "name": "Invalid Player",
+      "bench": false,
+      "reserve": false,
+      "lineupSlotEligible": false
+    },
+    {
+      "slotId": 15,
+      "label": "ALL",
+      "name": "All Players",
+      "bench": false,
+      "reserve": false,
+      "lineupSlotEligible": false
+    }
+  ],
+  "normalCapacity": 13,
+  "reserveCapacity": 1,
+  "lineupSlotCounts": {
+    "0": 1,
+    "1": 1,
+    "2": 1,
+    "3": 1,
+    "4": 1,
+    "5": 1,
+    "6": 1,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 0,
+    "11": 3,
+    "12": 3,
+    "13": 1,
+    "14": 0
+  },
+  "positionLimits": {
+    "0": 0,
+    "1": -1,
+    "2": -1,
+    "3": -1,
+    "4": -1,
+    "5": -1
+  },
+  "isBenchUnlimited": true,
+  "primaryPositionLimits": [
+    {
+      "positionId": 1,
+      "label": "PG",
+      "maximum": null
+    },
+    {
+      "positionId": 2,
+      "label": "SG",
+      "maximum": null
+    },
+    {
+      "positionId": 3,
+      "label": "SF",
+      "maximum": null
+    },
+    {
+      "positionId": 4,
+      "label": "PF",
+      "maximum": null
+    },
+    {
+      "positionId": 5,
+      "label": "C",
+      "maximum": null
+    }
+  ],
+  "limitations": [
+    "Slot counts describe the configured ESPN lineup and bench layout. They are not primary-position roster maximums or a draft transaction validator.",
+    "Position maximums apply to the ESPN primary position only. A null maximum is ESPN’s No Limit setting (-1 in the raw settings).",
+    "The raw isBenchUnlimited setting is preserved without interpreting it as additional draft slots.",
+    "IR is shown separately. eligibleSlots includes IR even for healthy players; IR eligibility also depends on ESPN’s current injury designation. No player is automatically placed on IR.",
+    "Settings and player eligibility are dated ESPN captures. Rebuild from ESPN to reflect later changes."
+  ]
+}

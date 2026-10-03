@@ -1,0 +1,3064 @@
+{
+  "version": 1,
+  "reviewDate": "2026-10-03",
+  "draftYear": 2026,
+  "status": "evidence-and-established-rule-reviewed-migrations-prepared",
+  "productionApplication": "Not established by this static artifact; consult database audit events and current readiness status.",
+  "comparisonDefinition": "Matched means consistent with a rule-based recomputation from the commissioner-approved 2025 nominal baseline, marked 2025 draft, supplied tenure evidence, and frozen roster. The initial undrafted season counts as tenure one under the established rule. This check does not certify every historical ownership chain or establish production migration status.",
+  "ownershipComparison": {
+    "reviewDate": "2026-10-01",
+    "frozenSnapshotDate": "2026-03-29",
+    "source": "Public production league records compared with the reviewed bootstrap and permanent pick identities",
+    "rosterPlayersChecked": 111,
+    "rosterOwnershipDifferences": 0,
+    "picksChecked": 104,
+    "pickIdentityRoundOrOwnershipDifferences": 0,
+    "changesApplied": false
+  },
+  "sources": {
+    "workbookSha256": "b617ed70f97c12c4482492902a86812e4ac2692724e372da28dfc7ad330bd6da",
+    "extractedWorkbookSha256": "8bafe97e19f75ee01ae087abed58259220eee9e96fa9968733b7bcc3a71ac1dc",
+    "commissionerMarkedDraftSha256": "83a4b24a567b0e0e88ffb8c4c0874e718533fc13e7f506743e1cefdd88ac52c8",
+    "keeperCostSourceSha256": "3cfde875f4cc63f2d5a364f98b955ee5de17c9a81811e7f3ddd41f3870859058"
+  },
+  "summary": {
+    "rosterPlayers": 111,
+    "upcomingNumericDifferences": 0,
+    "reviewProfiles": 47,
+    "evidenceSupportedVerificationCorrections": 11,
+    "pendingConventionOrRuling": 0,
+    "matchedRosterCosts": 111,
+    "comparisonsConditionalOnPendingDecisions": 0,
+    "unchangedNumericValues": true,
+    "pendingUndraftedConvention": 0,
+    "pendingSpecificCostRulings": [],
+    "observedReviewProfiles": 47,
+    "undraftedRuleConfirmations": 36,
+    "totalSupportedConfirmations": 47
+  },
+  "interpretation": [
+    "All 111 nominal costs and tenure values agree with the baseline recomputation after normalizing fresh round-one ineligibility. Retained-player costs preserve the approved 2025 nominal baseline; older historical discrepancies remain visible.",
+    "Migration 00008 confirms eleven histories supported by positive 2024 fresh-draft records and marked 2025 retention. Migration 00009 applies the already-established undrafted rule to the remaining thirty-six matching histories.",
+    "Thirty players went undrafted and unkept in 2025: initial tenure one and nominal 2026 round-thirteen keeper cost. Six players went undrafted and unkept in 2024 and were retained in 2025: tenure two and nominal 2026 round-twelve keeper cost.",
+    "Josh Hart and Quentin Grimes match the same six-player setup. The commissioner authorized confirmation for all matching setups; the earlier provisional labels are retained only as historical provenance. Their actual 2025 payments remain rounds twelve and eleven respectively.",
+    "Observed status and observed review reasons preserve the October 1 database snapshot. Resolved evidence does not imply deployment: current database verification and migration audit events determine official submission readiness."
+  ],
+  "roster": [
+    {
+      "playerId": 3975,
+      "player": "Stephen Curry",
+      "franchiseId": 1,
+      "baseRound": 1,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4432166,
+      "player": "Cade Cunningham",
+      "franchiseId": 1,
+      "baseRound": 2,
+      "tenureYears": 2,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "supported-confirmation",
+      "observedReviewReason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "resolutionStatus": "confirmed-by-historical-evidence",
+      "resolutionMigration": "20261001000008_keeper_evidence_review"
+    },
+    {
+      "playerId": 3917376,
+      "player": "Jaylen Brown",
+      "franchiseId": 1,
+      "baseRound": 4,
+      "tenureYears": 2,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "supported-confirmation",
+      "observedReviewReason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "resolutionStatus": "confirmed-by-historical-evidence",
+      "resolutionMigration": "20261001000008_keeper_evidence_review"
+    },
+    {
+      "playerId": 3978,
+      "player": "DeMar DeRozan",
+      "franchiseId": 1,
+      "baseRound": 4,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 3913176,
+      "player": "Brandon Ingram",
+      "franchiseId": 1,
+      "baseRound": 5,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 3064514,
+      "player": "Julius Randle",
+      "franchiseId": 1,
+      "baseRound": 5,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 3064440,
+      "player": "Zach LaVine",
+      "franchiseId": 1,
+      "baseRound": 6,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4433621,
+      "player": "Jalen Duren",
+      "franchiseId": 1,
+      "baseRound": 7,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4277961,
+      "player": "Jaren Jackson Jr.",
+      "franchiseId": 1,
+      "baseRound": 8,
+      "tenureYears": 4,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 3078576,
+      "player": "Derrick White",
+      "franchiseId": 1,
+      "baseRound": 10,
+      "tenureYears": 3,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 3945274,
+      "player": "Luka Doncic",
+      "franchiseId": 1,
+      "baseRound": null,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "ineligible",
+      "eligibleByNumericRules": false,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 3908845,
+      "player": "John Collins",
+      "franchiseId": 1,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4397002,
+      "player": "Ayo Dosunmu",
+      "franchiseId": 1,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4277905,
+      "player": "Trae Young",
+      "franchiseId": 1,
+      "baseRound": null,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "ineligible",
+      "eligibleByNumericRules": false,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4278073,
+      "player": "Shai Gilgeous-Alexander",
+      "franchiseId": 2,
+      "baseRound": null,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "ineligible",
+      "eligibleByNumericRules": false,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 3202,
+      "player": "Kevin Durant",
+      "franchiseId": 2,
+      "baseRound": 1,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4432816,
+      "player": "LaMelo Ball",
+      "franchiseId": 2,
+      "baseRound": 2,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 6450,
+      "player": "Kawhi Leonard",
+      "franchiseId": 2,
+      "baseRound": 3,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 3059318,
+      "player": "Joel Embiid",
+      "franchiseId": 2,
+      "baseRound": 5,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 3934719,
+      "player": "OG Anunoby",
+      "franchiseId": 2,
+      "baseRound": 6,
+      "tenureYears": 2,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "supported-confirmation",
+      "observedReviewReason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "resolutionStatus": "confirmed-by-historical-evidence",
+      "resolutionMigration": "20261001000008_keeper_evidence_review"
+    },
+    {
+      "playerId": 4433287,
+      "player": "Brandon Miller",
+      "franchiseId": 2,
+      "baseRound": 7,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4701230,
+      "player": "Jalen Johnson",
+      "franchiseId": 2,
+      "baseRound": 11,
+      "tenureYears": 3,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 5105565,
+      "player": "Donovan Clingan",
+      "franchiseId": 2,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4711272,
+      "player": "Reed Sheppard",
+      "franchiseId": 2,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4873138,
+      "player": "Ace Bailey",
+      "franchiseId": 2,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4431736,
+      "player": "Toumani Camara",
+      "franchiseId": 2,
+      "baseRound": 8,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4432165,
+      "player": "Jalen Suggs",
+      "franchiseId": 2,
+      "baseRound": 7,
+      "tenureYears": 2,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "supported-confirmation",
+      "observedReviewReason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "resolutionStatus": "confirmed-by-historical-evidence",
+      "resolutionMigration": "20261001000008_keeper_evidence_review"
+    },
+    {
+      "playerId": 3032977,
+      "player": "Giannis Antetokounmpo",
+      "franchiseId": 3,
+      "baseRound": null,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "ineligible",
+      "eligibleByNumericRules": false,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 3155942,
+      "player": "Domantas Sabonis",
+      "franchiseId": 3,
+      "baseRound": 1,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 5041939,
+      "player": "Cooper Flagg",
+      "franchiseId": 3,
+      "baseRound": 2,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4871144,
+      "player": "Alperen Sengun",
+      "franchiseId": 3,
+      "baseRound": 3,
+      "tenureYears": 4,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 3133628,
+      "player": "Myles Turner",
+      "franchiseId": 3,
+      "baseRound": 4,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4433134,
+      "player": "Scottie Barnes",
+      "franchiseId": 3,
+      "baseRound": 9,
+      "tenureYears": 5,
+      "comparison": "matched",
+      "observedStatus": "ineligible",
+      "eligibleByNumericRules": false,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4395725,
+      "player": "Tyler Herro",
+      "franchiseId": 3,
+      "baseRound": 9,
+      "tenureYears": 5,
+      "comparison": "matched",
+      "observedStatus": "ineligible",
+      "eligibleByNumericRules": false,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4600663,
+      "player": "Zach Edey",
+      "franchiseId": 3,
+      "baseRound": 11,
+      "tenureYears": 2,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "supported-confirmation",
+      "observedReviewReason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "resolutionStatus": "confirmed-by-historical-evidence",
+      "resolutionMigration": "20261001000008_keeper_evidence_review"
+    },
+    {
+      "playerId": 4683634,
+      "player": "Bennedict Mathurin",
+      "franchiseId": 3,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4395626,
+      "player": "Tre Jones",
+      "franchiseId": 3,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 3032976,
+      "player": "Rudy Gobert",
+      "franchiseId": 3,
+      "baseRound": 9,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4278067,
+      "player": "Nic Claxton",
+      "franchiseId": 3,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4845367,
+      "player": "Stephon Castle",
+      "franchiseId": 3,
+      "baseRound": 11,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4397136,
+      "player": "Saddiq Bey",
+      "franchiseId": 3,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 3112335,
+      "player": "Nikola Jokic",
+      "franchiseId": 4,
+      "baseRound": null,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "ineligible",
+      "eligibleByNumericRules": false,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4066261,
+      "player": "Bam Adebayo",
+      "franchiseId": 4,
+      "baseRound": 1,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4395628,
+      "player": "Zion Williamson",
+      "franchiseId": 4,
+      "baseRound": 2,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 1966,
+      "player": "LeBron James",
+      "franchiseId": 4,
+      "baseRound": 3,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 3149673,
+      "player": "Pascal Siakam",
+      "franchiseId": 4,
+      "baseRound": 4,
+      "tenureYears": 2,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "supported-confirmation",
+      "observedReviewReason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "resolutionStatus": "confirmed-by-historical-evidence",
+      "resolutionMigration": "20261001000008_keeper_evidence_review"
+    },
+    {
+      "playerId": 4066336,
+      "player": "Lauri Markkanen",
+      "franchiseId": 4,
+      "baseRound": 5,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 2490149,
+      "player": "CJ McCollum",
+      "franchiseId": 4,
+      "baseRound": 6,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4395625,
+      "player": "RJ Barrett",
+      "franchiseId": 4,
+      "baseRound": 7,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4278129,
+      "player": "Deandre Ayton",
+      "franchiseId": 4,
+      "baseRound": 8,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4395712,
+      "player": "Andrew Nembhard",
+      "franchiseId": 4,
+      "baseRound": 10,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 3062679,
+      "player": "Josh Hart",
+      "franchiseId": 4,
+      "baseRound": 12,
+      "tenureYears": 2,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Provisional round 12. Commissioner will double-check the 2024 free-agent history.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4683021,
+      "player": "Deni Avdija",
+      "franchiseId": 4,
+      "baseRound": 12,
+      "tenureYears": 2,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 3064290,
+      "player": "Aaron Gordon",
+      "franchiseId": 4,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4593125,
+      "player": "Santi Aldama",
+      "franchiseId": 4,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 3136195,
+      "player": "Karl-Anthony Towns",
+      "franchiseId": 5,
+      "baseRound": 1,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4593803,
+      "player": "Jalen Williams",
+      "franchiseId": 5,
+      "baseRound": 2,
+      "tenureYears": 3,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4066259,
+      "player": "De'Aaron Fox",
+      "franchiseId": 5,
+      "baseRound": 3,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4066383,
+      "player": "Miles Bridges",
+      "franchiseId": 5,
+      "baseRound": 4,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4278104,
+      "player": "Michael Porter Jr.",
+      "franchiseId": 5,
+      "baseRound": 7,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4066457,
+      "player": "Austin Reaves",
+      "franchiseId": 5,
+      "baseRound": 10,
+      "tenureYears": 2,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "supported-confirmation",
+      "observedReviewReason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "resolutionStatus": "confirmed-by-historical-evidence",
+      "resolutionMigration": "20261001000008_keeper_evidence_review"
+    },
+    {
+      "playerId": 6442,
+      "player": "Kyrie Irving",
+      "franchiseId": 5,
+      "baseRound": 9,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 5160992,
+      "player": "Alex Sarr",
+      "franchiseId": 5,
+      "baseRound": 8,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4433627,
+      "player": "Keyonte George",
+      "franchiseId": 5,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 3059319,
+      "player": "Andrew Wiggins",
+      "franchiseId": 5,
+      "baseRound": 12,
+      "tenureYears": 2,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4432639,
+      "player": "Jabari Smith Jr.",
+      "franchiseId": 5,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4278585,
+      "player": "Collin Gillespie",
+      "franchiseId": 5,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4683692,
+      "player": "Cason Wallace",
+      "franchiseId": 5,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4433247,
+      "player": "Jonathan Kuminga",
+      "franchiseId": 5,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 5104157,
+      "player": "Victor Wembanyama",
+      "franchiseId": 6,
+      "baseRound": null,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "ineligible",
+      "eligibleByNumericRules": false,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 3908809,
+      "player": "Donovan Mitchell",
+      "franchiseId": 6,
+      "baseRound": 1,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4432158,
+      "player": "Evan Mobley",
+      "franchiseId": 6,
+      "baseRound": 2,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4066328,
+      "player": "Jarrett Allen",
+      "franchiseId": 6,
+      "baseRound": 4,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 3147657,
+      "player": "Mikal Bridges",
+      "franchiseId": 6,
+      "baseRound": 5,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4437244,
+      "player": "Jalen Green",
+      "franchiseId": 6,
+      "baseRound": 10,
+      "tenureYears": 2,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "supported-confirmation",
+      "observedReviewReason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "resolutionStatus": "confirmed-by-historical-evidence",
+      "resolutionMigration": "20261001000008_keeper_evidence_review"
+    },
+    {
+      "playerId": 4066354,
+      "player": "Payton Pritchard",
+      "franchiseId": 6,
+      "baseRound": 12,
+      "tenureYears": 2,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4591725,
+      "player": "Ryan Rollins",
+      "franchiseId": 6,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 5105623,
+      "player": "Kel'el Ware",
+      "franchiseId": 6,
+      "baseRound": 7,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4684740,
+      "player": "Amen Thompson",
+      "franchiseId": 6,
+      "baseRound": 11,
+      "tenureYears": 2,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "supported-confirmation",
+      "observedReviewReason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "resolutionStatus": "confirmed-by-historical-evidence",
+      "resolutionMigration": "20261001000008_keeper_evidence_review"
+    },
+    {
+      "playerId": 4397424,
+      "player": "Neemias Queta",
+      "franchiseId": 6,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4431679,
+      "player": "Precious Achiuwa",
+      "franchiseId": 6,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4397014,
+      "player": "Quentin Grimes",
+      "franchiseId": 6,
+      "baseRound": 12,
+      "tenureYears": 2,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Provisional round 12. Commissioner will double-check the 2024 free-agent history.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4278594,
+      "player": "Naji Marshall",
+      "franchiseId": 6,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 3934672,
+      "player": "Jalen Brunson",
+      "franchiseId": 7,
+      "baseRound": 2,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4065648,
+      "player": "Jayson Tatum",
+      "franchiseId": 7,
+      "baseRound": 5,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4066320,
+      "player": "Desmond Bane",
+      "franchiseId": 7,
+      "baseRound": 9,
+      "tenureYears": 5,
+      "comparison": "matched",
+      "observedStatus": "ineligible",
+      "eligibleByNumericRules": false,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4395724,
+      "player": "Immanuel Quickley",
+      "franchiseId": 7,
+      "baseRound": 11,
+      "tenureYears": 3,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4869342,
+      "player": "Dyson Daniels",
+      "franchiseId": 7,
+      "baseRound": 12,
+      "tenureYears": 2,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4397688,
+      "player": "Trey Murphy III",
+      "franchiseId": 7,
+      "baseRound": 3,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 5124612,
+      "player": "VJ Edgecombe",
+      "franchiseId": 7,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4277813,
+      "player": "Herbert Jones",
+      "franchiseId": 7,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 3995,
+      "player": "Jrue Holiday",
+      "franchiseId": 7,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 3907497,
+      "player": "Dejounte Murray",
+      "franchiseId": 7,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4251,
+      "player": "Paul George",
+      "franchiseId": 7,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4433136,
+      "player": "Walker Kessler",
+      "franchiseId": 7,
+      "baseRound": 10,
+      "tenureYears": 4,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4869780,
+      "player": "Derik Queen",
+      "franchiseId": 7,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 5037871,
+      "player": "Dylan Harper",
+      "franchiseId": 7,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 3136193,
+      "player": "Devin Booker",
+      "franchiseId": 8,
+      "baseRound": 1,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4433255,
+      "player": "Chet Holmgren",
+      "franchiseId": 8,
+      "baseRound": 2,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 3936299,
+      "player": "Jamal Murray",
+      "franchiseId": 8,
+      "baseRound": 3,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4871145,
+      "player": "Josh Giddey",
+      "franchiseId": 8,
+      "baseRound": 4,
+      "tenureYears": 2,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "supported-confirmation",
+      "observedReviewReason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "resolutionStatus": "confirmed-by-historical-evidence",
+      "resolutionMigration": "20261001000008_keeper_evidence_review"
+    },
+    {
+      "playerId": 4432573,
+      "player": "Paolo Banchero",
+      "franchiseId": 8,
+      "baseRound": 5,
+      "tenureYears": 2,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "supported-confirmation",
+      "observedReviewReason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "resolutionStatus": "confirmed-by-historical-evidence",
+      "resolutionMigration": "20261001000008_keeper_evidence_review"
+    },
+    {
+      "playerId": 4396993,
+      "player": "Tyrese Haliburton",
+      "franchiseId": 8,
+      "baseRound": 6,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4396907,
+      "player": "Darius Garland",
+      "franchiseId": 8,
+      "baseRound": 8,
+      "tenureYears": 5,
+      "comparison": "matched",
+      "observedStatus": "ineligible",
+      "eligibleByNumericRules": false,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4566434,
+      "player": "Franz Wagner",
+      "franchiseId": 8,
+      "baseRound": 9,
+      "tenureYears": 5,
+      "comparison": "matched",
+      "observedStatus": "ineligible",
+      "eligibleByNumericRules": false,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4431680,
+      "player": "Onyeka Okongwu",
+      "franchiseId": 8,
+      "baseRound": 10,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 2595516,
+      "player": "Norman Powell",
+      "franchiseId": 8,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 5061575,
+      "player": "Kon Knueppel",
+      "franchiseId": 8,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4711294,
+      "player": "Matas Buzelis",
+      "franchiseId": 8,
+      "baseRound": 6,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    },
+    {
+      "playerId": 4278039,
+      "player": "Nickeil Alexander-Walker",
+      "franchiseId": 8,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "review",
+      "eligibleByNumericRules": true,
+      "reviewCategory": "rule-supported-confirmation",
+      "observedReviewReason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "resolutionMigration": "20261003000009_undrafted_keeper_rule"
+    },
+    {
+      "playerId": 4279888,
+      "player": "Ja Morant",
+      "franchiseId": 8,
+      "baseRound": 5,
+      "tenureYears": 1,
+      "comparison": "matched",
+      "observedStatus": "eligible",
+      "eligibleByNumericRules": true,
+      "reviewCategory": null
+    }
+  ],
+  "supportedConfirmations": [
+    {
+      "player": "Cade Cunningham",
+      "playerId": 4432166,
+      "baseRound": 2,
+      "tenureYears": 2,
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "evidence": {
+        "fresh2024Draft": {
+          "round": 4,
+          "playerCell": "'2024 Draft'!E28",
+          "roundCell": "'2024 Draft'!A28"
+        },
+        "absentFrom2024Keepers": "'2025 Draft'!Y4:Y37 (34 confirmed keepers)",
+        "retained2025": {
+          "marker": "x",
+          "row": 22,
+          "paymentRound": 3,
+          "source": "commissioner-marked-2025-draft"
+        },
+        "rule": "The drafted season counts as tenure one; retaining for 2025 adds one. The blank source tenure remains preserved."
+      },
+      "sourceCells": [
+        "'2025 Draft'!A22",
+        "'2025 Draft'!E22",
+        "commissioner-marked-2025-draft:row-22",
+        "'2025 Draft'!R30",
+        "'2024 Draft'!A28",
+        "'2024 Draft'!E28"
+      ],
+      "originalReviewFlags": [
+        "tenure_inferred_from_complete_2024_draft_and_keeper_list"
+      ]
+    },
+    {
+      "player": "Jaylen Brown",
+      "playerId": 3917376,
+      "baseRound": 4,
+      "tenureYears": 2,
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "evidence": {
+        "fresh2024Draft": {
+          "round": 6,
+          "playerCell": "'2024 Draft'!E44",
+          "roundCell": "'2024 Draft'!A44"
+        },
+        "absentFrom2024Keepers": "'2025 Draft'!Y4:Y37 (34 confirmed keepers)",
+        "retained2025": {
+          "marker": "x",
+          "row": 38,
+          "paymentRound": 5,
+          "source": "commissioner-marked-2025-draft"
+        },
+        "rule": "The drafted season counts as tenure one; retaining for 2025 adds one. The blank source tenure remains preserved."
+      },
+      "sourceCells": [
+        "'2025 Draft'!A38",
+        "'2025 Draft'!E38",
+        "commissioner-marked-2025-draft:row-38",
+        "'2025 Draft'!R45",
+        "'2024 Draft'!A44",
+        "'2024 Draft'!E44"
+      ],
+      "originalReviewFlags": [
+        "tenure_inferred_from_complete_2024_draft_and_keeper_list"
+      ]
+    },
+    {
+      "player": "OG Anunoby",
+      "playerId": 3934719,
+      "baseRound": 6,
+      "tenureYears": 2,
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "evidence": {
+        "fresh2024Draft": {
+          "round": 8,
+          "playerCell": "'2024 Draft'!E63",
+          "roundCell": "'2024 Draft'!A63"
+        },
+        "absentFrom2024Keepers": "'2025 Draft'!Y4:Y37 (34 confirmed keepers)",
+        "retained2025": {
+          "marker": "x",
+          "row": 57,
+          "paymentRound": 7,
+          "source": "commissioner-marked-2025-draft"
+        },
+        "rule": "The drafted season counts as tenure one; retaining for 2025 adds one. The blank source tenure remains preserved."
+      },
+      "sourceCells": [
+        "'2025 Draft'!A57",
+        "'2025 Draft'!E57",
+        "commissioner-marked-2025-draft:row-57",
+        "'2025 Draft'!R64",
+        "'2024 Draft'!A63",
+        "'2024 Draft'!E63"
+      ],
+      "originalReviewFlags": [
+        "tenure_inferred_from_complete_2024_draft_and_keeper_list"
+      ]
+    },
+    {
+      "player": "Jalen Suggs",
+      "playerId": 4432165,
+      "baseRound": 7,
+      "tenureYears": 2,
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "evidence": {
+        "fresh2024Draft": {
+          "round": 9,
+          "playerCell": "'2024 Draft'!E69",
+          "roundCell": "'2024 Draft'!A69"
+        },
+        "absentFrom2024Keepers": "'2025 Draft'!Y4:Y37 (34 confirmed keepers)",
+        "retained2025": {
+          "marker": "x",
+          "row": 53,
+          "paymentRound": 7,
+          "source": "commissioner-marked-2025-draft"
+        },
+        "rule": "The drafted season counts as tenure one; retaining for 2025 adds one. The blank source tenure remains preserved."
+      },
+      "sourceCells": [
+        "'2025 Draft'!A53",
+        "'2025 Draft'!E53",
+        "commissioner-marked-2025-draft:row-53",
+        "'2025 Draft'!R70",
+        "'2024 Draft'!A69",
+        "'2024 Draft'!E69"
+      ],
+      "originalReviewFlags": [
+        "tenure_inferred_from_complete_2024_draft_and_keeper_list"
+      ]
+    },
+    {
+      "player": "Zach Edey",
+      "playerId": 4600663,
+      "baseRound": 11,
+      "tenureYears": 2,
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "evidence": {
+        "fresh2024Draft": {
+          "round": 13,
+          "playerCell": "'2024 Draft'!E101",
+          "roundCell": "'2024 Draft'!A101"
+        },
+        "absentFrom2024Keepers": "'2025 Draft'!Y4:Y37 (34 confirmed keepers)",
+        "retained2025": {
+          "marker": "x",
+          "row": 94,
+          "paymentRound": 12,
+          "source": "commissioner-marked-2025-draft"
+        },
+        "rule": "The drafted season counts as tenure one; retaining for 2025 adds one. The blank source tenure remains preserved."
+      },
+      "sourceCells": [
+        "'2025 Draft'!A94",
+        "'2025 Draft'!E94",
+        "commissioner-marked-2025-draft:row-94",
+        "'2025 Draft'!R107",
+        "'2024 Draft'!A101",
+        "'2024 Draft'!E101"
+      ],
+      "originalReviewFlags": [
+        "tenure_inferred_from_complete_2024_draft_and_keeper_list"
+      ]
+    },
+    {
+      "player": "Pascal Siakam",
+      "playerId": 3149673,
+      "baseRound": 4,
+      "tenureYears": 2,
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "evidence": {
+        "fresh2024Draft": {
+          "round": 6,
+          "playerCell": "'2024 Draft'!E48",
+          "roundCell": "'2024 Draft'!A48"
+        },
+        "absentFrom2024Keepers": "'2025 Draft'!Y4:Y37 (34 confirmed keepers)",
+        "retained2025": {
+          "marker": "x",
+          "row": 37,
+          "paymentRound": 5,
+          "source": "commissioner-marked-2025-draft"
+        },
+        "rule": "The drafted season counts as tenure one; retaining for 2025 adds one. The blank source tenure remains preserved."
+      },
+      "sourceCells": [
+        "'2025 Draft'!A37",
+        "'2025 Draft'!E37",
+        "commissioner-marked-2025-draft:row-37",
+        "'2025 Draft'!R49",
+        "'2024 Draft'!A48",
+        "'2024 Draft'!E48"
+      ],
+      "originalReviewFlags": [
+        "tenure_inferred_from_complete_2024_draft_and_keeper_list"
+      ]
+    },
+    {
+      "player": "Austin Reaves",
+      "playerId": 4066457,
+      "baseRound": 10,
+      "tenureYears": 2,
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "evidence": {
+        "fresh2024Draft": {
+          "round": 12,
+          "playerCell": "'2024 Draft'!E90",
+          "roundCell": "'2024 Draft'!A90"
+        },
+        "absentFrom2024Keepers": "'2025 Draft'!Y4:Y37 (34 confirmed keepers)",
+        "retained2025": {
+          "marker": "x",
+          "row": 89,
+          "paymentRound": 11,
+          "source": "commissioner-marked-2025-draft"
+        },
+        "rule": "The drafted season counts as tenure one; retaining for 2025 adds one. The blank source tenure remains preserved."
+      },
+      "sourceCells": [
+        "'2025 Draft'!A89",
+        "'2025 Draft'!E89",
+        "commissioner-marked-2025-draft:row-89",
+        "'2025 Draft'!R96",
+        "'2024 Draft'!A90",
+        "'2024 Draft'!E90"
+      ],
+      "originalReviewFlags": [
+        "tenure_inferred_from_complete_2024_draft_and_keeper_list"
+      ]
+    },
+    {
+      "player": "Jalen Green",
+      "playerId": 4437244,
+      "baseRound": 10,
+      "tenureYears": 2,
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "evidence": {
+        "fresh2024Draft": {
+          "round": 12,
+          "playerCell": "'2024 Draft'!E95",
+          "roundCell": "'2024 Draft'!A95"
+        },
+        "absentFrom2024Keepers": "'2025 Draft'!Y4:Y37 (34 confirmed keepers)",
+        "retained2025": {
+          "marker": "x",
+          "row": 83,
+          "paymentRound": 11,
+          "source": "commissioner-marked-2025-draft"
+        },
+        "rule": "The drafted season counts as tenure one; retaining for 2025 adds one. The blank source tenure remains preserved."
+      },
+      "sourceCells": [
+        "'2025 Draft'!A83",
+        "'2025 Draft'!E83",
+        "commissioner-marked-2025-draft:row-83",
+        "'2025 Draft'!R100",
+        "'2024 Draft'!A95",
+        "'2024 Draft'!E95"
+      ],
+      "originalReviewFlags": [
+        "tenure_inferred_from_complete_2024_draft_and_keeper_list"
+      ]
+    },
+    {
+      "player": "Amen Thompson",
+      "playerId": 4684740,
+      "baseRound": 11,
+      "tenureYears": 2,
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "evidence": {
+        "fresh2024Draft": {
+          "round": 13,
+          "playerCell": "'2024 Draft'!E102",
+          "roundCell": "'2024 Draft'!A102"
+        },
+        "absentFrom2024Keepers": "'2025 Draft'!Y4:Y37 (34 confirmed keepers)",
+        "retained2025": {
+          "marker": "x",
+          "row": 96,
+          "paymentRound": 12,
+          "source": "commissioner-marked-2025-draft"
+        },
+        "rule": "The drafted season counts as tenure one; retaining for 2025 adds one. The blank source tenure remains preserved."
+      },
+      "sourceCells": [
+        "'2025 Draft'!A96",
+        "'2025 Draft'!E96",
+        "commissioner-marked-2025-draft:row-96",
+        "'2025 Draft'!R108",
+        "'2024 Draft'!A102",
+        "'2024 Draft'!E102"
+      ],
+      "originalReviewFlags": [
+        "tenure_inferred_from_complete_2024_draft_and_keeper_list"
+      ]
+    },
+    {
+      "player": "Josh Giddey",
+      "playerId": 4871145,
+      "baseRound": 4,
+      "tenureYears": 2,
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "evidence": {
+        "fresh2024Draft": {
+          "round": 6,
+          "playerCell": "'2024 Draft'!E49",
+          "roundCell": "'2024 Draft'!A49"
+        },
+        "absentFrom2024Keepers": "'2025 Draft'!Y4:Y37 (34 confirmed keepers)",
+        "retained2025": {
+          "marker": "x",
+          "row": 40,
+          "paymentRound": 5,
+          "source": "commissioner-marked-2025-draft"
+        },
+        "rule": "The drafted season counts as tenure one; retaining for 2025 adds one. The blank source tenure remains preserved."
+      },
+      "sourceCells": [
+        "'2025 Draft'!A40",
+        "'2025 Draft'!E40",
+        "commissioner-marked-2025-draft:row-40",
+        "'2025 Draft'!R76",
+        "'2024 Draft'!A49",
+        "'2024 Draft'!E49"
+      ],
+      "originalReviewFlags": [
+        "tenure_inferred_from_complete_2024_draft_and_keeper_list"
+      ]
+    },
+    {
+      "player": "Paolo Banchero",
+      "playerId": 4432573,
+      "baseRound": 5,
+      "tenureYears": 2,
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "evidence": {
+        "fresh2024Draft": {
+          "round": 7,
+          "playerCell": "'2024 Draft'!E50",
+          "roundCell": "'2024 Draft'!A50"
+        },
+        "absentFrom2024Keepers": "'2025 Draft'!Y4:Y37 (34 confirmed keepers)",
+        "retained2025": {
+          "marker": "x",
+          "row": 43,
+          "paymentRound": 6,
+          "source": "commissioner-marked-2025-draft"
+        },
+        "rule": "The drafted season counts as tenure one; retaining for 2025 adds one. The blank source tenure remains preserved."
+      },
+      "sourceCells": [
+        "'2025 Draft'!A43",
+        "'2025 Draft'!E43",
+        "commissioner-marked-2025-draft:row-43",
+        "'2025 Draft'!R51",
+        "'2024 Draft'!A50",
+        "'2024 Draft'!E50"
+      ],
+      "originalReviewFlags": [
+        "tenure_inferred_from_complete_2024_draft_and_keeper_list"
+      ]
+    }
+  ],
+  "pendingReviews": [],
+  "historicalExceptions": [
+    {
+      "player": "Giannis Antetokounmpo",
+      "source": "'2025 Draft'!R10",
+      "recorded": "ineligible",
+      "independent": "round 1",
+      "rationale": "Fresh 2024 round-two entry at '2024 Draft'!A12/E12 implies a 2025 round-one cost. Historical discrepancy retained. Fresh 2025 round-one draft resets tenure and makes him ineligible for 2026 either way.",
+      "changesCurrentCost": false
+    },
+    {
+      "player": "Luguentz Dort",
+      "source": "'2025 Draft'!R99 and R113",
+      "recorded": [
+        11,
+        12
+      ],
+      "independent": 11,
+      "rationale": "Original cycle at '2024 Draft V2'!J98:M98 and 2024 retained record at A94/E94 support 11; duplicate alias row has 12. Preserve both historical source values with this resolution. Player absent from current frozen roster.",
+      "changesCurrentCost": false
+    },
+    {
+      "player": "Damian Lillard",
+      "source": "'2024 Draft V2'!N9",
+      "recorded": 0,
+      "independent": "ineligible",
+      "rationale": "Round zero is not a legal keeper payment; normalize the interpretation to ineligible while preserving raw source. Player absent from current frozen roster.",
+      "changesCurrentCost": false
+    }
+  ],
+  "decisionsNeeded": [],
+  "observedReviewDate": "2026-10-01",
+  "ruleConfirmedProfiles": [
+    {
+      "player": "John Collins",
+      "playerId": 3908845,
+      "teamId": 1,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Ayo Dosunmu",
+      "playerId": 4397002,
+      "teamId": 1,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Donovan Clingan",
+      "playerId": 5105565,
+      "teamId": 2,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": false,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Reed Sheppard",
+      "playerId": 4711272,
+      "teamId": 2,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Ace Bailey",
+      "playerId": 4873138,
+      "teamId": 2,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Bennedict Mathurin",
+      "playerId": 4683634,
+      "teamId": 3,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Tre Jones",
+      "playerId": 4395626,
+      "teamId": 3,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Nic Claxton",
+      "playerId": 4278067,
+      "teamId": 3,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Saddiq Bey",
+      "playerId": 4397136,
+      "teamId": 3,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Josh Hart",
+      "playerId": 3062679,
+      "teamId": 4,
+      "baseRound": 12,
+      "tenureYears": 2,
+      "originalReviewFlags": [
+        "provisional_commissioner_base_2025_round_13_pending_history_check",
+        "tenure_inferred_from_complete_2024_draft_and_keeper_list"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A97",
+        "'2025 Draft'!E97",
+        "commissioner-marked-2025-draft:row-97",
+        "'2024 Draft'!A2:E105 (absent from complete draft)",
+        "'2025 Draft'!Y4:Y37 (absent from 2024 keeper list)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "marked2025": {
+        "row": 97,
+        "paymentRound": 12,
+        "kept": true
+      },
+      "historicalCategory": "provisional-ruling-and-undrafted-tenure",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-undrafted-history-plus-marked-retention",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2024,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A97",
+          "'2025 Draft'!E97",
+          "commissioner-marked-2025-draft:row-97",
+          "'2024 Draft'!A2:E105 (absent from complete draft)",
+          "'2025 Draft'!Y4:Y37 (absent from 2024 keeper list)"
+        ],
+        "retained2025": true,
+        "actualPayment2025": 12
+      },
+      "explanation": "Confirmed from complete 2024 undrafted and unkept history and marked 2025 retention: tenure two, nominal 2026 round-twelve cost. Actual 2025 round-12 payment is preserved separately."
+    },
+    {
+      "player": "Deni Avdija",
+      "playerId": 4683021,
+      "teamId": 4,
+      "baseRound": 12,
+      "tenureYears": 2,
+      "originalReviewFlags": [
+        "base_2025_derived_from_round_13_payment_and_maximum_round",
+        "tenure_inferred_from_complete_2024_draft_and_keeper_list"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A98",
+        "'2025 Draft'!E98",
+        "commissioner-marked-2025-draft:row-98",
+        "'2024 Draft'!A2:E105 (absent from complete draft)",
+        "'2025 Draft'!Y4:Y37 (absent from 2024 keeper list)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "marked2025": {
+        "row": 98,
+        "paymentRound": 13,
+        "kept": true
+      },
+      "historicalCategory": "undrafted2024-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-undrafted-history-plus-marked-retention",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2024,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A98",
+          "'2025 Draft'!E98",
+          "commissioner-marked-2025-draft:row-98",
+          "'2024 Draft'!A2:E105 (absent from complete draft)",
+          "'2025 Draft'!Y4:Y37 (absent from 2024 keeper list)"
+        ],
+        "retained2025": true,
+        "actualPayment2025": 13
+      },
+      "explanation": "Confirmed from complete 2024 undrafted and unkept history and marked 2025 retention: tenure two, nominal 2026 round-twelve cost. Actual 2025 round-13 payment is preserved separately."
+    },
+    {
+      "player": "Aaron Gordon",
+      "playerId": 3064290,
+      "teamId": 4,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Santi Aldama",
+      "playerId": 4593125,
+      "teamId": 4,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Keyonte George",
+      "playerId": 4433627,
+      "teamId": 5,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Andrew Wiggins",
+      "playerId": 3059319,
+      "teamId": 5,
+      "baseRound": 12,
+      "tenureYears": 2,
+      "originalReviewFlags": [
+        "base_2025_derived_from_round_13_payment_and_maximum_round",
+        "tenure_inferred_from_complete_2024_draft_and_keeper_list"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A102",
+        "'2025 Draft'!E102",
+        "commissioner-marked-2025-draft:row-102",
+        "'2024 Draft'!A2:E105 (absent from complete draft)",
+        "'2025 Draft'!Y4:Y37 (absent from 2024 keeper list)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "marked2025": {
+        "row": 102,
+        "paymentRound": 13,
+        "kept": true
+      },
+      "historicalCategory": "undrafted2024-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-undrafted-history-plus-marked-retention",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2024,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A102",
+          "'2025 Draft'!E102",
+          "commissioner-marked-2025-draft:row-102",
+          "'2024 Draft'!A2:E105 (absent from complete draft)",
+          "'2025 Draft'!Y4:Y37 (absent from 2024 keeper list)"
+        ],
+        "retained2025": true,
+        "actualPayment2025": 13
+      },
+      "explanation": "Confirmed from complete 2024 undrafted and unkept history and marked 2025 retention: tenure two, nominal 2026 round-twelve cost. Actual 2025 round-13 payment is preserved separately."
+    },
+    {
+      "player": "Jabari Smith Jr.",
+      "playerId": 4432639,
+      "teamId": 5,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": false,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Collin Gillespie",
+      "playerId": 4278585,
+      "teamId": 5,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Cason Wallace",
+      "playerId": 4683692,
+      "teamId": 5,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Jonathan Kuminga",
+      "playerId": 4433247,
+      "teamId": 5,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Payton Pritchard",
+      "playerId": 4066354,
+      "teamId": 6,
+      "baseRound": 12,
+      "tenureYears": 2,
+      "originalReviewFlags": [
+        "base_2025_derived_from_round_13_payment_and_maximum_round",
+        "tenure_inferred_from_complete_2024_draft_and_keeper_list"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A99",
+        "'2025 Draft'!E99",
+        "commissioner-marked-2025-draft:row-99",
+        "'2024 Draft'!A2:E105 (absent from complete draft)",
+        "'2025 Draft'!Y4:Y37 (absent from 2024 keeper list)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "marked2025": {
+        "row": 99,
+        "paymentRound": 13,
+        "kept": true
+      },
+      "historicalCategory": "undrafted2024-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-undrafted-history-plus-marked-retention",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2024,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A99",
+          "'2025 Draft'!E99",
+          "commissioner-marked-2025-draft:row-99",
+          "'2024 Draft'!A2:E105 (absent from complete draft)",
+          "'2025 Draft'!Y4:Y37 (absent from 2024 keeper list)"
+        ],
+        "retained2025": true,
+        "actualPayment2025": 13
+      },
+      "explanation": "Confirmed from complete 2024 undrafted and unkept history and marked 2025 retention: tenure two, nominal 2026 round-twelve cost. Actual 2025 round-13 payment is preserved separately."
+    },
+    {
+      "player": "Ryan Rollins",
+      "playerId": 4591725,
+      "teamId": 6,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Neemias Queta",
+      "playerId": 4397424,
+      "teamId": 6,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Precious Achiuwa",
+      "playerId": 4431679,
+      "teamId": 6,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Quentin Grimes",
+      "playerId": 4397014,
+      "teamId": 6,
+      "baseRound": 12,
+      "tenureYears": 2,
+      "originalReviewFlags": [
+        "provisional_commissioner_base_2025_round_13_pending_history_check",
+        "tenure_inferred_from_complete_2024_draft_and_keeper_list"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A87",
+        "'2025 Draft'!E87",
+        "commissioner-marked-2025-draft:row-87",
+        "'2024 Draft'!A2:E105 (absent from complete draft)",
+        "'2025 Draft'!Y4:Y37 (absent from 2024 keeper list)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "marked2025": {
+        "row": 87,
+        "paymentRound": 11,
+        "kept": true
+      },
+      "historicalCategory": "provisional-ruling-and-undrafted-tenure",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-undrafted-history-plus-marked-retention",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2024,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A87",
+          "'2025 Draft'!E87",
+          "commissioner-marked-2025-draft:row-87",
+          "'2024 Draft'!A2:E105 (absent from complete draft)",
+          "'2025 Draft'!Y4:Y37 (absent from 2024 keeper list)"
+        ],
+        "retained2025": true,
+        "actualPayment2025": 11
+      },
+      "explanation": "Confirmed from complete 2024 undrafted and unkept history and marked 2025 retention: tenure two, nominal 2026 round-twelve cost. Actual 2025 round-11 payment is preserved separately."
+    },
+    {
+      "player": "Naji Marshall",
+      "playerId": 4278594,
+      "teamId": 6,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Dyson Daniels",
+      "playerId": 4869342,
+      "teamId": 7,
+      "baseRound": 12,
+      "tenureYears": 2,
+      "originalReviewFlags": [
+        "base_2025_derived_from_round_13_payment_and_maximum_round",
+        "tenure_inferred_from_complete_2024_draft_and_keeper_list"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A103",
+        "'2025 Draft'!E103",
+        "commissioner-marked-2025-draft:row-103",
+        "'2024 Draft'!A2:E105 (absent from complete draft)",
+        "'2025 Draft'!Y4:Y37 (absent from 2024 keeper list)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "marked2025": {
+        "row": 103,
+        "paymentRound": 13,
+        "kept": true
+      },
+      "historicalCategory": "undrafted2024-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-undrafted-history-plus-marked-retention",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2024,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A103",
+          "'2025 Draft'!E103",
+          "commissioner-marked-2025-draft:row-103",
+          "'2024 Draft'!A2:E105 (absent from complete draft)",
+          "'2025 Draft'!Y4:Y37 (absent from 2024 keeper list)"
+        ],
+        "retained2025": true,
+        "actualPayment2025": 13
+      },
+      "explanation": "Confirmed from complete 2024 undrafted and unkept history and marked 2025 retention: tenure two, nominal 2026 round-twelve cost. Actual 2025 round-13 payment is preserved separately."
+    },
+    {
+      "player": "VJ Edgecombe",
+      "playerId": 5124612,
+      "teamId": 7,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Herbert Jones",
+      "playerId": 4277813,
+      "teamId": 7,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": false,
+      "absentFrom2024Keepers": false,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Jrue Holiday",
+      "playerId": 3995,
+      "teamId": 7,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": false,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Dejounte Murray",
+      "playerId": 3907497,
+      "teamId": 7,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": false,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Paul George",
+      "playerId": 4251,
+      "teamId": 7,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": false,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Derik Queen",
+      "playerId": 4869780,
+      "teamId": 7,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Dylan Harper",
+      "playerId": 5037871,
+      "teamId": 7,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Norman Powell",
+      "playerId": 2595516,
+      "teamId": 8,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Kon Knueppel",
+      "playerId": 5061575,
+      "teamId": 8,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    },
+    {
+      "player": "Nickeil Alexander-Walker",
+      "playerId": 4278039,
+      "teamId": 8,
+      "baseRound": 13,
+      "tenureYears": 1,
+      "originalReviewFlags": [
+        "undrafted_first_season_tenure_one_is_an_explicit_inference"
+      ],
+      "sourceCells": [
+        "'2025 Draft'!A2:E105 (absent from complete draft)"
+      ],
+      "absentFrom2024Draft": true,
+      "absentFrom2024Keepers": true,
+      "historicalCategory": "undrafted2025-tenure-convention",
+      "verificationBefore": "provisional",
+      "verificationAfter": "confirmed",
+      "resolutionStatus": "confirmed-by-established-rule",
+      "evidence": {
+        "method": "complete-draft-exclusion",
+        "rule": "The initial undrafted season counts as tenure one, with an initial nominal round-thirteen keeper cost. Retention advances tenure by one and nominal cost one round earlier independently of payment.",
+        "initialUndraftedYear": 2025,
+        "initialTenure": 1,
+        "initialNominalRound": 13,
+        "sourceCells": [
+          "'2025 Draft'!A2:E105 (absent from complete draft)"
+        ],
+        "retained2025": false,
+        "actualPayment2025": null
+      },
+      "explanation": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost."
+    }
+  ],
+  "confirmedRule": {
+    "reaffirmedDate": "2026-10-03",
+    "initialUndraftedTenure": 1,
+    "initialNominalKeeperRound": 13,
+    "instruction": "Confirm costs for all players with the matching undrafted setup.",
+    "resolvedProfileCount": 36,
+    "numericalValuesChanged": false
+  }
+}

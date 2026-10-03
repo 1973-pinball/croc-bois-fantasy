@@ -1,0 +1,35 @@
+.pool{min-width:0}
+.pool :global(.panel-header){padding:12px 14px;gap:10px}
+.pool :global(.panel-header h2){font-size:22px;line-height:1.2;margin-top:3px}
+.pool :global(.panel-header .eyebrow){font-size:12px}
+.pool :global(.panel-header .small){font-size:12px;white-space:nowrap}
+.pool :global(.keeper-row){padding:2px 14px}
+.pool :global(.keeper-selection){gap:8px;align-items:center}
+.pool :global(.keeper-checkbox){min-height:44px;flex:1;gap:9px;align-items:center}
+.pool :global(.keeper-checkbox>span){min-width:0}
+.pool :global(.keeper-checkbox input){width:16px;height:16px;flex:none}
+.pool :global(.keeper-checkbox strong){font-size:14px;line-height:1.35;overflow-wrap:anywhere}
+.pool :global(.keeper-checkbox small){font-size:12px;line-height:1.45;margin-top:2px;overflow-wrap:anywhere}
+.pool :global(.divider-dot){padding:0 4px}
+.pool :global(.keeper-selection .status){font-size:12px;padding:4px 6px;flex:none}
+.pool :global(.pick-assignment){margin:3px 0 7px 25px;grid-template-columns:76px minmax(0,1fr);gap:4px 8px}
+.pool :global(.pick-assignment>label){font-size:12px;line-height:1.5}
+.pool :global(.pick-assignment select){min-height:44px;min-width:0;width:100%;padding:7px 25px 7px 9px;font-size:12px}
+.pool :global(.pick-assignment>small){font-size:12px;line-height:1.5}
+.reason{margin-left:25px;font-size:12px;line-height:1.6}
+.reason>summary{display:flex;align-items:center;gap:7px;min-height:44px;width:fit-content;min-width:64px;cursor:pointer;color:var(--green);font-size:12px;list-style:none}
+.reason>summary::-webkit-details-marker{display:none}
+.reason>summary::after{content:'+';font-size:14px}
+.reason[open]>summary::after{content:'−'}
+.reason>summary:focus-visible{outline:2px solid var(--green);outline-offset:1px;border-radius:3px}
+.reason>p{margin:0 0 9px;color:var(--muted);overflow-wrap:anywhere}
+@media(max-width:480px){
+  .pool :global(.panel-header){padding:10px 12px}
+  .pool :global(.panel-header h2){font-size:21px}
+  .pool :global(.keeper-row){padding:2px 12px}
+  .pool :global(.keeper-checkbox strong){font-size:14px}
+  .pool :global(.keeper-checkbox small){font-size:12px}
+  .pool :global(.keeper-selection .status){font-size:12px;padding:4px 5px}
+  .pool :global(.pick-assignment){grid-template-columns:minmax(0,1fr)}
+  .pool :global(.pick-assignment>small){grid-column:1}
+}

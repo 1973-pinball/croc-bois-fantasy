@@ -32,7 +32,7 @@ The final boards corroborate the returned original picks: `2024 Draft!C24:D24` a
 
 `Draft_Pick_Grids!A4:I17` records one 2027 pick in each of 13 rounds for every franchise, with totals of 13 at `B3:I3`. No 2027 or later pick transfer appears in the supplied trade ledger through trade 92. The 2027 holdings are a workbook reference, not live database pick assets or an established draft order. At the time of this audit, `data/league.json` contains only the 104 current 2026 picks.
 
-The `2026 Draft` tab uses A–H original/current-owner placeholders. It cannot establish a final 2026 order or replace the verified ownership above. No 2028 or later pick reference was found in the trade ledger or pick grid.
+The `2026 Draft` tab is the workspace for the upcoming draft. Its blank player inputs and A–H owner placeholders await future selections and draft order. Current pick ownership is verified from the pick grid and trade evidence above. No 2028 or later pick reference was found in the trade ledger or pick grid.
 
 ## Historical coverage and discrepancies
 

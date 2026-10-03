@@ -26,7 +26,7 @@ test("an incomplete draft ledger fails instead of silently shifting pick identit
   assert.throws(() => buildSnakeDraftBoard(picks.slice(1), ["a", "b"]), /incomplete/);
 });
 
-test("Birkhoff mixture reconstructs every one of the sixty-four confirmed marginals", () => {
+test("generic Birkhoff mixture reconstructs every one of the sixty-four legacy example marginals", () => {
   const config = createEightTeamLottery({ nonPlayoffFranchiseIds: nonPlayoff, playoffFranchiseIds: playoff });
   const components = decomposeBirkhoff(config.marginalMatrix);
   const reconstructed = Array.from({ length: 8 }, () => Array<number>(8).fill(0));

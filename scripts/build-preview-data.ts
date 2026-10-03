@@ -8,6 +8,11 @@ const workbook = read(".local/workbook.json") as {sheets:Sheet[]};
 const roster = read("croc_bois_139935_2025-26_migration.json");
 const source = read("keeper_costs_2025_source.json");
 const decisions = read("planning_reconciliation.json");
+type ReviewedKeeper = { playerId:number; baseRound:number; tenureYears:number; sourceCells:string[] };
+const reviewedKeepers = read("data/keeper-readiness-audit.json") as {
+ supportedConfirmations:ReviewedKeeper[];
+ ruleConfirmedProfiles:(ReviewedKeeper & { explanation:string })[];
+};
 const oldKeepers = read("data/keeper-history-2024.json") as {Player:string;Team:string}[];
 const aliases:Record<string,string> = {
  "damontissabonis":"domantassabonis","lugenzdort":"luguentzdort","nicolasclaxton":"nicclaxton",
@@ -35,12 +40,11 @@ for (const p of ["Deni Avdija","Payton Pritchard","Andrew Wiggins","Dyson Daniel
  if (!costs.has(key(p))) costs.set(key(p),{cost:13,tenure:null});
 }
 const priorKept=new Set(oldKeepers.map(p=>key(p.Player)));
-const provisional=new Set(["Quentin Grimes","Josh Hart"].map(key));
 const players:LeaguePlayer[] = [];
 for (const t of roster.teams) for (const p of t.roster.entries) {
  const k=key(p.full_name), drafted=draftMap.get(k), c=costs.get(k);
  let baseCost:number|null=null, tenure:number|null=null, status:LeaguePlayer["status"]="eligible", reason="";
- if (!drafted) { baseCost=13;tenure=1;reason="Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1."; }
+ if (!drafted) { baseCost=13;tenure=1;reason="Undrafted in 2025. The initial undrafted season counts as tenure one under the league rule; initial keeper cost is round 13."; }
  else if (!drafted.kept) { baseCost=drafted.round>1?drafted.round-1:null;tenure=1;reason="Fresh 2025 draft resets the keeper cycle."; if(drafted.round===1){status="ineligible";reason="Drafted in the first round in 2025.";} }
  else {
    baseCost=typeof c?.cost==="number"?c.cost-1:null;
@@ -48,12 +52,30 @@ for (const t of roster.teams) for (const p of t.roster.entries) {
    reason=c?.tenure!==null&&c?.tenure!==undefined?"2025 base cost and recorded keeper tenure rolled forward.":"Tenure inferred from first retention in the supplied 2024/2025 keeper lists.";
    if(baseCost===null||tenure===null){status="review";reason="Keeper history needs commissioner review.";}
    if(tenure!==null&&tenure>=5){status="ineligible";reason="Reached five seasons of tenure in 2025–26.";}
-   if(provisional.has(k)){status="review";reason="Provisional round 12. Commissioner will double-check the 2024 free-agent history.";}
  }
  players.push({id:p.player_id,name:p.full_name,teamId:t.team_id,baseCost,tenure,status,reason,wasKept:!!drafted?.kept,previousRound:drafted?.round??null,rosterSlot:p.lineup_slot_label});
 }
 assert.equal(players.length,111);
 assert.equal(new Set(players.map(p=>p.id)).size,111);
+// Confirm only the exact reviewed tuples. Retain the imported numerical calculation
+// and fail if future source edits disagree rather than silently overriding them.
+assert.equal(reviewedKeepers.supportedConfirmations.length,11);
+assert.equal(reviewedKeepers.ruleConfirmedProfiles.length,36);
+const confirmations=[
+ ...reviewedKeepers.supportedConfirmations.map(row=>({...row,explanation:"Confirmed from the fresh 2024 draft and marked 2025 retention. The drafted season counts as tenure one; retention advances tenure to two while nominal cost remains separate from pick payment."})),
+ ...reviewedKeepers.ruleConfirmedProfiles,
+];
+assert.equal(new Set(confirmations.map(row=>row.playerId)).size,47);
+for(const review of confirmations) {
+ const player=players.find(p=>p.id===review.playerId);
+ assert.ok(player,`Reviewed player ${review.playerId} is missing from the frozen roster`);
+ assert.equal(player.baseCost,review.baseRound,`Reviewed cost changed for ${player.name}`);
+ assert.equal(player.tenure,review.tenureYears,`Reviewed tenure changed for ${player.name}`);
+ assert.ok(review.baseRound>=1&&review.baseRound<=13&&review.tenureYears>=1&&review.tenureYears<5,`Invalid confirmation for ${player.name}`);
+ assert.notEqual(player.status,"ineligible",`Ineligible player ${player.name} cannot be confirmed`);
+ player.status="eligible";
+ player.reason=review.explanation;
+}
 const owners:Record<number,string>={1:"Jon",2:"Arod",3:"Wyndham",4:"Sebastian",5:"Shane",6:"Justin & Amber",7:"James",8:"Cars"};
 const colors=["#14634d","#d88042","#5c6654","#637b86","#9d6446","#87714d","#596589","#8b5d74"];
 const teams=roster.teams.map((t:any,i:number)=>({id:t.team_id,name:t.name,owner:owners[t.team_id],shortName:t.abbreviation?.trim() || t.name,managers:t.team_id===4?["Sebastian Rodriguez (incoming)"]:t.managers.map((m:any)=>m.first_name),color:colors[i]}));
@@ -100,7 +122,7 @@ for(const row of workbook.sheets.find(s=>s.name==="Trades")!.rows) {
 }
 const charter=[
  {title:"League format",paragraphs:["Head-to-head categories: points, assists, rebounds, steals, blocks, field-goal percentage, free-throw percentage, three-pointers made and turnovers.","13 roster spots: 10 starters and 3 bench, plus 1 IR. Daily lineups lock at each player’s tipoff. One-day waivers and four acquisitions per matchup.","Four teams reach the playoffs. Head-to-head record breaks seeding ties. Season dates are set by the commissioner."]},
- {title:"Keepers",paragraphs:["Keepers come from the previous season’s final roster. Newly drafted first-round players cannot be kept. The drafted season counts as tenure year one; a player with five completed consecutive seasons must return to the draft.","Each retention advances the underlying cost one round earlier. Paying an earlier pick because another round is unavailable does not accelerate future cost. An undrafted player starts at round 13.","Trades and waiver moves preserve the keeper cycle. Re-entering the draft without being kept resets it. Keeper rights stay with the player.","Owners choose their payment picks. Each pick can fund one keeper. If the required round is unavailable, move to the next available earlier round. Owners cannot voluntarily overpay while a suitable later pick remains.","Submissions are private until every team is locked. Owners can edit until the commissioner locks them."]},
+ {title:"Keepers",paragraphs:["Keepers come from the previous season’s final roster. Newly drafted first-round players cannot be kept. The initial season counts as tenure year one for both drafted and undrafted players; a player with five completed consecutive seasons must return to the draft.","Each retention advances the underlying cost one round earlier. Paying an earlier pick because another round is unavailable does not accelerate future cost. An undrafted player starts at nominal round 13 and tenure one; retaining them the next season advances tenure to two and the following nominal keeper cost to round 12.","Trades and waiver moves preserve the keeper cycle. Re-entering the draft without being kept resets it. Keeper rights stay with the player.","Owners choose their payment picks. Each pick can fund one keeper. If the required round is unavailable, move to the next available earlier round. Owners cannot voluntarily overpay while a suitable later pick remains.","Submissions are private until every team is locked. Owners can edit until the commissioner locks them."]},
  {title:"Trades",paragraphs:["Players, future picks and multi-team agreements can be logged. Future-pick trades have no season cap. Record conditions, loans and options explicitly for commissioner review.","The charter provides a 24-hour review and veto by four other league members. Voting units and draft-day exceptions need commissioner confirmation before automation.","Historical voided trades remain visible without applying their transfers. Complex obligations require reconciliation. ESPN execution remains separate from this asset ledger."]},
  {title:"Draft and lottery",paragraphs:["Thirteen rounds in snake order. A lottery determines the order teams choose their draft position.","For eight teams, playoff and non-playoff groups use the charter’s published probabilities. Expansion requires an approved probability configuration, not an extrapolation of the eight-team table.","The commissioner runs the lottery on stream. Draft order is released after the keeper deadline and 24 hours before the draft. The commissioner must give an inaugural speech."]},
  {title:"League history",paragraphs:["A franchise keeps its players, picks, obligations and history when its manager changes. Edwin, Julian and incoming manager Sebastian Rodriguez represent successive ownership of one team.","This app is replacing the league workbook. Original source records and commissioner corrections are tracked separately."]}
@@ -108,5 +130,8 @@ const charter=[
 const reviewItems=players.filter(p=>p.status==="review").map(p=>({id:`player-${p.id}`,player:p.name,detail:p.reason,status:"provisional" as const}));
 const data:LeagueData={season:2026,snapshotDate:"2026-03-29",teams,players,picks,drafts,trades,reviewItems,charter};
 mkdirSync("data",{recursive:true});
-writeFileSync("data/league.json",JSON.stringify(data,null,2)+"\n");
+const outputIndex=process.argv.indexOf("--output");
+const output=outputIndex<0?"data/league.json":process.argv[outputIndex+1];
+assert.ok(output&&!output.startsWith("--"),"--output requires a file path");
+writeFileSync(output,JSON.stringify(data,null,2)+"\n");
 console.log(JSON.stringify({teams:teams.length,players:players.length,picks:picks.length,trades:trades.length,drafts:drafts.map(d=>({year:d.year,picks:d.selections.length})),review:reviewItems.length}));

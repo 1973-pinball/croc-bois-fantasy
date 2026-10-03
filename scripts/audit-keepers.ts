@@ -211,7 +211,7 @@ function predict2025(player: string): Prediction {
     }
   }
   if (priorDraft) return { cycle: rolloverKeeperCycle(playerKey, null, { kind: "drafted", season: 2024, round: priorDraft.round }), sourceCells: priorDraft.sourceCells, basis: "fresh_2024_draft_reset", notes: [], legacyCost: priorDraft.round === 1 ? "ineligible" : priorDraft.round - 1 };
-  return { cycle: rolloverKeeperCycle(playerKey, null, { kind: "undrafted", season: 2024, tenureYears: 1 }), sourceCells: ["'2024 Draft'!A2:E105 (absent from complete draft)", "'2025 Draft'!Y4:Y37 (absent from 2024 keeper list)"], basis: "undrafted_after_2024_reentry", notes: ["First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference."], legacyCost: 13 };
+  return { cycle: rolloverKeeperCycle(playerKey, null, { kind: "undrafted", season: 2024, tenureYears: 1 }), sourceCells: ["'2024 Draft'!A2:E105 (absent from complete draft)", "'2025 Draft'!Y4:Y37 (absent from 2024 keeper list)"], basis: "undrafted_after_2024_reentry", notes: ["The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen."], legacyCost: 13 };
 }
 
 const groupedTargets = new Map<string, CostSourceRow[]>();
@@ -232,8 +232,7 @@ const replayRows = [...groupedTargets.values()].map((rows) => {
   };
 });
 
-const provisionalPlayers = new Set(["quentingrimes", "joshhart"]);
-const derivedRound13Players = new Set(["deniavdija", "paytonpritchard", "andrewwiggins", "dysondaniels"]);
+const historicallyProvisionalPlayers = new Set(["quentingrimes", "joshhart"]);
 const projectionRows = roster.teams.flatMap((team) => team.roster.entries.map((entry) => {
   const playerKey = key(entry.full_name);
   const draft = draft2025.get(playerKey);
@@ -241,21 +240,35 @@ const projectionRows = roster.teams.flatMap((team) => team.roster.entries.map((e
   const target = targetRows ? chosenSource(targetRows) : undefined;
   const independent = predict2025(entry.full_name);
   const reviewFlags: string[] = [];
+  const historicalReviewFlags: string[] = [];
+  const evidenceNotes: string[] = [];
+  let tenureBasis = draft ? draft.keeper ? "reported-keeper-tenure" : "fresh-2025-draft" : "undrafted-2025-rule";
+  let priorTenureReported: number | null = null;
   let cycle: KeeperCycle;
   let base2025: number | null = null;
   let sourceCells = draft?.sourceCells ?? ["'2025 Draft'!A2:E105 (absent from complete draft)"];
   if (draft?.keeper) {
     base2025 = typeof target?.keeper_cost_2025 === "number" ? target.keeper_cost_2025 : null;
-    if (provisionalPlayers.has(playerKey)) {
+    if (historicallyProvisionalPlayers.has(playerKey)) {
+      historicalReviewFlags.push("provisional_commissioner_base_2025_round_13_pending_history_check");
+    }
+    if (base2025 === null && independent.basis === "undrafted_after_2024_reentry") {
       base2025 = 13;
-      reviewFlags.push("provisional_commissioner_base_2025_round_13_pending_history_check");
-    } else if (base2025 === null && derivedRound13Players.has(playerKey) && draft.round === 13) {
-      base2025 = 13;
-      reviewFlags.push("base_2025_derived_from_round_13_payment_and_maximum_round");
+      evidenceNotes.push("base_2025_round_13_confirmed_from_complete_2024_undrafted_and_unkept_history");
+      if (draft.round === 13 && !historicallyProvisionalPlayers.has(playerKey)) historicalReviewFlags.push("base_2025_derived_from_round_13_payment_and_maximum_round");
+    } else if (base2025 === null && historicallyProvisionalPlayers.has(playerKey)) {
+      // The old provisional label is not a substitute for matching evidence.
+      reviewFlags.push("undrafted_cost_confirmation_requires_matching_history");
     }
     const reportedTenure = targetRows?.find((row) => row.tenure_before_2025_draft !== null)?.tenure_before_2025_draft;
+    priorTenureReported = reportedTenure ?? null;
     const priorTenure = reportedTenure ?? independent.cycle?.tenureYears ?? null;
-    if (reportedTenure === undefined || reportedTenure === null) reviewFlags.push("tenure_inferred_from_complete_2024_draft_and_keeper_list");
+    if (reportedTenure === undefined || reportedTenure === null) {
+      historicalReviewFlags.push("tenure_inferred_from_complete_2024_draft_and_keeper_list");
+      tenureBasis = independent.basis;
+      if (priorTenure === null) reviewFlags.push("missing_tenure");
+      else evidenceNotes.push("tenure_reconstructed_from_complete_2024_draft_and_keeper_list");
+    }
     if (target) sourceCells = [...sourceCells, `'2025 Draft'!R${target.source_row + 1}`];
     sourceCells.push(...independent.sourceCells);
     if (base2025 === null) reviewFlags.push("missing_base_cost");
@@ -271,7 +284,8 @@ const projectionRows = roster.teams.flatMap((team) => team.roster.entries.map((e
     cycle = rolloverKeeperCycle(String(entry.player_id), null, { kind: "drafted", season: 2025, round: draft.round });
   } else {
     cycle = rolloverKeeperCycle(String(entry.player_id), null, { kind: "undrafted", season: 2025, tenureYears: 1 });
-    reviewFlags.push("undrafted_first_season_tenure_one_is_an_explicit_inference");
+    historicalReviewFlags.push("undrafted_first_season_tenure_one_is_an_explicit_inference");
+    evidenceNotes.push("initial_undrafted_season_tenure_one_and_round_13_are_established_rules");
   }
   const eligibility = evaluateKeeperEligibility(cycle);
   return {
@@ -280,7 +294,7 @@ const projectionRows = roster.teams.flatMap((team) => team.roster.entries.map((e
     base2025, payment2025: draft?.round ?? null, tenureAfter2025: cycle.tenureYears,
     base2026: cycle.nextKeeperRound, eligible: eligibility.valid,
     ineligibilityReasons: eligibility.issues.map((issue) => issue.code),
-    reviewFlags, sourceCells: [...new Set(sourceCells)],
+    reviewFlags, historicalReviewFlags, evidenceNotes, tenureBasis, priorTenureReported, sourceCells: [...new Set(sourceCells)],
   };
 }));
 
@@ -296,7 +310,11 @@ const projectionSummary = {
   eligible: projectionRows.filter((row) => row.eligible).length,
   ineligible: projectionRows.filter((row) => !row.eligible).length,
   provisionalCosts: projectionRows.filter((row) => row.reviewFlags.some((flag) => flag.startsWith("provisional_"))).length,
-  inferredKeeperTenures: projectionRows.filter((row) => row.reviewFlags.includes("tenure_inferred_from_complete_2024_draft_and_keeper_list")).length,
+  historicalProvisionalCosts: projectionRows.filter((row) => row.historicalReviewFlags.some((flag) => flag.startsWith("provisional_"))).length,
+  inferredKeeperTenures: projectionRows.filter((row) => row.historicalReviewFlags.includes("tenure_inferred_from_complete_2024_draft_and_keeper_list")).length,
+  reconstructedKeeperTenures: projectionRows.filter((row) => row.evidenceNotes.includes("tenure_reconstructed_from_complete_2024_draft_and_keeper_list")).length,
+  unresolvedReviewPlayers: projectionRows.filter((row) => row.reviewFlags.length > 0).length,
+  undraftedRuleConfirmedPlayers: projectionRows.filter((row) => ["undrafted-2025-rule", "undrafted_after_2024_reentry"].includes(row.tenureBasis) && row.reviewFlags.length === 0).length,
 };
 const report = {
   schemaVersion: 1,
@@ -307,13 +325,14 @@ const report = {
     preserveHistoricalPayments: true,
     retroactiveRepricing: false,
     independentReplayPurpose: "Audit discrepancies without silently replacing the authoritative 2025 baseline used for 2026.",
-    explicitRulings: ["Evan Mobley's fresh 2025 draft resets cost and tenure.", "Quentin Grimes and Josh Hart retain provisional 2025 nominal round thirteen pending review."],
+    explicitRulings: ["Evan Mobley's fresh 2025 draft resets cost and tenure.", "The initial undrafted season counts as tenure one. Matching undrafted and unkept histories establish nominal round thirteen without a separate per-player ruling.", "Quentin Grimes and Josh Hart match the confirmed undrafted-2024 setup: nominal round thirteen in 2025, nominal round twelve and tenure two for 2026. Actual 2025 payments remain rounds eleven and twelve respectively."],
   },
   methodology: [
     "2025 replay does not use the 2025 target costs as calculation inputs. Actual 2024 keepers are identified by the commissioner-maintained 2024 list; their original year and round come from 2024 Draft V2. Newly drafted 2024 players reset to the actual draft round and tenure one; undrafted reentries start at round thirteen.",
     "The current domain engine advances nominal cost independently of payment. The older 2024 Draft sheet and corrected 2024 Draft V2 sheet are audited separately, including the V2 column explicitly labeled WRONG WAY BUT WHAT WE DID.",
-    "2026 projection uses commissioner-confirmed 2025 costs and explicit rulings as its authoritative baseline. Independent historical discrepancies stay visible instead of silently rewriting that baseline.",
+    "The 2026 Draft tab is the workspace for the upcoming draft. Its player inputs are expected to remain blank until selections are entered. Upcoming keeper costs are checked against the confirmed rules and frozen roster, using commissioner-confirmed 2025 nominal costs and explicit rulings as the authoritative baseline. Independent historical discrepancies remain visible.",
     "Known aliases are normalized explicitly; earlier non-round-thirteen entries take precedence over duplicate round-thirteen defaults. Conflicting non-thirteen targets remain flagged.",
+    "Review flags describe unresolved issues only. Historical review flags preserve the prior provenance labels; rule-derived undrafted tenure and complete draft-based tenure reconstruction are evidence, not automatic manual-review requirements.",
     "Only player names, NBA player IDs, franchise numbers, costs, tenure, draft years and source-cell references are emitted. Authentication data, manager account IDs, workbook trade prose and local paths are excluded.",
   ],
   historicalAudits,
@@ -328,11 +347,10 @@ const report = {
     rawTargetRows: sourceRows.length,
   },
   limitations: [
-    "The 2026 Draft tab is an unfilled template with blank player inputs and stale prior-year headers/references. It provides no independent expected 2026 player-cost table; 2026 is validated against the confirmed rules and frozen roster instead.",
     "Historical formula replay checks arithmetic against independent input columns, not the truth of every original draft-year entry. A formula match is not a complete transaction-history certification.",
     "2018–2021 lifecycle replay is not certified: the workbook includes a historical keeper-point system and incomplete rule-version/retention metadata. Those draft tabs must be imported with their own historical rules.",
-    "Seventeen retained players have inferred tenure rather than directly supplied tenure. The undrafted first-season tenure-one convention is separately labeled. Null source cells are never silently interpreted as zero.",
-    "Quentin Grimes and Josh Hart retain their commissioner-provisional 2025 base thirteen and projected 2026 base twelve pending the promised history check.",
+    "Seventeen retained players have blank supplied prior-tenure cells; their tenure is reconstructed from the completed 2024 draft and keeper list under the established initial-season rule. The original blanks and historical review flags remain visible, separate from current verification.",
+    "This generated evidence report does not establish whether the guarded database confirmations have been applied. Current verification and migration audit events remain authoritative for official submissions.",
     "Historical actual keeper payments are preserved; this audit does not certify historical pick availability or retroactively apply the current allocation policy.",
   ],
 };

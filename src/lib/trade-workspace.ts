@@ -1,4 +1,5 @@
 import type { LeagueData } from './types';
+import { z } from 'zod';
 
 export type ObligationKind = 'loan_return' | 'conditional_pick' | 'espn_action' | 'other';
 type TeamLeg = { key: string; fromTeamId: number; toTeamId: number };
@@ -8,6 +9,25 @@ export type TradeDraftLeg = TeamLeg & (
   { kind: 'obligation'; obligationKind: ObligationKind; terms: string; dueAt: string | null }
 );
 export type TradeCategory = 'player_only' | 'advanced';
+
+const draftTeam = { key: z.string(), fromTeamId: z.number().int(), toTeamId: z.number().int() };
+export const tradeComposerDraftSchema = z.object({
+  category: z.enum(['player_only', 'advanced']), terms: z.string().max(10000),
+  legs: z.array(z.discriminatedUnion('kind', [
+    z.object({ ...draftTeam, kind: z.literal('player'), playerId: z.number().int() }),
+    z.object({ ...draftTeam, kind: z.literal('pick'), pickId: z.string() }),
+    z.object({ ...draftTeam, kind: z.literal('obligation'), obligationKind: z.enum(['loan_return', 'conditional_pick', 'espn_action', 'other']), terms: z.string().max(10000), dueAt: z.string().nullable() }),
+  ])).max(100),
+  kind: z.enum(['player', 'pick', 'obligation']), fromTeam: z.string(), toTeam: z.string(), assetId: z.string(),
+  obligationKind: z.enum(['loan_return', 'conditional_pick', 'espn_action', 'other']), obligationTerms: z.string().max(10000), dueAt: z.string(),
+  correctsTradeId: z.string().uuid().nullable(),
+});
+export type TradeComposerDraft = z.infer<typeof tradeComposerDraftSchema>;
+export function emptyTradeDraft(playersPaused: boolean): TradeComposerDraft {
+  return { category: 'advanced', terms: '', legs: [], kind: playersPaused ? 'pick' : 'player', fromTeam: '', toTeam: '', assetId: '', obligationKind: 'loan_return', obligationTerms: '', dueAt: '', correctsTradeId: null };
+}
+export function isTradeComposerDraft(value: unknown): value is TradeComposerDraft { return tradeComposerDraftSchema.safeParse(value).success; }
+export function hasTradeDraftChanges(draft: TradeComposerDraft) { return Boolean(draft.legs.length || draft.terms || draft.fromTeam || draft.toTeam || draft.assetId || draft.obligationTerms || draft.dueAt || draft.correctsTradeId); }
 
 export function serializeTradeDraft(input: {
   seasonId: string; category: TradeCategory; terms: string; legs: TradeDraftLeg[];

@@ -279,3 +279,54 @@ test('season opening requires commissioner review, all participants, frozen owne
   assert.equal(result.rows[0].season.phase,'keeper_selection');
   assert.equal((await db.query("select * from public.audit_events where event_type='keeper_selection_opened'")).rows.length,1);
 }));
+
+
+test('withdrawal requires commissioner access and a reason, retains original legs, audit and participant visibility', () => isolated(async () => {
+  await asUser(userA);
+  const trade = await createTrade([{player_id:101,from_franchise_id:a,to_franchise_id:b}],[],false);
+  await rejected(() => db.query('select public.withdraw_trade($1,$2)',[trade,'Agreement withdrawn']), /Commissioner access required/);
+  await asUser(commissioner);
+  await rejected(() => db.query('select public.withdraw_trade($1,$2)',[trade,'   ']), /Withdrawal reason/);
+  const result = await db.query<{value: {status:string;cancellation_reason:string;cancelled_by:string;cancelled_at:string}}>('select public.withdraw_trade($1,$2) as value',[trade,'  Managers withdrew the agreement  ']);
+  assert.equal(result.rows[0].value.status,'cancelled');
+  assert.equal(result.rows[0].value.cancellation_reason,'Managers withdrew the agreement');
+  assert.equal(result.rows[0].value.cancelled_by,commissioner); assert.ok(result.rows[0].value.cancelled_at);
+  assert.equal((await db.query<{franchise_id:string}>('select franchise_id from public.player_ownerships where player_id=101')).rows[0].franchise_id,a);
+  assert.equal((await db.query('select * from public.trade_player_transfers where trade_id=$1',[trade])).rows.length,1);
+  const audit = await db.query<{detail:{reason:string}}>("select detail from public.audit_events where event_type='trade_withdrawn' and entity_id=$1",[trade]);
+  assert.equal(audit.rows[0].detail.reason,'Managers withdrew the agreement');
+  await rejected(() => db.query('select public.withdraw_trade($1,$2)',[trade,'Withdraw again']), /Only pending live trades/);
+  await rejected(() => db.query('select public.finalize_trade($1)',[trade]), /finalized or cancelled/);
+  await asUser(userB); assert.equal((await db.query('select id from public.trades where id=$1',[trade])).rows.length,1);
+  await asUser(null,'anon'); assert.equal((await db.query('select id from public.trades where id=$1',[trade])).rows.length,0);
+}));
+
+test('withdrawal cannot change finalized, historical or archived records', () => isolated(async () => {
+  await asAdmin(); await db.query("update public.seasons set trading_opened_at=now() where id=$1",[season]);
+  await asUser(commissioner);
+  const finalized = await createTrade([{player_id:101,from_franchise_id:a,to_franchise_id:b}]);
+  await db.query('select public.finalize_trade($1)',[finalized]);
+  await rejected(() => db.query('select public.withdraw_trade($1,$2)',[finalized,'Correct completed trade']), /Only pending live trades/);
+  const historical = await createTrade([{player_id:103,from_franchise_id:b,to_franchise_id:a}],[],false);
+  await asAdmin(); await db.query("update public.trades set application_mode='record_only' where id=$1",[historical]); await asUser(commissioner);
+  await rejected(() => db.query('select public.withdraw_trade($1,$2)',[historical,'Historical correction']), /Only pending live trades/);
+  const archived = await createTrade([{player_id:103,from_franchise_id:b,to_franchise_id:a}],[],false);
+  await asAdmin(); await db.query("update public.seasons set phase='archived' where id=$1",[season]); await asUser(commissioner);
+  await rejected(() => db.query('select public.withdraw_trade($1,$2)',[archived,'Archived correction']), /archived season/);
+}));
+
+test('a corrected proposal links its withdrawn predecessor, starts a fresh review and preserves the original', () => isolated(async () => {
+  await asUser(commissioner);
+  const previous = await createTrade([{player_id:101,from_franchise_id:a,to_franchise_id:b}],[],false);
+  const args = [previous,season,'player_only','Corrected terms',JSON.stringify([{player_id:102,from_franchise_id:a,to_franchise_id:b}]),'[]','[]'];
+  await rejected(() => db.query('select public.create_trade_revision($1,$2,$3,$4,$5::jsonb,$6::jsonb,$7::jsonb)',args), /withdrawn live trade/);
+  await db.query('select public.withdraw_trade($1,$2)',[previous,'Incorrect player in the original record']);
+  await asUser(userA);
+  await rejected(() => db.query('select public.create_trade_revision($1,$2,$3,$4,$5::jsonb,$6::jsonb,$7::jsonb)',args), /Commissioner access required/);
+  await asUser(commissioner);
+  const revision = await db.query<{id:string}>('select public.create_trade_revision($1,$2,$3,$4,$5::jsonb,$6::jsonb,$7::jsonb) as id',args);
+  const records = await db.query<{status:string;corrects_trade_id:string;review_hours:number}>('select status,corrects_trade_id,extract(epoch from (review_deadline-created_at))/3600 as review_hours from public.trades where id=$1',[revision.rows[0].id]);
+  assert.equal(records.rows[0].status,'proposed'); assert.equal(records.rows[0].corrects_trade_id,previous); assert.equal(Number(records.rows[0].review_hours),24);
+  assert.equal((await db.query<{player_id:number}>('select player_id from public.trade_player_transfers where trade_id=$1',[previous])).rows[0].player_id,101);
+  assert.equal((await db.query("select * from public.audit_events where event_type='trade_revision_created' and entity_id=$1",[revision.rows[0].id])).rows.length,1);
+}));

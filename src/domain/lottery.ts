@@ -1,3 +1,73 @@
+/** Official rule: the notebook's NumPy weighted draw without replacement. */
+export interface WeightedLotteryConfiguration {
+  franchiseIds: readonly string[];
+  /** Positive integer weights remain unchanged until that franchise is selected. */
+  weights: readonly number[];
+}
+
+export interface WeightedLotteryStep {
+  priority: number;
+  remainingTotal: number;
+  ticket: number;
+  selectedFranchiseId: string;
+}
+
+function validateWeightedConfiguration(configuration: WeightedLotteryConfiguration): void {
+  const { franchiseIds, weights } = configuration;
+  if (franchiseIds.length < 2 || franchiseIds.length > 16 || weights.length !== franchiseIds.length
+    || new Set(franchiseIds).size !== franchiseIds.length || franchiseIds.some(id => !id)
+    || weights.some(weight => !Number.isSafeInteger(weight) || weight <= 0)
+    || weights.reduce((sum, weight) => sum + weight, 0) > 4294967296) {
+    throw new Error('Weighted lotteries require 2–16 distinct franchises with positive integer weights totaling at most 2^32.');
+  }
+}
+
+/** Exact unconditional priority probabilities, calculated over all subsets of selected teams. */
+export function calculateWeightedLotteryMarginals(configuration: WeightedLotteryConfiguration): number[][] {
+  validateWeightedConfiguration(configuration);
+  const { weights } = configuration;
+  const size = weights.length;
+  const probabilities = Array<number>(1 << size).fill(0);
+  const matrix = Array.from({ length: size }, () => Array<number>(size).fill(0));
+  probabilities[0] = 1;
+  for (let mask = 0; mask < probabilities.length - 1; mask += 1) {
+    let priority = 0;
+    let remainingTotal = 0;
+    for (let column = 0; column < size; column += 1) {
+      if (mask & (1 << column)) priority += 1;
+      else remainingTotal += weights[column];
+    }
+    for (let column = 0; column < size; column += 1) {
+      if (mask & (1 << column)) continue;
+      const probability = probabilities[mask] * weights[column] / remainingTotal;
+      matrix[priority][column] += probability;
+      probabilities[mask | (1 << column)] += probability;
+    }
+  }
+  return matrix;
+}
+
+/** Reference replay of the database's unbiased integer tickets; this does not generate randomness. */
+export function replayWeightedLottery(configuration: WeightedLotteryConfiguration, tickets: readonly number[]): {
+  priorityOrder: string[]; steps: WeightedLotteryStep[];
+} {
+  validateWeightedConfiguration(configuration);
+  if (tickets.length !== configuration.franchiseIds.length) throw new Error('A replay requires one ticket for every priority.');
+  const remainingWeights = [...configuration.weights];
+  const steps: WeightedLotteryStep[] = [];
+  for (const [index, ticket] of tickets.entries()) {
+    const remainingTotal = remainingWeights.reduce((sum, weight) => sum + weight, 0);
+    if (!Number.isSafeInteger(ticket) || ticket < 0 || ticket >= remainingTotal) throw new Error('A ticket must be an integer in [0, remainingTotal).');
+    let cumulative = 0;
+    const column = remainingWeights.findIndex(weight => { cumulative += weight; return ticket < cumulative; });
+    steps.push({ priority: index + 1, remainingTotal, ticket, selectedFranchiseId: configuration.franchiseIds[column] });
+    remainingWeights[column] = 0;
+  }
+  return { priorityOrder: steps.map(step => step.selectedFranchiseId), steps };
+}
+
+// Generic matrix/Birkhoff utilities below are retained for simulations and are not
+// the official weighted-without-replacement lottery executed by the database.
 export interface LotteryConfiguration {
   franchiseIds: readonly string[];
   /** Rows are selection priorities; columns correspond to franchiseIds. */
@@ -32,7 +102,7 @@ export function createEightTeamLottery(input: {
   playoffFranchiseIds: readonly string[];
 }): LotteryConfiguration {
   if (input.nonPlayoffFranchiseIds.length !== 4 || input.playoffFranchiseIds.length !== 4) {
-    throw new Error("The confirmed lottery applies to four non-playoff and four playoff teams; other formats require an explicit matrix.");
+    throw new Error("This legacy matrix example applies to four non-playoff and four playoff teams; other formats require an explicit matrix.");
   }
   const franchiseIds = [...input.nonPlayoffFranchiseIds, ...input.playoffFranchiseIds];
   if (new Set(franchiseIds).size !== 8 || franchiseIds.some((id) => !id)) throw new Error("Lottery franchises must be distinct.");

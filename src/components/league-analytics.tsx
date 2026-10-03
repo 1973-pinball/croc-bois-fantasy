@@ -1,9 +1,16 @@
 'use client';
 
-import { useId, useMemo, useState, type CSSProperties } from 'react';
+import { useEffect, useId, useMemo, useState, type CSSProperties } from 'react';
 import analyticsFile from '../../data/analytics.json';
+import categoryPreferencesFile from '../../data/category-preferences.json';
+import rosterPositionHistoryFile from '../../data/roster-position-history.json';
+import { aggregateCategoryPreferences, type CategoryPreferences } from '@/lib/category-preferences';
+import { aggregateRosterPositions, type RosterPositionHistory } from '@/lib/roster-position-history';
 import { calculateLuckbox, type PlayoffHistory } from '@/lib/playoff-history';
+import { managerLabel } from '@/lib/display-labels';
 import type { LeagueData } from '@/lib/types';
+import { updateQuery, useQueryFilter } from './use-portal-location';
+import styles from './league-preferences.module.css';
 
 type PositionRow = { franchiseId: string; position: number; count: number; seasons: number[] };
 type PositionSeason = { season: number; franchiseId: string; position: number; historicalOwner: string };
@@ -19,6 +26,9 @@ type Analytics = {
   winsTrades: { observations: Observation[]; pearson: number | null; sampleSize: number; cohort: unknown; units: unknown; limitations: string[] };
 };
 const analytics = analyticsFile as unknown as Analytics;
+const categoryHistory = categoryPreferencesFile as unknown as CategoryPreferences;
+const positionHistory = rosterPositionHistoryFile as unknown as RosterPositionHistory;
+const categoryYears = [...new Set([...categoryHistory.coverage.draftYears, ...positionHistory.coverage.draftYears])].sort((a, b) => b - a);
 const palette = ['#386d54', '#d58045', '#6f7b53', '#668da1', '#b37263', '#9b8552', '#707ca7', '#a07996'];
 const formatYears = (years: number[]) => { const sorted = [...new Set(years)].sort((a, b) => a - b); return sorted.length === 0 ? 'No dated records' : sorted.length === 1 ? String(sorted[0]) : sorted[0] + '–' + sorted[sorted.length - 1]; };
 const joinedNames = (names: string[]) => names.length <= 3 ? names.join(' + ') : names.slice(0, 2).join(' + ') + ' + ' + (names.length - 2) + ' more';
@@ -28,24 +38,38 @@ function LabIcon({ kind }: { kind: 'fish' | 'dice' | 'phone' | 'heart' | 'chart'
 }
 
 export function LeagueAnalytics({ league, playoffHistory }: { league: LeagueData; playoffHistory: PlayoffHistory }) {
-  const [spotlight, setSpotlight] = useState('all');
-  const [slotSeason, setSlotSeason] = useState('all');
-  const [includeInferred, setIncludeInferred] = useState(true);
-  const [selectedPosition, setSelectedPosition] = useState(1);
+  const [spotlightParam, setSpotlight] = useQueryFilter('labTeam', 'all');
+  const spotlight = analytics.franchises.some(franchise => franchise.id === spotlightParam) ? spotlightParam : 'all';
+  const [slotSeasonParam, setSlotSeason] = useQueryFilter('labDraftYear', 'all');
+  const [inferredParam, setInferredParam] = useQueryFilter('labInferred', '1');
+  const includeInferred = inferredParam !== '0';
+  const setIncludeInferred = (value: boolean) => setInferredParam(value ? '1' : '0');
+  const [positionParam, setPositionParam] = useQueryFilter('labPosition', '1');
+  const selectedPosition = /^\d+$/.test(positionParam) && Number(positionParam) >= 1 && Number(positionParam) <= analytics.franchises.length ? Number(positionParam) : 1;
+  const setSelectedPosition = (value: number) => setPositionParam(String(value));
   const [selectedCell, setSelectedCell] = useState<{ franchiseId: string; position: number } | null>(null);
   const [activePoint, setActivePoint] = useState(0);
   const [showTrend, setShowTrend] = useState(true);
-  const [preferenceMode, setPreferenceMode] = useState<'all' | 'fresh' | 'kept'>('all');
-  const [playerSearch, setPlayerSearch] = useState('');
-  const [preferenceSeason, setPreferenceSeason] = useState('all');
-  const [selectedPreference, setSelectedPreference] = useState<string | null>(null);
+  const [preferenceTabParam, setPreferenceTab] = useQueryFilter('labTab', 'players');
+  const preferenceTab = preferenceTabParam === 'categories' ? 'categories' : 'players';
+  const [playerSearchParam, setPlayerSearch] = useQueryFilter('labPlayer', '');
+  const playerSearch = playerSearchParam.slice(0, 200);
+  const [preferenceSeasonParam, setPreferenceSeason] = useQueryFilter('labPlayerYear', 'all');
+  const preferenceSeason = analytics.coverage.draftYears.some(year => String(year) === preferenceSeasonParam) ? preferenceSeasonParam : 'all';
+  const [categorySeasonParam, setCategorySeason] = useQueryFilter('labCategoryYear', 'all');
+  const categorySeason = categoryYears.some(year => String(year) === categorySeasonParam) ? categorySeasonParam : 'all';
+  const [selectedPreference, setSelectedPreference] = useState<{ key: string; scope: string } | null>(null);
+  const [preferencePageSize, setPreferencePageSize] = useState(10);
+  const [preferencePagination, setPreferencePagination] = useState({ scope: '', page: 1 });
   const clipId = useId().replace(/:/g, '');
   const franchises = analytics.franchises;
   const label = (id: string) => league.teams.find(team => String(team.id) === id)?.shortName || franchises.find(franchise => franchise.id === id)?.name || id;
-  const name = (id: string) => franchises.find(franchise => franchise.id === id)?.name || league.teams.find(team => String(team.id) === id)?.owner || id;
+  const name = (id: string) => league.teams.find(team => String(team.id) === id)?.name || franchises.find(franchise => franchise.id === id)?.name || id;
+  const currentManager = (id: string) => { const team = league.teams.find(team => String(team.id) === id); return team ? managerLabel(team) : ''; };
   const color = (id: string) => league.teams.find(team => String(team.id) === id)?.color || palette[Math.max(0, franchises.findIndex(franchise => franchise.id === id)) % palette.length];
   const positionSeasons = useMemo(() => [...analytics.draftPositions.seasonOrders, ...(includeInferred ? analytics.draftPositions.inferredSeasonOrders || [] : [])], [includeInferred]);
   const availableSlotYears = [...new Set(positionSeasons.map(item => item.season))].sort((a, b) => b - a);
+  const slotSeason = availableSlotYears.some(year => String(year) === slotSeasonParam) ? slotSeasonParam : 'all';
   const filteredOrders = positionSeasons.filter(item => slotSeason === 'all' || String(item.season) === slotSeason);
   const countFor = (franchiseId: string, position: number) => filteredOrders.filter(item => item.franchiseId === franchiseId && item.position === position);
   const maxFrequency = Math.max(1, ...franchises.flatMap(franchise => Array.from({ length: franchises.length }, (_, index) => countFor(franchise.id, index + 1).length)));
@@ -57,6 +81,11 @@ export function LeagueAnalytics({ league, playoffHistory }: { league: LeagueData
   const firstSlotWinners = firstSlotCounts.filter(item => item.count === firstSlotMax && firstSlotMax > 0);
   const luckbox = calculateLuckbox(filteredOrders, playoffHistory.seasons);
   const observations = analytics.winsTrades.observations.filter(item => Number.isFinite(item.wins) && Number.isFinite(item.trades));
+  useEffect(() => {
+    const index = analytics.winsTrades.observations.filter(item => Number.isFinite(item.wins) && Number.isFinite(item.trades)).findIndex(item => item.franchiseId === spotlight);
+    if (index >= 0) setActivePoint(index);
+  }, [spotlight]);
+  useEffect(() => { setSelectedCell(null); }, [slotSeason, includeInferred]);
   const mostTrades = Math.max(0, ...observations.map(item => item.trades));
   const busiest = observations.filter(item => item.trades === mostTrades);
   const maxAppearances = Math.max(0, ...analytics.playerPreferences.rows.map(item => item.picks));
@@ -79,19 +108,37 @@ export function LeagueAnalytics({ league, playoffHistory }: { league: LeagueData
   const preferenceRows = analytics.playerPreferences.rows.map(item => {
     const selections = (item.selections || []).filter(selection => preferenceSeason === 'all' || String(selection.season) === preferenceSeason);
     const dated = Boolean(item.selections);
-    const fresh = dated ? selections.filter(selection => selection.kept === false).length : item.freshSelections || 0;
-    const kept = dated ? selections.filter(selection => selection.kept === true).length : item.keeperSelections || 0;
-    const total = dated ? selections.length : item.picks;
-    const unknown = Math.max(0, total - kept - fresh);
-    return { ...item, selectedAppearances: selections, fresh, kept, unknown, total, value: preferenceMode === 'fresh' ? fresh : preferenceMode === 'kept' ? kept : total };
+    const total = dated ? selections.length : preferenceSeason === 'all' ? item.picks : item.seasons.filter(year => String(year) === preferenceSeason).length;
+    return { ...item, selectedAppearances: selections, value: total };
   }).filter(item => (spotlight === 'all' || item.franchiseId === spotlight) && item.player.toLowerCase().includes(playerSearch.trim().toLowerCase()) && item.value > 0).sort((a, b) => b.value - a.value || a.player.localeCompare(b.player) || a.franchiseId.localeCompare(b.franchiseId));
-  const rankedPreferences = preferenceRows.slice(0, 10);
-  const preferenceMax = Math.max(1, ...rankedPreferences.map(item => item.value));
-  const preferenceDetail = preferenceRows.find(item => item.franchiseId + ':' + item.player === selectedPreference);
+  const preferenceScope = JSON.stringify([spotlight, preferenceSeason, playerSearch, preferencePageSize]);
+  useEffect(() => {
+    setPreferencePagination({ scope: preferenceScope, page: 1 });
+    setSelectedPreference(null);
+  }, [preferenceScope]);
+  const preferencePageCount = Math.max(1, Math.ceil(preferenceRows.length / preferencePageSize));
+  const preferencePage = preferencePagination.scope === preferenceScope ? Math.min(preferencePagination.page, preferencePageCount) : 1;
+  const preferenceStart = (preferencePage - 1) * preferencePageSize;
+  const rankedPreferences = preferenceRows.slice(preferenceStart, preferenceStart + preferencePageSize);
+  const preferenceMax = Math.max(1, ...preferenceRows.map(item => item.value));
+  const preferencePageScope = `${preferenceScope}:${preferencePage}`;
+  const selectedPreferenceKey = selectedPreference?.scope === preferencePageScope ? selectedPreference.key : null;
+  const preferenceDetail = rankedPreferences.find(item => item.franchiseId + ':' + item.player === selectedPreferenceKey);
+  const changePreferencePage = (page: number) => {
+    setPreferencePagination({ scope: preferenceScope, page: Math.max(1, Math.min(page, preferencePageCount)) });
+    setSelectedPreference(null);
+  };
+  const categoryDraftYears = categorySeason === 'all' ? categoryYears : [Number(categorySeason)];
+  const rosterPositions = aggregateRosterPositions(positionHistory, categoryDraftYears);
+  const categoryPreferences = aggregateCategoryPreferences(categoryHistory, categoryDraftYears);
+  const seasonLabel = (draftYear: number) => `${draftYear}–${String(draftYear + 1).slice(-2)}`;
+  const seasonList = (years: number[]) => [...years].sort((a, b) => a - b).map(seasonLabel).join(', ');
+  const percent = (value: number | null) => value === null ? '—' : `${(value * 100).toFixed(1)}%`;
+  const resetPlayerFilters = () => { updateQuery({ labTeam: null, labPlayer: null, labPlayerYear: null }); setSelectedPreference(null); };
 
   return <div className="league-lab">
     <div className="page-heading lab-heading"><div><p className="eyebrow">THE CROC BOIS CURIOSITY DEPARTMENT</p><h1>League Lab.</h1><p className="page-intro">A little evidence for the group chat. Explore the patterns behind the picks, deals, and familiar faces.</p></div><span className="lab-stamp"><LabIcon kind="chart"/><span>HISTORICAL<br/>DEEP CUTS</span></span></div>
-    <div className="lab-controls"><label>Spotlight a franchise<select value={spotlight} onChange={event => { setSpotlight(event.target.value); const found = observations.findIndex(item => item.franchiseId === event.target.value); if (found >= 0) setActivePoint(found); }}><option value="all">The whole league</option>{franchises.map(franchise => <option value={franchise.id} key={franchise.id}>{label(franchise.id)} · {franchise.name}</option>)}</select></label><p>Highlights the charts and filters player favorites.<br/><span>Current abbreviations follow franchise history across manager changes.</span></p>{spotlight !== 'all' && <button className="text-button" onClick={() => setSpotlight('all')}>Clear spotlight ×</button>}</div>
+    <div className="lab-controls"><label>Spotlight a franchise<select value={spotlight} onChange={event => { setSpotlight(event.target.value); const found = observations.findIndex(item => item.franchiseId === event.target.value); if (found >= 0) setActivePoint(found); }}><option value="all">The whole league</option>{franchises.map(franchise => <option value={franchise.id} key={franchise.id}>{name(franchise.id)} · {currentManager(franchise.id)}</option>)}</select></label><p>Highlights the charts and filters both preference views.<br/><span>Current names follow franchise history across manager changes. Historical manager labels stay with their recorded seasons.</span></p>{spotlight !== 'all' && <button className="text-button" onClick={() => setSpotlight('all')}>Clear spotlight</button>}</div>
 
     <div className="lab-section-caption"><span>THE UNOFFICIAL HARDWARE</span><span>Every award comes with receipts.</span></div>
     <section className="lab-awards" aria-label="Evidence-backed league awards">
@@ -110,8 +157,99 @@ export function LeagueAnalytics({ league, playoffHistory }: { league: LeagueData
 
     <section className="panel lab-scatter-panel" aria-labelledby="wins-trades-title"><div className="panel-header"><div><p className="eyebrow">02 / THE DEALMAKER QUESTION</p><h2 id="wins-trades-title">Does dealing pay off?</h2></div><span className="lab-source-chip">LEAGUE HISTORY</span></div><div className="lab-panel-description"><p>This eight-franchise snapshot pairs <strong>cumulative trade counts</strong> with <strong>recorded regular-season wins from 2018–2024</strong>.</p></div><div className="lab-scatter-layout"><div className="lab-scatter-area"><div className="lab-chart-toolbar"><span>Hover, focus, or tap a franchise.</span><label><input type="checkbox" checked={showTrend} onChange={event => setShowTrend(event.target.checked)}/> Show trend</label></div><svg className="lab-scatter" viewBox="0 0 622 349" role="img" aria-labelledby={'scatter-title-' + clipId} aria-describedby={'scatter-description-' + clipId}><title id={'scatter-title-' + clipId}>Reported cumulative trades versus regular-season wins</title><desc id={'scatter-description-' + clipId}>Each point represents one franchise. Wins and trade counts cover different periods. Select a point to read its trade and win totals.</desc><defs><clipPath id={'plot-' + clipId}><rect x={plot.left} y={plot.top} width={plot.width} height={plot.height}/></clipPath></defs>{Array.from({ length: 5 }, (_, index) => yMin + index * (yMax - yMin) / 4).map(value => <g key={value}><line x1={plot.left} x2={plot.left + plot.width} y1={y(value)} y2={y(value)} className="lab-gridline"/><text x={plot.left - 12} y={y(value) + 3} textAnchor="end" className="lab-axis-text">{Math.round(value)}</text></g>)}{Array.from({ length: 5 }, (_, index) => index * xMax / 4).map(value => <g key={value}><line x1={x(value)} x2={x(value)} y1={plot.top} y2={plot.top + plot.height} className="lab-gridline vertical"/><text x={x(value)} y={plot.top + plot.height + 19} textAnchor="middle" className="lab-axis-text">{Math.round(value)}</text></g>)}<text x={plot.left} y={12} className="lab-axis-title">RECORDED WINS</text><text x={plot.left + plot.width / 2} y={343} textAnchor="middle" className="lab-axis-title">REPORTED CUMULATIVE TRADES</text>{showTrend && slope !== null && <line x1={x(0)} y1={y(averageWins - slope * averageTrades)} x2={x(xMax)} y2={y(averageWins + slope * (xMax - averageTrades))} className="lab-trendline" clipPath={'url(#plot-' + clipId + ')'}/>}<line x1={x(averageTrades)} x2={x(averageTrades)} y1={plot.top} y2={plot.top + plot.height} className="lab-meanline"/>{observations.map((item, index) => { const isActive = activePoint === index; const dim = spotlight !== 'all' && item.franchiseId !== spotlight; const atRight = x(item.trades) > plot.left + plot.width - 60; return <g key={item.franchiseId + ':' + index} className={'lab-scatter-point' + (dim ? ' lab-dimmed' : '')} role="button" tabIndex={0} aria-label={item.historicalOwner + ': ' + item.trades + ' reported trades and ' + item.wins + ' recorded wins'} onMouseEnter={() => setActivePoint(index)} onFocus={() => setActivePoint(index)} onClick={() => { setActivePoint(index); setSpotlight(spotlight === item.franchiseId ? 'all' : item.franchiseId); }} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setActivePoint(index); setSpotlight(spotlight === item.franchiseId ? 'all' : item.franchiseId); } }}><title>{item.historicalOwner + ' · ' + item.trades + ' trades · ' + item.wins + ' wins'}</title><circle cx={x(item.trades)} cy={y(item.wins)} r="17" fill="transparent"/>{isActive && <circle cx={x(item.trades)} cy={y(item.wins)} r="12" fill={color(item.franchiseId)} opacity=".15"/>}<circle cx={x(item.trades)} cy={y(item.wins)} r={isActive ? 6.8 : 5.5} fill={color(item.franchiseId)} stroke="var(--surface)" strokeWidth="2"/><text x={x(item.trades) + (atRight ? -11 : 11)} y={y(item.wins) - 9} textAnchor={atRight ? 'end' : 'start'} className="lab-point-label">{label(item.franchiseId)}</text></g>; })}</svg><div className="lab-franchise-legend">{franchises.map(franchise => <button className={spotlight === franchise.id ? 'active' : ''} onClick={() => { setSpotlight(spotlight === franchise.id ? 'all' : franchise.id); const index = observations.findIndex(item => item.franchiseId === franchise.id); if (index >= 0) setActivePoint(index); }} key={franchise.id} aria-pressed={spotlight === franchise.id}><i style={{ background: color(franchise.id) }}/>{label(franchise.id)}</button>)}</div></div><aside className="lab-scatter-insight"><p className="eyebrow">THE ASSOCIATION</p><div className="lab-correlation"><span>r =</span><strong>{analytics.winsTrades.pearson === null ? '—' : analytics.winsTrades.pearson.toFixed(2)}</strong></div><p className="lab-correlation-caption">{analytics.winsTrades.pearson !== null && analytics.winsTrades.pearson > 0 ? 'A positive association in this snapshot.' : 'A descriptive comparison of the recorded values.'}</p><span className="lab-sample-size">{observations.length} franchise observations · Pearson correlation</span>{point && <div className="lab-point-detail" aria-live="polite"><span className="lab-team-badge" style={{ '--lab-color': color(point.franchiseId) } as CSSProperties}>{label(point.franchiseId)}</span><strong>{point.historicalOwner}</strong><div><p><b>{point.trades}</b><span>reported trades</span></p><p><b>{point.wins}</b><span>recorded wins</span></p></div></div>}<p className="lab-chart-footnote">Counts span different periods and include workbook formula adjustments. More trades are not proven to cause more wins.</p></aside></div><div className="lab-source-warning"><strong>Read this as a historical snapshot.</strong> Trade totals are not matched to the same years as the win totals. Different tenures, roster strength, and disputed tally formulas can affect the relationship.</div></section>
 
-    <section className="panel lab-preference-panel" aria-labelledby="player-preferences-title"><div className="panel-header"><div><p className="eyebrow">03 / THE FAMILIAR FACES</p><h2 id="player-preferences-title">Everybody has a type.</h2></div><label className="lab-inline-filter">Draft year<select aria-label="Filter player preference year" value={preferenceSeason} onChange={event => { setPreferenceSeason(event.target.value); setSelectedPreference(null); }}><option value="all">{formatYears(analytics.coverage.draftYears)} · full archive</option>{[...analytics.coverage.draftYears].sort((a, b) => b - a).map(year => <option key={year} value={String(year)}>{year}</option>)}</select></label></div><div className="lab-panel-description"><p>Players who keep appearing on the same franchise’s draft board. Count all appearances, or separate known new selections from recorded keepers.</p></div><div className="lab-preference-controls"><div className="lab-segmented" aria-label="Player appearance classification">{([{ id: 'all', label: 'All appearances' }, { id: 'fresh', label: 'New selections' }, { id: 'kept', label: 'Keepers' }] as const).map(mode => <button key={mode.id} onClick={() => { setPreferenceMode(mode.id); setSelectedPreference(null); }} aria-pressed={preferenceMode === mode.id} className={preferenceMode === mode.id ? 'active' : ''}>{mode.label}</button>)}</div><label className="search-input"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/></svg><input aria-label="Search player preferences" type="search" placeholder="Find a familiar face…" value={playerSearch} onChange={event => { setPlayerSearch(event.target.value); setSelectedPreference(null); }}/></label></div><div className="lab-preference-heading"><span>{spotlight === 'all' ? 'LEAGUE-WIDE PAIRINGS' : label(spotlight) + ' · ' + name(spotlight)}</span><span>{rankedPreferences.length} of {preferenceRows.length} matching pairs</span></div><div className="lab-preference-bars">{rankedPreferences.map((item, index) => <button key={item.franchiseId + ':' + item.player} className={selectedPreference === item.franchiseId + ':' + item.player ? 'selected' : ''} onClick={() => setSelectedPreference(item.franchiseId + ':' + item.player)} aria-label={item.player + ' with ' + name(item.franchiseId) + ': ' + item.value + ' ' + (preferenceMode === 'all' ? 'draft-board appearances' : preferenceMode === 'fresh' ? 'known new selections' : 'recorded keepers')}><span className="lab-preference-rank">{String(index + 1).padStart(2, '0')}</span><span className="lab-preference-player"><strong>{item.player}</strong><small><i style={{ background: color(item.franchiseId) }}/>{label(item.franchiseId)} · {item.selectedAppearances.length ? formatYears(item.selectedAppearances.map(selection => selection.season)) : formatYears(item.seasons)}</small></span><span className="lab-stacked-track">{preferenceMode === 'all' ? <><i className="lab-stack-fresh" style={{ width: item.fresh / preferenceMax * 100 + '%' }}/><i className="lab-stack-kept" style={{ width: item.kept / preferenceMax * 100 + '%' }}/><i className="lab-stack-unknown" style={{ width: item.unknown / preferenceMax * 100 + '%' }}/></> : <i className={preferenceMode === 'kept' ? 'lab-stack-kept' : 'lab-stack-fresh'} style={{ width: item.value / preferenceMax * 100 + '%' }}/>}</span><strong className="lab-preference-value">{item.value}</strong><span className="lab-preference-arrow" aria-hidden="true">↗</span></button>)}</div>{rankedPreferences.length === 0 && <div className="empty-state">No recorded appearances match these filters. Try another franchise, year, or classification.</div>}<div className="lab-stack-legend"><span><i className="lab-stack-fresh"/> Known new selection</span><span><i className="lab-stack-kept"/> Recorded keeper</span><span><i className="lab-stack-unknown"/> Classification unknown</span></div>{preferenceDetail && <div className="lab-appearance-detail" aria-live="polite"><div><p className="eyebrow">THE RECEIPTS</p><h3>{preferenceDetail.player} × {label(preferenceDetail.franchiseId)}</h3><span>{preferenceDetail.fresh} new · {preferenceDetail.kept} kept · {preferenceDetail.unknown} unclassified</span></div><div className="lab-appearance-timeline">{preferenceDetail.selectedAppearances.map((selection, index) => <div key={selection.season + ':' + index}><strong>{selection.season}</strong><span>Round {selection.round} · #{selection.overallPick}</span><small>{selection.kept === true ? 'Kept' : selection.kept === false ? 'New selection' : 'Classification unknown'} · {selection.historicalOwner}</small></div>)}</div></div>}<p className="lab-preference-note">Retention creates repeat appearances. Unknown keeper classifications stay unknown and are excluded from the “New selections” and “Keepers” filters. These patterns describe the archive; they do not establish anyone’s intentions.</p></section>
-
-    <details className="panel lab-methodology"><summary><div><p className="eyebrow">BEHIND THE NUMBERS</p><h2>Sources, scope & a few healthy caveats.</h2></div><span aria-hidden="true">+</span></summary><div className="lab-methodology-content"><section><h3>Draft position is a specific thing.</h3><p>Verified original positions use the explicit original-owner columns from {formatYears(authoritativeYears)}. Reconstructed older slots are included by default and can be excluded with the chart toggle. A traded first-round pick can go to a different franchise, and neither record is the lottery’s choice priority.</p><p>Historical owners remain associated with their own draft years. A new owner inherits the franchise, but earlier draft choices are not attributed to them.</p></section><section><h3>Historical totals, with context.</h3><p>Trades cover the full historical ledger, while wins cover 2018–2024. Annual trade counts are unavailable, so the periods cannot be aligned.</p><p>These totals retain historical formula adjustments and owner-name inconsistencies. Some earlier owners were excluded from franchise tallies; those decisions limit comparisons.</p><p>The trend line is a least-squares fit through the reported pairs. Correlation is descriptive; unequal time windows and historical tally decisions limit what can be concluded.</p></section><section><h3>Favorite players, with context.</h3><p>Counts come from {analytics.coverage.selectionCount} draft-board entries across {formatYears(analytics.coverage.draftYears)}. Franchise identities are grouped across owner changes. A repeated player may reflect keeper retention, draft choices, or ownership transfers.</p>{(analytics.playerPreferences.limitations || []).map((note, index) => <p key={index}>{note}</p>)}</section><section><h3>How Luckbox is calculated.</h3><p>The four franchises in each season’s championship bracket form the playoff group for the following draft. For example, the 2025–26 bracket feeds the 2026 draft. Luckbox counts top-four original draft slots earned by those franchises and follows the draft chart’s year selection.</p><p>A winner appears only when every selected year has both a verified bracket and a complete original draft order. Missing results never count as a non-playoff season or a loss.</p></section>{analytics.coverage.limitations?.length > 0 && <section><h3>Archive coverage</h3><p>Older draft positions were reconstructed from ownership annotations. Later records distinguish original pick owners from the teams that received traded picks.</p></section>}</div></details>
+    <section className="panel lab-preference-panel" aria-labelledby="player-preferences-title">
+      <div className="panel-header">
+        <div><p className="eyebrow">03 / PATTERNS OF PLAY</p><h2 id="player-preferences-title">Everybody has a type.</h2></div>
+        <label className="lab-inline-filter">{preferenceTab === 'players' ? 'Draft year' : 'Season'}
+          <select aria-label={preferenceTab === 'players' ? 'Filter player preference year' : 'Filter category preference season'} value={preferenceTab === 'players' ? preferenceSeason : categorySeason} onChange={event => { if (preferenceTab === 'players') { setPreferenceSeason(event.target.value); setSelectedPreference(null); } else setCategorySeason(event.target.value); }}>
+            <option value="all">{preferenceTab === 'players' ? `${formatYears(analytics.coverage.draftYears)} · full archive` : 'All recorded seasons'}</option>
+            {(preferenceTab === 'players' ? [...analytics.coverage.draftYears].sort((a, b) => b - a) : categoryYears).map(year => <option key={year} value={String(year)}>{preferenceTab === 'players' ? year : seasonLabel(year)}</option>)}
+          </select>
+        </label>
+      </div>
+      <div className={styles.tabs} role="tablist" aria-label="Explore franchise preferences">
+        {([{ id: 'players', label: 'Players' }, { id: 'categories', label: 'Category Preferences' }] as const).map((tab, index) => <button
+          key={tab.id} id={`preference-tab-${tab.id}`} type="button" role="tab"
+          aria-selected={preferenceTab === tab.id} aria-controls={`preference-panel-${tab.id}`} tabIndex={preferenceTab === tab.id ? 0 : -1}
+          onClick={() => setPreferenceTab(tab.id)}
+          onKeyDown={event => {
+            if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+            event.preventDefault();
+            const next = event.key === 'Home' ? 'players' : event.key === 'End' ? 'categories' : index === 0 ? 'categories' : 'players';
+            setPreferenceTab(next);
+            document.getElementById(`preference-tab-${next}`)?.focus();
+          }}
+        >{tab.label}</button>)}
+      </div>
+      <div id="preference-panel-players" role="tabpanel" aria-labelledby="preference-tab-players" hidden={preferenceTab !== 'players'}>
+        <div className="lab-panel-description"><p>Every recorded appearance on a franchise’s draft board counts, including retained players. Find the familiar faces and the years they came back.</p></div>
+        <div className="lab-preference-controls">
+          <span className={styles.metricLabel}>TOTAL DRAFT-BOARD APPEARANCES</span>
+          <label className="search-input"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/></svg><input aria-label="Search player preferences" type="search" maxLength={200} placeholder="Find a familiar face…" value={playerSearch} onChange={event => { setPlayerSearch(event.target.value); setSelectedPreference(null); }}/></label>
+          {playerSearch && <button type="button" className="text-button" onClick={() => setPlayerSearch('')}>Clear search</button>}
+          {(spotlight !== 'all' || preferenceSeason !== 'all' || playerSearch) && <button type="button" className="text-button" onClick={resetPlayerFilters}>Reset player filters</button>}
+        </div>
+        <div className="lab-preference-heading"><span>{spotlight === 'all' ? 'LEAGUE-WIDE PAIRINGS' : label(spotlight) + ' · ' + name(spotlight)}</span><span role="status">Showing {preferenceRows.length ? preferenceStart + 1 : 0}–{preferenceStart + rankedPreferences.length} of {preferenceRows.length} matching pairs</span></div>
+        <div className="lab-preference-bars">
+          {rankedPreferences.map((item, index) => <button key={item.franchiseId + ':' + item.player} className={selectedPreferenceKey === item.franchiseId + ':' + item.player ? 'selected' : ''} onClick={() => setSelectedPreference({ key: item.franchiseId + ':' + item.player, scope: preferencePageScope })} aria-label={item.player + ' with ' + name(item.franchiseId) + ': ' + item.value + ' draft-board appearances'} aria-pressed={selectedPreferenceKey === item.franchiseId + ':' + item.player}>
+            <span className="lab-preference-rank">{String(preferenceStart + index + 1).padStart(2, '0')}</span>
+            <span className="lab-preference-player"><strong>{item.player}</strong><small><i style={{ background: color(item.franchiseId) }}/>{label(item.franchiseId)} · {item.selectedAppearances.length ? formatYears(item.selectedAppearances.map(selection => selection.season)) : formatYears(item.seasons)}</small></span>
+            <span className="lab-stacked-track" aria-hidden="true"><i style={{ width: item.value / preferenceMax * 100 + '%', background: color(item.franchiseId) }}/></span>
+            <strong className="lab-preference-value">{item.value}</strong><span className="lab-preference-arrow" aria-hidden="true">↗</span>
+          </button>)}
+        </div>
+        {rankedPreferences.length === 0 && <div className="empty-state">No recorded appearances match these filters. Try another franchise, year, or player.</div>}
+        <div className={styles.pagination}>
+          <label>Rows per page<select aria-label="Player appearances per page" value={preferencePageSize} onChange={event => { setPreferencePageSize(Number(event.target.value)); setSelectedPreference(null); }}><option value="10">10</option><option value="25">25</option></select></label>
+          <nav className={styles.paginationNav} aria-label="Player appearance pages">
+            <button type="button" onClick={() => changePreferencePage(1)} disabled={preferencePage === 1} aria-label="First player page">First</button>
+            <button type="button" onClick={() => changePreferencePage(preferencePage - 1)} disabled={preferencePage === 1} aria-label="Previous player page">Previous</button>
+            <span className={styles.pageNumber}>Page {preferencePage} of {preferencePageCount}</span>
+            <button type="button" onClick={() => changePreferencePage(preferencePage + 1)} disabled={preferencePage === preferencePageCount} aria-label="Next player page">Next</button>
+            <button type="button" onClick={() => changePreferencePage(preferencePageCount)} disabled={preferencePage === preferencePageCount} aria-label="Last player page">Last</button>
+          </nav>
+        </div>
+        {preferenceDetail && <div className={`lab-appearance-detail ${styles.playerDetail}`} aria-live="polite">
+          <div><p className="eyebrow">THE RECEIPTS</p><h3>{preferenceDetail.player} × {label(preferenceDetail.franchiseId)}</h3><span>{preferenceDetail.value} recorded appearance{preferenceDetail.value === 1 ? '' : 's'}</span></div>
+          <div className="lab-appearance-timeline">{preferenceDetail.selectedAppearances.map((selection, index) => <div key={selection.season + ':' + index}><strong>{selection.season}</strong><span>Round {selection.round} · #{selection.overallPick}</span><small>Manager then: {selection.historicalOwner}</small></div>)}</div>
+        </div>}
+        <p className="lab-preference-note">These are franchise draft-board appearances, including retention and selections made by earlier owners. The archive describes recorded player relationships; it does not establish a manager’s intent.</p>
+      </div>
+      <div id="preference-panel-categories" role="tabpanel" aria-labelledby="preference-tab-categories" hidden={preferenceTab !== 'categories'}>
+        <div className="lab-panel-description"><p>Explore each franchise’s recorded roster mix and strongest regular-season categories. Position averages use saved roster snapshots; category records use completed matchups.</p></div>
+        <div className={styles.categoryScope}><span>{spotlight === 'all' ? 'ALL FRANCHISES' : label(spotlight) + ' · FRANCHISE HISTORY'}</span><p>Season labels follow the basketball season: 2025–26 begins with the 2025 draft. Results stay with the franchise across owner changes.</p></div>
+        <div className={styles.franchises}>
+          {franchises.filter(franchise => spotlight === 'all' || franchise.id === spotlight).map(franchise => {
+            const roster = rosterPositions.find(row => row.franchiseId === franchise.id);
+            const categories = categoryPreferences.find(row => row.franchiseId === franchise.id);
+            const strongest = [...(categories?.categories || [])].filter(category => category.winRate !== null && category.decisions > 0).sort((a, b) => (b.winRate ?? 0) - (a.winRate ?? 0) || b.wins - a.wins || a.label.localeCompare(b.label)).slice(0, 3);
+            const maxPosition = Math.max(1, ...(roster?.positions.map(position => position.averageCount ?? 0) || []));
+            return <article className={styles.franchise} key={franchise.id} style={{ '--franchise-color': color(franchise.id) } as CSSProperties} aria-label={`${name(franchise.id)} category preferences`}>
+              <header className={styles.franchiseHeader}><span className="lab-team-badge" style={{ '--lab-color': color(franchise.id) } as CSSProperties}>{label(franchise.id)}</span><div><h3>{name(franchise.id)}</h3><p>{currentManager(franchise.id)} · franchise history</p></div></header>
+              <section className={styles.positionSection} aria-label={`${label(franchise.id)} roster positions`}>
+                <h4>Average recorded roster mix</h4>
+                {roster && roster.snapshotCount > 0 ? <>
+                  <p className={styles.coverage}>{roster.snapshotCount} snapshot{roster.snapshotCount === 1 ? '' : 's'} · {seasonList(roster.recordedSeasons)} · {roster.averageRosterSize?.toFixed(1)} players per roster</p>
+                  <dl className={styles.positions}>{roster.positions.map(position => <div key={position.position}><dt>{position.position}</dt><dd><strong>{position.averageCount?.toFixed(1) ?? '—'}</strong><span>{percent(position.averageShare)}</span><i aria-hidden="true"><b style={{ width: `${(position.averageCount ?? 0) / maxPosition * 100}%` }}/></i></dd></div>)}</dl>
+                  {roster.unknownPlayers > 0 && <p className={styles.coverage}>{roster.unknownPlayers} player observation{roster.unknownPlayers === 1 ? '' : 's'} have no recorded primary position and remain in the roster denominator.</p>}
+                </> : <p className={styles.unavailable}>No roster snapshots in the selected seasons.</p>}
+                {roster && roster.missingSeasons.length > 0 && <p className={styles.missing}>No roster snapshot: {seasonList(roster.missingSeasons)}.</p>}
+              </section>
+              <section className={styles.resultsSection} aria-label={`${label(franchise.id)} category results`}>
+                <h4>Strongest recorded categories</h4>
+                {categories && categories.matchups > 0 && strongest.length > 0 ? <>
+                  <p className={styles.coverage}>{categories.matchups} completed regular-season matchups · {seasonList(categories.recordedSeasons)}</p>
+                  <div className={styles.strongest}>{strongest.map(category => <div key={category.id}><span>{category.label}</span><strong>{percent(category.winRate)}</strong><small>{category.wins} W · {category.losses} L · {category.ties} T</small></div>)}</div>
+                  <details className={styles.categoryDetails}><summary>All {categories.categories.length} category records <span aria-hidden="true">+</span></summary><div className={styles.categoryTable}><table><caption className="visually-hidden">{name(franchise.id)} regular-season category records. Win rate gives a tie half credit.</caption><thead><tr><th scope="col">Category</th><th scope="col">W</th><th scope="col">L</th><th scope="col">T</th><th scope="col">Win rate</th></tr></thead><tbody>{categories.categories.map(category => <tr key={category.id}><th scope="row">{category.label}</th><td>{category.wins}</td><td>{category.losses}</td><td>{category.ties}</td><td>{percent(category.winRate)}{category.coverageMatchups < categories.matchups && <small>{category.coverageMatchups}/{categories.matchups} matchups</small>}</td></tr>)}</tbody></table></div></details>
+                </> : <p className={styles.unavailable}>No completed category results in the selected seasons.</p>}
+                {categories && categories.missingSeasons.length > 0 && <p className={styles.missing}>No category results: {seasonList(categories.missingSeasons)}.</p>}
+              </section>
+            </article>;
+          })}
+        </div>
+        <p className="lab-preference-note">Positions count each player once at ESPN’s recorded primary position, including the bench and injured list. Averages weight recorded season snapshots equally and do not measure lineup usage throughout a season. Category win rate is (wins + ½ ties) ÷ decisions; a turnover win means fewer turnovers. Strong categories show results, without assuming a manager’s strategy.</p>
+      </div>
+    </section>
+    <details className="panel lab-methodology"><summary><div><p className="eyebrow">BEHIND THE NUMBERS</p><h2>Sources, scope & a few healthy caveats.</h2></div><span aria-hidden="true">+</span></summary><div className="lab-methodology-content"><section><h3>Draft position is a specific thing.</h3><p>Verified original positions use the explicit original-owner columns from {formatYears(authoritativeYears)}. Reconstructed older slots are included by default and can be excluded with the chart toggle. A traded first-round pick can go to a different franchise, and neither record is the lottery’s choice priority.</p><p>Historical owners remain associated with their own draft years. A new owner inherits the franchise, but earlier draft choices are not attributed to them.</p></section><section><h3>Historical totals, with context.</h3><p>Trades cover the full historical ledger, while wins cover 2018–2024. Annual trade counts are unavailable, so the periods cannot be aligned.</p><p>These totals retain historical formula adjustments and owner-name inconsistencies. Some earlier owners were excluded from franchise tallies; those decisions limit comparisons.</p><p>The trend line is a least-squares fit through the reported pairs. Correlation is descriptive; unequal time windows and historical tally decisions limit what can be concluded.</p></section><section><h3>Favorite players, with context.</h3><p>Counts come from {analytics.coverage.selectionCount} draft-board entries across {formatYears(analytics.coverage.draftYears)}. Franchise identities are grouped across owner changes. A repeated player may reflect keeper retention, draft choices, or ownership transfers.</p><p>Known spelling variants and nicknames are normalized explicitly. Players without a recorded draft-board appearance are not added to these counts, even when a separate keeper list names them.</p></section><section><h3>How Luckbox is calculated.</h3><p>The four franchises in each season’s championship bracket form the playoff group for the following draft. For example, the 2025–26 bracket feeds the 2026 draft. Luckbox counts top-four original draft slots earned by those franchises and follows the draft chart’s year selection.</p><p>A winner appears only when every selected year has both a verified bracket and a complete original draft order. Missing results never count as a non-playoff season or a loss.</p></section>{analytics.coverage.limitations?.length > 0 && <section><h3>Archive coverage</h3><p>Older draft positions were reconstructed from ownership annotations. Later records distinguish original pick owners from the teams that received traded picks.</p></section>}</div></details>
   </div>;
 }

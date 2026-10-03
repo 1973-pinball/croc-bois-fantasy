@@ -1,0 +1,2293 @@
+{
+  "version": 1,
+  "leagueId": 139935,
+  "coverage": {
+    "draftYears": [
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "limitations": [
+      "One captured end-of-season roster per franchise and ESPN season; these are not draft selections or daily season averages.",
+      "Primary position comes from the player record returned by each season-specific ESPN endpoint. Eligible slots are not counted repeatedly. Bench and injured-reserve players remain roster members.",
+      "Average counts and shares give each recorded season equal weight. Unknown positions and missing snapshots remain explicit; no current roster is used to fill a missing older season.",
+      "Draft year means the starting calendar year of the NBA season. Franchise identity continues across manager changes."
+    ]
+  },
+  "seasons": [
+    {
+      "season": 2018,
+      "draftYear": 2017,
+      "source": {
+        "sha256": "3abf3f6de413bf08e133258c248bd1714f6e2dc5e40178fe1e7b584e0cdee8c7",
+        "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2018/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+        "capturedAt": "2026-10-03T15:58:24.794Z"
+      },
+      "scoringPeriodId": 178,
+      "teams": [
+        {
+          "franchiseId": "1",
+          "espnTeamId": 1,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 4
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "franchiseId": "2",
+          "espnTeamId": 2,
+          "rosterAvailable": true,
+          "rosterPlayers": 12,
+          "classifiedPlayers": 12,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 4
+            },
+            {
+              "position": "SG",
+              "count": 2
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 4
+            },
+            {
+              "position": "C",
+              "count": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "3",
+          "espnTeamId": 3,
+          "rosterAvailable": true,
+          "rosterPlayers": 13,
+          "classifiedPlayers": 13,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 6
+            },
+            {
+              "position": "SG",
+              "count": 1
+            },
+            {
+              "position": "SF",
+              "count": 1
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "4",
+          "espnTeamId": 4,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 3
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "franchiseId": "5",
+          "espnTeamId": 5,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 4
+            },
+            {
+              "position": "SG",
+              "count": 0
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 7
+            },
+            {
+              "position": "C",
+              "count": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "6",
+          "espnTeamId": 6,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 4
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 3
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "franchiseId": "7",
+          "espnTeamId": 7,
+          "rosterAvailable": true,
+          "rosterPlayers": 12,
+          "classifiedPlayers": 12,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 2
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 0
+            },
+            {
+              "position": "PF",
+              "count": 4
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "8",
+          "espnTeamId": 8,
+          "rosterAvailable": true,
+          "rosterPlayers": 13,
+          "classifiedPlayers": 13,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 2
+            },
+            {
+              "position": "SF",
+              "count": 4
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "season": 2019,
+      "draftYear": 2018,
+      "source": {
+        "sha256": "fb072438290cf75f533538705e35fe913e963d7ef48f6d02f0a5c629220dc949",
+        "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2019/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+        "capturedAt": "2026-10-03T15:58:24.957Z"
+      },
+      "scoringPeriodId": 178,
+      "teams": [
+        {
+          "franchiseId": "1",
+          "espnTeamId": 1,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 2
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 4
+            }
+          ]
+        },
+        {
+          "franchiseId": "2",
+          "espnTeamId": 2,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 5
+            },
+            {
+              "position": "SG",
+              "count": 4
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 1
+            },
+            {
+              "position": "C",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "franchiseId": "3",
+          "espnTeamId": 3,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 4
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 1
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 4
+            }
+          ]
+        },
+        {
+          "franchiseId": "4",
+          "espnTeamId": 4,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 5
+            },
+            {
+              "position": "SG",
+              "count": 2
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "5",
+          "espnTeamId": 5,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 5
+            },
+            {
+              "position": "SG",
+              "count": 1
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 4
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "franchiseId": "6",
+          "espnTeamId": 6,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 4
+            },
+            {
+              "position": "SG",
+              "count": 4
+            },
+            {
+              "position": "SF",
+              "count": 1
+            },
+            {
+              "position": "PF",
+              "count": 3
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "franchiseId": "7",
+          "espnTeamId": 7,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 1
+            },
+            {
+              "position": "SG",
+              "count": 1
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 7
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "8",
+          "espnTeamId": 8,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 2
+            },
+            {
+              "position": "SG",
+              "count": 2
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 3
+            },
+            {
+              "position": "C",
+              "count": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "season": 2020,
+      "draftYear": 2019,
+      "source": {
+        "sha256": "6fdce56650db424e31347062f6821670727add478e186e5a254f50fe189c00d0",
+        "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2020/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+        "capturedAt": "2026-10-03T15:58:25.087Z"
+      },
+      "scoringPeriodId": 259,
+      "teams": [
+        {
+          "franchiseId": "1",
+          "espnTeamId": 1,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 2
+            },
+            {
+              "position": "SG",
+              "count": 4
+            },
+            {
+              "position": "SF",
+              "count": 4
+            },
+            {
+              "position": "PF",
+              "count": 1
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "2",
+          "espnTeamId": 2,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 5
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "franchiseId": "3",
+          "espnTeamId": 3,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 5
+            },
+            {
+              "position": "SG",
+              "count": 2
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "4",
+          "espnTeamId": 4,
+          "rosterAvailable": true,
+          "rosterPlayers": 13,
+          "classifiedPlayers": 13,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 1
+            },
+            {
+              "position": "PF",
+              "count": 4
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "franchiseId": "5",
+          "espnTeamId": 5,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 4
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "6",
+          "espnTeamId": 6,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 5
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 1
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "7",
+          "espnTeamId": 7,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 2
+            },
+            {
+              "position": "SG",
+              "count": 2
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 5
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "franchiseId": "8",
+          "espnTeamId": 8,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 4
+            },
+            {
+              "position": "SG",
+              "count": 1
+            },
+            {
+              "position": "SF",
+              "count": 1
+            },
+            {
+              "position": "PF",
+              "count": 4
+            },
+            {
+              "position": "C",
+              "count": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "season": 2021,
+      "draftYear": 2020,
+      "source": {
+        "sha256": "6932c7d96687946f251f54bec68e5d0f7408a18612e6a736025b7a9e8f6d88e6",
+        "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2021/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+        "capturedAt": "2026-10-03T15:58:25.235Z"
+      },
+      "scoringPeriodId": 147,
+      "teams": [
+        {
+          "franchiseId": "1",
+          "espnTeamId": 1,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 2
+            },
+            {
+              "position": "SF",
+              "count": 4
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "2",
+          "espnTeamId": 2,
+          "rosterAvailable": true,
+          "rosterPlayers": 11,
+          "classifiedPlayers": 11,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 4
+            },
+            {
+              "position": "SG",
+              "count": 2
+            },
+            {
+              "position": "SF",
+              "count": 1
+            },
+            {
+              "position": "PF",
+              "count": 1
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "3",
+          "espnTeamId": 3,
+          "rosterAvailable": true,
+          "rosterPlayers": 13,
+          "classifiedPlayers": 13,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 0
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 6
+            }
+          ]
+        },
+        {
+          "franchiseId": "4",
+          "espnTeamId": 4,
+          "rosterAvailable": true,
+          "rosterPlayers": 13,
+          "classifiedPlayers": 13,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 4
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 3
+            },
+            {
+              "position": "C",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "franchiseId": "5",
+          "espnTeamId": 5,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 5
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "franchiseId": "6",
+          "espnTeamId": 6,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 5
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 1
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "7",
+          "espnTeamId": 7,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 2
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 4
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "franchiseId": "8",
+          "espnTeamId": 8,
+          "rosterAvailable": true,
+          "rosterPlayers": 13,
+          "classifiedPlayers": 13,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 4
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "season": 2022,
+      "draftYear": 2021,
+      "source": {
+        "sha256": "1dd22865270e42a4268203670db6270ceab72cd6ab263c55aba839a204793627",
+        "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2022/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+        "capturedAt": "2026-10-03T15:58:25.395Z"
+      },
+      "scoringPeriodId": 175,
+      "teams": [
+        {
+          "franchiseId": "1",
+          "espnTeamId": 1,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 1
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 5
+            }
+          ]
+        },
+        {
+          "franchiseId": "2",
+          "espnTeamId": 2,
+          "rosterAvailable": true,
+          "rosterPlayers": 13,
+          "classifiedPlayers": 13,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 5
+            },
+            {
+              "position": "SG",
+              "count": 1
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 1
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "3",
+          "espnTeamId": 3,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 4
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 1
+            },
+            {
+              "position": "PF",
+              "count": 3
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "4",
+          "espnTeamId": 4,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 2
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 5
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "franchiseId": "5",
+          "espnTeamId": 5,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 2
+            },
+            {
+              "position": "SG",
+              "count": 6
+            },
+            {
+              "position": "SF",
+              "count": 4
+            },
+            {
+              "position": "PF",
+              "count": 1
+            },
+            {
+              "position": "C",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "franchiseId": "6",
+          "espnTeamId": 6,
+          "rosterAvailable": true,
+          "rosterPlayers": 13,
+          "classifiedPlayers": 13,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 5
+            },
+            {
+              "position": "SF",
+              "count": 1
+            },
+            {
+              "position": "PF",
+              "count": 1
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "7",
+          "espnTeamId": 7,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 2
+            },
+            {
+              "position": "SG",
+              "count": 4
+            },
+            {
+              "position": "SF",
+              "count": 4
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "franchiseId": "8",
+          "espnTeamId": 8,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 5
+            },
+            {
+              "position": "SG",
+              "count": 4
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 1
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "draftYear": 2022,
+      "source": {
+        "sha256": "d75c99e5ee00be6d65a2b5bbd3c34338306eaa993a8e903777258f5d92f44654",
+        "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2023/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+        "capturedAt": "2026-10-03T15:58:25.554Z"
+      },
+      "scoringPeriodId": 176,
+      "teams": [
+        {
+          "franchiseId": "1",
+          "espnTeamId": 1,
+          "rosterAvailable": true,
+          "rosterPlayers": 13,
+          "classifiedPlayers": 13,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 1
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 1
+            },
+            {
+              "position": "PF",
+              "count": 4
+            },
+            {
+              "position": "C",
+              "count": 4
+            }
+          ]
+        },
+        {
+          "franchiseId": "2",
+          "espnTeamId": 2,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 5
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 1
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "3",
+          "espnTeamId": 3,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 1
+            },
+            {
+              "position": "PF",
+              "count": 3
+            },
+            {
+              "position": "C",
+              "count": 4
+            }
+          ]
+        },
+        {
+          "franchiseId": "4",
+          "espnTeamId": 4,
+          "rosterAvailable": true,
+          "rosterPlayers": 13,
+          "classifiedPlayers": 13,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 2
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 3
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "franchiseId": "5",
+          "espnTeamId": 5,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 2
+            },
+            {
+              "position": "SG",
+              "count": 7
+            },
+            {
+              "position": "SF",
+              "count": 1
+            },
+            {
+              "position": "PF",
+              "count": 3
+            },
+            {
+              "position": "C",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "franchiseId": "6",
+          "espnTeamId": 6,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 2
+            },
+            {
+              "position": "SG",
+              "count": 4
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 3
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "7",
+          "espnTeamId": 7,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 5
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 4
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "8",
+          "espnTeamId": 8,
+          "rosterAvailable": true,
+          "rosterPlayers": 13,
+          "classifiedPlayers": 13,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 4
+            },
+            {
+              "position": "SG",
+              "count": 2
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 3
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "draftYear": 2023,
+      "source": {
+        "sha256": "b8c4cdaa165da54c0dbd607af5faf1d62cbf7e5503b5f8e5e47eaa5c0a8bb6e3",
+        "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2024/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+        "capturedAt": "2026-10-03T15:58:25.744Z"
+      },
+      "scoringPeriodId": 175,
+      "teams": [
+        {
+          "franchiseId": "1",
+          "espnTeamId": 1,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 1
+            },
+            {
+              "position": "SG",
+              "count": 4
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 5
+            }
+          ]
+        },
+        {
+          "franchiseId": "2",
+          "espnTeamId": 2,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 2
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 4
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "3",
+          "espnTeamId": 3,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 2
+            },
+            {
+              "position": "SG",
+              "count": 4
+            },
+            {
+              "position": "SF",
+              "count": 1
+            },
+            {
+              "position": "PF",
+              "count": 3
+            },
+            {
+              "position": "C",
+              "count": 4
+            }
+          ]
+        },
+        {
+          "franchiseId": "4",
+          "espnTeamId": 4,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 1
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 4
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "5",
+          "espnTeamId": 5,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 4
+            },
+            {
+              "position": "SG",
+              "count": 6
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 1
+            },
+            {
+              "position": "C",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "franchiseId": "6",
+          "espnTeamId": 6,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 4
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "franchiseId": "7",
+          "espnTeamId": 7,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 7
+            },
+            {
+              "position": "SG",
+              "count": 5
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 0
+            },
+            {
+              "position": "C",
+              "count": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "8",
+          "espnTeamId": 8,
+          "rosterAvailable": true,
+          "rosterPlayers": 13,
+          "classifiedPlayers": 13,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 2
+            },
+            {
+              "position": "SG",
+              "count": 4
+            },
+            {
+              "position": "SF",
+              "count": 1
+            },
+            {
+              "position": "PF",
+              "count": 4
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "draftYear": 2024,
+      "source": {
+        "sha256": "6aac4a458a00b3478946cea929d157ad095a7b2ca3c6b0616f02f975e8dee936",
+        "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2025/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+        "capturedAt": "2026-10-03T15:58:25.899Z"
+      },
+      "scoringPeriodId": 175,
+      "teams": [
+        {
+          "franchiseId": "1",
+          "espnTeamId": 1,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 2
+            },
+            {
+              "position": "SG",
+              "count": 2
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 3
+            },
+            {
+              "position": "C",
+              "count": 4
+            }
+          ]
+        },
+        {
+          "franchiseId": "2",
+          "espnTeamId": 2,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 4
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 1
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "3",
+          "espnTeamId": 3,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 2
+            },
+            {
+              "position": "SG",
+              "count": 2
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 5
+            }
+          ]
+        },
+        {
+          "franchiseId": "4",
+          "espnTeamId": 4,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 2
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 4
+            }
+          ]
+        },
+        {
+          "franchiseId": "5",
+          "espnTeamId": 5,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 2
+            },
+            {
+              "position": "SG",
+              "count": 7
+            },
+            {
+              "position": "SF",
+              "count": 1
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "franchiseId": "6",
+          "espnTeamId": 6,
+          "rosterAvailable": true,
+          "rosterPlayers": 13,
+          "classifiedPlayers": 13,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 4
+            },
+            {
+              "position": "SG",
+              "count": 1
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 3
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "7",
+          "espnTeamId": 7,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 5
+            },
+            {
+              "position": "SG",
+              "count": 5
+            },
+            {
+              "position": "SF",
+              "count": 4
+            },
+            {
+              "position": "PF",
+              "count": 0
+            },
+            {
+              "position": "C",
+              "count": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "8",
+          "espnTeamId": 8,
+          "rosterAvailable": true,
+          "rosterPlayers": 13,
+          "classifiedPlayers": 13,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 2
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "season": 2026,
+      "draftYear": 2025,
+      "source": {
+        "sha256": "cd37ab9913b3197e0108bae4a006b9c6e538d155d1a2f00bd84a4bed58498efd",
+        "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2026/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+        "capturedAt": "2026-10-03T15:58:26.024Z"
+      },
+      "scoringPeriodId": 175,
+      "teams": [
+        {
+          "franchiseId": "1",
+          "espnTeamId": 1,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 4
+            },
+            {
+              "position": "SG",
+              "count": 3
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "franchiseId": "2",
+          "espnTeamId": 2,
+          "rosterAvailable": true,
+          "rosterPlayers": 13,
+          "classifiedPlayers": 13,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 3
+            },
+            {
+              "position": "SG",
+              "count": 1
+            },
+            {
+              "position": "SF",
+              "count": 4
+            },
+            {
+              "position": "PF",
+              "count": 3
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "franchiseId": "3",
+          "espnTeamId": 3,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 2
+            },
+            {
+              "position": "SG",
+              "count": 1
+            },
+            {
+              "position": "SF",
+              "count": 4
+            },
+            {
+              "position": "PF",
+              "count": 1
+            },
+            {
+              "position": "C",
+              "count": 6
+            }
+          ]
+        },
+        {
+          "franchiseId": "4",
+          "espnTeamId": 4,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 1
+            },
+            {
+              "position": "SG",
+              "count": 1
+            },
+            {
+              "position": "SF",
+              "count": 4
+            },
+            {
+              "position": "PF",
+              "count": 5
+            },
+            {
+              "position": "C",
+              "count": 3
+            }
+          ]
+        },
+        {
+          "franchiseId": "5",
+          "espnTeamId": 5,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 4
+            },
+            {
+              "position": "SG",
+              "count": 2
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 3
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "franchiseId": "6",
+          "espnTeamId": 6,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 1
+            },
+            {
+              "position": "SG",
+              "count": 4
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 2
+            },
+            {
+              "position": "C",
+              "count": 4
+            }
+          ]
+        },
+        {
+          "franchiseId": "7",
+          "espnTeamId": 7,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 4
+            },
+            {
+              "position": "SG",
+              "count": 4
+            },
+            {
+              "position": "SF",
+              "count": 3
+            },
+            {
+              "position": "PF",
+              "count": 1
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "franchiseId": "8",
+          "espnTeamId": 8,
+          "rosterAvailable": true,
+          "rosterPlayers": 14,
+          "classifiedPlayers": 14,
+          "unknownPlayers": 0,
+          "positions": [
+            {
+              "position": "PG",
+              "count": 5
+            },
+            {
+              "position": "SG",
+              "count": 4
+            },
+            {
+              "position": "SF",
+              "count": 2
+            },
+            {
+              "position": "PF",
+              "count": 1
+            },
+            {
+              "position": "C",
+              "count": 2
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

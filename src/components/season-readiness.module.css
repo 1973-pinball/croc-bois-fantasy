@@ -1,0 +1,55 @@
+.panel { min-width: 0; }
+.scheduleNotice summary { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 18px; min-height: 44px; cursor: pointer; color: var(--green); font-size: 13px; font-weight: 650; }
+.scheduleNotice summary::after { content: '+'; }
+.scheduleNotice[open] summary::after { content: '−'; }
+.scheduleNotice summary span { margin-left: auto; color: var(--muted); font-weight: 400; font-size: 12px; }
+.scheduleNotice[open] > span { display: block; margin-top: 8px; }
+.scheduleNotice[open] > small { display: block; margin-top: 10px; }
+.panel :global(.panel-header) { gap: 12px; flex-wrap: wrap; }
+.body { padding: 20px 24px 24px; }
+.help { color: var(--muted); font-size:12px; line-height: 1.9; margin: 0 0 18px; }
+.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 20px 0; }
+.facts > div { padding: 15px; background: #f3f6ea; border: 1px solid var(--line); border-radius: 6px; }
+.facts dt, .dates dt { color: var(--muted); font-size:12px; line-height: 1.7; }
+.facts dd { color: var(--green); font-size: 27px; font-weight: 700; margin: 6px 0 0; }
+.dates { display: flex; flex-wrap: wrap; gap: 18px 35px; padding: 0 0 20px; margin: 0; }
+.dates dd { font-size: 12px; margin: 5px 0 0; line-height: 1.7; }
+.table { min-width: 760px; margin-bottom: 12px; }
+.table small { display: block; margin-top: 5px; color: var(--muted); font-size:12px; line-height: 1.7; }
+.table tbody th { max-width: 190px; white-space: normal; text-transform: none; letter-spacing: normal; font-size: 12px; }
+.status { display: inline-block; padding: 5px 8px; background: #eef2e6; color: var(--green); border-radius: 4px; font-size:12px; line-height: 1.7; }
+.warning, .error, .success { padding: 13px 15px; border-radius: 5px; font-size:12px; line-height: 1.9; margin: 14px 0; }
+.warning { background: #fbf2df; color: #80622f; border: 1px solid #e8d6af; }
+.error { background: #fbefe7; color: #8d4e3c; border: 1px solid #e5cbbb; }
+.success { background: #edf4e6; color: #38634c; border: 1px solid #d0dfc7; }
+.scheduleEditor { border-top: 1px solid var(--line); padding-top: 18px; margin-top: 20px; }
+.scheduleEditor summary { cursor: pointer; font-size: 12px; font-weight: 600; color: var(--green); padding: 5px 0; }
+.scheduleEditor form { padding-top: 18px; }
+.fields { border: 0; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; min-width: 0; }
+.fields label { display: flex; flex-direction: column; gap: 8px; font-size:12px; line-height: 1.7; min-width: 0; }
+.fields input, .fields textarea { width: 100%; min-width: 0; padding: 10px; border: 1px solid #cbd3c4; border-radius: 4px; background: white; color: var(--ink); font: inherit; }
+.fields .reason { grid-column: 1 / -1; }
+.fields button { width: fit-content; grid-column: 1 / -1; }
+.fields:disabled { opacity: .65; }
+.scheduleNotice { display: block; padding: 0 16px; margin: 0 0 22px; border: 1px solid var(--line); border-radius: 6px; background: #f7f8f0; font-size:12px; line-height: 1.8; color: var(--muted); }
+.scheduleNotice strong { color: var(--green); margin-right: 6px; }
+.scheduleNotice small { flex-basis: 100%; font-size:12px; }
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+@media (max-width: 800px) { .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } .fields { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 600px) {
+  .body { padding: 17px; }
+  .facts { gap: 8px; }
+  .facts > div { padding: 12px; }
+  .facts dd { font-size: 24px; }
+  .scheduleNotice { padding: 12px; }
+  .table { min-width: 0; }
+  .table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+  .table tbody, .table tr, .table tbody th, .table td { display: block; width: 100%; max-width: none; }
+  .table tr { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+  .table tbody th { padding: 14px; font-size: 13px; color: var(--green); }
+  .table td { padding: 10px 14px; border: 0; font-size: 12px; white-space: normal; }
+  .table td::before { content: attr(data-label); display: block; margin-bottom: 4px; font-size:12px; color: var(--muted); }
+  .fields input, .fields textarea { font-size: 14px; }
+}
+
+.scheduleNotice[open] { padding-bottom: 14px; }

@@ -16,8 +16,12 @@
       "undrafted2025": 30,
       "eligible": 100,
       "ineligible": 11,
-      "provisionalCosts": 2,
-      "inferredKeeperTenures": 17
+      "provisionalCosts": 0,
+      "historicalProvisionalCosts": 2,
+      "inferredKeeperTenures": 17,
+      "reconstructedKeeperTenures": 17,
+      "unresolvedReviewPlayers": 0,
+      "undraftedRuleConfirmedPlayers": 36
     }
   },
   "grandfatherPolicy": {
@@ -27,14 +31,16 @@
     "independentReplayPurpose": "Audit discrepancies without silently replacing the authoritative 2025 baseline used for 2026.",
     "explicitRulings": [
       "Evan Mobley's fresh 2025 draft resets cost and tenure.",
-      "Quentin Grimes and Josh Hart retain provisional 2025 nominal round thirteen pending review."
+      "The initial undrafted season counts as tenure one. Matching undrafted and unkept histories establish nominal round thirteen without a separate per-player ruling.",
+      "Quentin Grimes and Josh Hart match the confirmed undrafted-2024 setup: nominal round thirteen in 2025, nominal round twelve and tenure two for 2026. Actual 2025 payments remain rounds eleven and twelve respectively."
     ]
   },
   "methodology": [
     "2025 replay does not use the 2025 target costs as calculation inputs. Actual 2024 keepers are identified by the commissioner-maintained 2024 list; their original year and round come from 2024 Draft V2. Newly drafted 2024 players reset to the actual draft round and tenure one; undrafted reentries start at round thirteen.",
     "The current domain engine advances nominal cost independently of payment. The older 2024 Draft sheet and corrected 2024 Draft V2 sheet are audited separately, including the V2 column explicitly labeled WRONG WAY BUT WHAT WE DID.",
-    "2026 projection uses commissioner-confirmed 2025 costs and explicit rulings as its authoritative baseline. Independent historical discrepancies stay visible instead of silently rewriting that baseline.",
+    "The 2026 Draft tab is the workspace for the upcoming draft. Its player inputs are expected to remain blank until selections are entered. Upcoming keeper costs are checked against the confirmed rules and frozen roster, using commissioner-confirmed 2025 nominal costs and explicit rulings as the authoritative baseline. Independent historical discrepancies remain visible.",
     "Known aliases are normalized explicitly; earlier non-round-thirteen entries take precedence over duplicate round-thirteen defaults. Conflicting non-thirteen targets remain flagged.",
+    "Review flags describe unresolved issues only. Historical review flags preserve the prior provenance labels; rule-derived undrafted tenure and complete draft-based tenure reconstruction are evidence, not automatic manual-review requirements.",
     "Only player names, NBA player IDs, franchise numbers, costs, tenure, draft years and source-cell references are emitted. Authentication data, manager account IDs, workbook trade prose and local paths are excluded."
   ],
   "historicalAudits": [
@@ -8437,7 +8443,7 @@
         ],
         "targetCell": "'2025 Draft'!R114",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8460,7 +8466,7 @@
         ],
         "targetCell": "'2025 Draft'!R115",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8483,7 +8489,7 @@
         ],
         "targetCell": "'2025 Draft'!R116",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8506,7 +8512,7 @@
         ],
         "targetCell": "'2025 Draft'!R117",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8529,7 +8535,7 @@
         ],
         "targetCell": "'2025 Draft'!R118",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8552,7 +8558,7 @@
         ],
         "targetCell": "'2025 Draft'!R120",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8575,7 +8581,7 @@
         ],
         "targetCell": "'2025 Draft'!R121",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8598,7 +8604,7 @@
         ],
         "targetCell": "'2025 Draft'!R122",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8621,7 +8627,7 @@
         ],
         "targetCell": "'2025 Draft'!R123",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8644,7 +8650,7 @@
         ],
         "targetCell": "'2025 Draft'!R124",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8667,7 +8673,7 @@
         ],
         "targetCell": "'2025 Draft'!R126",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8690,7 +8696,7 @@
         ],
         "targetCell": "'2025 Draft'!R127",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8713,7 +8719,7 @@
         ],
         "targetCell": "'2025 Draft'!R129",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8736,7 +8742,7 @@
         ],
         "targetCell": "'2025 Draft'!R130",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8759,7 +8765,7 @@
         ],
         "targetCell": "'2025 Draft'!R131",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8782,7 +8788,7 @@
         ],
         "targetCell": "'2025 Draft'!R132",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8805,7 +8811,7 @@
         ],
         "targetCell": "'2025 Draft'!R133",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8828,7 +8834,7 @@
         ],
         "targetCell": "'2025 Draft'!R134",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8851,7 +8857,7 @@
         ],
         "targetCell": "'2025 Draft'!R135",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8874,7 +8880,7 @@
         ],
         "targetCell": "'2025 Draft'!R137",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8897,7 +8903,7 @@
         ],
         "targetCell": "'2025 Draft'!R138",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8920,7 +8926,7 @@
         ],
         "targetCell": "'2025 Draft'!R139",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8943,7 +8949,7 @@
         ],
         "targetCell": "'2025 Draft'!R142",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8966,7 +8972,7 @@
         ],
         "targetCell": "'2025 Draft'!R143",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -8989,7 +8995,7 @@
         ],
         "targetCell": "'2025 Draft'!R144",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -9012,7 +9018,7 @@
         ],
         "targetCell": "'2025 Draft'!R145",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -9035,7 +9041,7 @@
         ],
         "targetCell": "'2025 Draft'!R146",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -9058,7 +9064,7 @@
         ],
         "targetCell": "'2025 Draft'!R147",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -9081,7 +9087,7 @@
         ],
         "targetCell": "'2025 Draft'!R148",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -9104,7 +9110,7 @@
         ],
         "targetCell": "'2025 Draft'!R150",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -9127,7 +9133,7 @@
         ],
         "targetCell": "'2025 Draft'!R151",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -9150,7 +9156,7 @@
         ],
         "targetCell": "'2025 Draft'!R152",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -9173,7 +9179,7 @@
         ],
         "targetCell": "'2025 Draft'!R153",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -9196,7 +9202,7 @@
         ],
         "targetCell": "'2025 Draft'!R155",
         "status": "match",
-        "note": "First undrafted season counted as tenure one for this historical projection; this convention remains an explicit inference.",
+        "note": "The established rule counts the initial undrafted season as tenure one, with initial nominal keeper cost round thirteen.",
         "basis": "undrafted_after_2024_reentry",
         "legacyPaymentBasedPrediction": 13,
         "priorTenureCalculated": 1,
@@ -9219,8 +9225,12 @@
       "undrafted2025": 30,
       "eligible": 100,
       "ineligible": 11,
-      "provisionalCosts": 2,
-      "inferredKeeperTenures": 17
+      "provisionalCosts": 0,
+      "historicalProvisionalCosts": 2,
+      "inferredKeeperTenures": 17,
+      "reconstructedKeeperTenures": 17,
+      "unresolvedReviewPlayers": 0,
+      "undraftedRuleConfirmedPlayers": 36
     },
     "rows": [
       {
@@ -9235,6 +9245,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A13",
           "'2025 Draft'!E13",
@@ -9252,9 +9266,15 @@
         "base2026": 2,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "tenure_inferred_from_complete_2024_draft_and_keeper_list"
         ],
+        "evidenceNotes": [
+          "tenure_reconstructed_from_complete_2024_draft_and_keeper_list"
+        ],
+        "tenureBasis": "fresh_2024_draft_reset",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A22",
           "'2025 Draft'!E22",
@@ -9275,9 +9295,15 @@
         "base2026": 4,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "tenure_inferred_from_complete_2024_draft_and_keeper_list"
         ],
+        "evidenceNotes": [
+          "tenure_reconstructed_from_complete_2024_draft_and_keeper_list"
+        ],
+        "tenureBasis": "fresh_2024_draft_reset",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A38",
           "'2025 Draft'!E38",
@@ -9299,6 +9325,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A39",
           "'2025 Draft'!E39",
@@ -9317,6 +9347,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A45",
           "'2025 Draft'!E45",
@@ -9335,6 +9369,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A46",
           "'2025 Draft'!E46",
@@ -9353,6 +9391,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A54",
           "'2025 Draft'!E54",
@@ -9371,6 +9413,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A60",
           "'2025 Draft'!E60",
@@ -9389,6 +9435,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "reported-keeper-tenure",
+        "priorTenureReported": 3,
         "sourceCells": [
           "'2025 Draft'!A70",
           "'2025 Draft'!E70",
@@ -9414,6 +9464,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "reported-keeper-tenure",
+        "priorTenureReported": 2,
         "sourceCells": [
           "'2025 Draft'!A86",
           "'2025 Draft'!E86",
@@ -9442,6 +9496,10 @@
           "invalid_keeper_cost"
         ],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A6",
           "'2025 Draft'!E6",
@@ -9459,9 +9517,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -9477,9 +9541,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -9499,6 +9569,10 @@
           "invalid_keeper_cost"
         ],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A9",
           "'2025 Draft'!E9",
@@ -9520,6 +9594,10 @@
           "invalid_keeper_cost"
         ],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A4",
           "'2025 Draft'!E4",
@@ -9538,6 +9616,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A15",
           "'2025 Draft'!E15",
@@ -9556,6 +9638,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A20",
           "'2025 Draft'!E20",
@@ -9574,6 +9660,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A31",
           "'2025 Draft'!E31",
@@ -9592,6 +9682,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A47",
           "'2025 Draft'!E47",
@@ -9609,9 +9703,15 @@
         "base2026": 6,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "tenure_inferred_from_complete_2024_draft_and_keeper_list"
         ],
+        "evidenceNotes": [
+          "tenure_reconstructed_from_complete_2024_draft_and_keeper_list"
+        ],
+        "tenureBasis": "fresh_2024_draft_reset",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A57",
           "'2025 Draft'!E57",
@@ -9633,6 +9733,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A58",
           "'2025 Draft'!E58",
@@ -9651,6 +9755,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "reported-keeper-tenure",
+        "priorTenureReported": 2,
         "sourceCells": [
           "'2025 Draft'!A84",
           "'2025 Draft'!E84",
@@ -9673,9 +9781,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -9691,9 +9805,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -9709,9 +9829,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -9728,6 +9854,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A67",
           "'2025 Draft'!E67",
@@ -9745,9 +9875,15 @@
         "base2026": 7,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "tenure_inferred_from_complete_2024_draft_and_keeper_list"
         ],
+        "evidenceNotes": [
+          "tenure_reconstructed_from_complete_2024_draft_and_keeper_list"
+        ],
+        "tenureBasis": "fresh_2024_draft_reset",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A53",
           "'2025 Draft'!E53",
@@ -9772,6 +9908,10 @@
           "invalid_keeper_cost"
         ],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A5",
           "'2025 Draft'!E5",
@@ -9790,6 +9930,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A14",
           "'2025 Draft'!E14",
@@ -9808,6 +9952,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A21",
           "'2025 Draft'!E21",
@@ -9826,6 +9974,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "reported-keeper-tenure",
+        "priorTenureReported": 3,
         "sourceCells": [
           "'2025 Draft'!A33",
           "'2025 Draft'!E33",
@@ -9851,6 +10003,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A34",
           "'2025 Draft'!E34",
@@ -9871,6 +10027,10 @@
           "tenure_limit"
         ],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "reported-keeper-tenure",
+        "priorTenureReported": 4,
         "sourceCells": [
           "'2025 Draft'!A69",
           "'2025 Draft'!E69",
@@ -9898,6 +10058,10 @@
           "tenure_limit"
         ],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "reported-keeper-tenure",
+        "priorTenureReported": 4,
         "sourceCells": [
           "'2025 Draft'!A78",
           "'2025 Draft'!E78",
@@ -9922,9 +10086,15 @@
         "base2026": 11,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "tenure_inferred_from_complete_2024_draft_and_keeper_list"
         ],
+        "evidenceNotes": [
+          "tenure_reconstructed_from_complete_2024_draft_and_keeper_list"
+        ],
+        "tenureBasis": "fresh_2024_draft_reset",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A94",
           "'2025 Draft'!E94",
@@ -9945,9 +10115,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -9963,9 +10139,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -9982,6 +10164,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A79",
           "'2025 Draft'!E79",
@@ -9999,9 +10185,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -10018,6 +10210,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A90",
           "'2025 Draft'!E90",
@@ -10035,9 +10231,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -10057,6 +10259,10 @@
           "invalid_keeper_cost"
         ],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2",
           "'2025 Draft'!E2",
@@ -10075,6 +10281,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A17",
           "'2025 Draft'!E17",
@@ -10093,6 +10303,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A23",
           "'2025 Draft'!E23",
@@ -10111,6 +10325,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A30",
           "'2025 Draft'!E30",
@@ -10128,9 +10346,15 @@
         "base2026": 4,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "tenure_inferred_from_complete_2024_draft_and_keeper_list"
         ],
+        "evidenceNotes": [
+          "tenure_reconstructed_from_complete_2024_draft_and_keeper_list"
+        ],
+        "tenureBasis": "fresh_2024_draft_reset",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A37",
           "'2025 Draft'!E37",
@@ -10152,6 +10376,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A49",
           "'2025 Draft'!E49",
@@ -10170,6 +10398,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A55",
           "'2025 Draft'!E55",
@@ -10188,6 +10420,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A65",
           "'2025 Draft'!E65",
@@ -10206,6 +10442,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A66",
           "'2025 Draft'!E66",
@@ -10224,6 +10464,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A82",
           "'2025 Draft'!E82",
@@ -10241,10 +10485,17 @@
         "base2026": 12,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "provisional_commissioner_base_2025_round_13_pending_history_check",
           "tenure_inferred_from_complete_2024_draft_and_keeper_list"
         ],
+        "evidenceNotes": [
+          "base_2025_round_13_confirmed_from_complete_2024_undrafted_and_unkept_history",
+          "tenure_reconstructed_from_complete_2024_draft_and_keeper_list"
+        ],
+        "tenureBasis": "undrafted_after_2024_reentry",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A97",
           "'2025 Draft'!E97",
@@ -10264,10 +10515,17 @@
         "base2026": 12,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "base_2025_derived_from_round_13_payment_and_maximum_round",
           "tenure_inferred_from_complete_2024_draft_and_keeper_list"
         ],
+        "evidenceNotes": [
+          "base_2025_round_13_confirmed_from_complete_2024_undrafted_and_unkept_history",
+          "tenure_reconstructed_from_complete_2024_draft_and_keeper_list"
+        ],
+        "tenureBasis": "undrafted_after_2024_reentry",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A98",
           "'2025 Draft'!E98",
@@ -10287,9 +10545,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -10305,9 +10569,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -10324,6 +10594,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A10",
           "'2025 Draft'!E10",
@@ -10342,6 +10616,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "reported-keeper-tenure",
+        "priorTenureReported": 2,
         "sourceCells": [
           "'2025 Draft'!A25",
           "'2025 Draft'!E25",
@@ -10367,6 +10645,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A26",
           "'2025 Draft'!E26",
@@ -10385,6 +10667,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A41",
           "'2025 Draft'!E41",
@@ -10403,6 +10689,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A63",
           "'2025 Draft'!E63",
@@ -10420,9 +10710,15 @@
         "base2026": 10,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "tenure_inferred_from_complete_2024_draft_and_keeper_list"
         ],
+        "evidenceNotes": [
+          "tenure_reconstructed_from_complete_2024_draft_and_keeper_list"
+        ],
+        "tenureBasis": "fresh_2024_draft_reset",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A89",
           "'2025 Draft'!E89",
@@ -10444,6 +10740,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A74",
           "'2025 Draft'!E74",
@@ -10462,6 +10762,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A73",
           "'2025 Draft'!E73",
@@ -10479,9 +10783,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -10497,10 +10807,17 @@
         "base2026": 12,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "base_2025_derived_from_round_13_payment_and_maximum_round",
           "tenure_inferred_from_complete_2024_draft_and_keeper_list"
         ],
+        "evidenceNotes": [
+          "base_2025_round_13_confirmed_from_complete_2024_undrafted_and_unkept_history",
+          "tenure_reconstructed_from_complete_2024_draft_and_keeper_list"
+        ],
+        "tenureBasis": "undrafted_after_2024_reentry",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A102",
           "'2025 Draft'!E102",
@@ -10520,9 +10837,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -10538,9 +10861,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -10556,9 +10885,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -10574,9 +10909,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -10596,6 +10937,10 @@
           "invalid_keeper_cost"
         ],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A3",
           "'2025 Draft'!E3",
@@ -10614,6 +10959,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A16",
           "'2025 Draft'!E16",
@@ -10632,6 +10981,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A19",
           "'2025 Draft'!E19",
@@ -10650,6 +11003,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A35",
           "'2025 Draft'!E35",
@@ -10668,6 +11025,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A48",
           "'2025 Draft'!E48",
@@ -10685,9 +11046,15 @@
         "base2026": 10,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "tenure_inferred_from_complete_2024_draft_and_keeper_list"
         ],
+        "evidenceNotes": [
+          "tenure_reconstructed_from_complete_2024_draft_and_keeper_list"
+        ],
+        "tenureBasis": "fresh_2024_draft_reset",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A83",
           "'2025 Draft'!E83",
@@ -10708,10 +11075,17 @@
         "base2026": 12,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "base_2025_derived_from_round_13_payment_and_maximum_round",
           "tenure_inferred_from_complete_2024_draft_and_keeper_list"
         ],
+        "evidenceNotes": [
+          "base_2025_round_13_confirmed_from_complete_2024_undrafted_and_unkept_history",
+          "tenure_reconstructed_from_complete_2024_draft_and_keeper_list"
+        ],
+        "tenureBasis": "undrafted_after_2024_reentry",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A99",
           "'2025 Draft'!E99",
@@ -10731,9 +11105,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -10750,6 +11130,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A61",
           "'2025 Draft'!E61",
@@ -10767,9 +11151,15 @@
         "base2026": 11,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "tenure_inferred_from_complete_2024_draft_and_keeper_list"
         ],
+        "evidenceNotes": [
+          "tenure_reconstructed_from_complete_2024_draft_and_keeper_list"
+        ],
+        "tenureBasis": "fresh_2024_draft_reset",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A96",
           "'2025 Draft'!E96",
@@ -10790,9 +11180,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -10808,9 +11204,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -10826,10 +11228,17 @@
         "base2026": 12,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "provisional_commissioner_base_2025_round_13_pending_history_check",
           "tenure_inferred_from_complete_2024_draft_and_keeper_list"
         ],
+        "evidenceNotes": [
+          "base_2025_round_13_confirmed_from_complete_2024_undrafted_and_unkept_history",
+          "tenure_reconstructed_from_complete_2024_draft_and_keeper_list"
+        ],
+        "tenureBasis": "undrafted_after_2024_reentry",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A87",
           "'2025 Draft'!E87",
@@ -10849,9 +11258,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -10868,6 +11283,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A18",
           "'2025 Draft'!E18",
@@ -10886,6 +11305,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A44",
           "'2025 Draft'!E44",
@@ -10906,6 +11329,10 @@
           "tenure_limit"
         ],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "reported-keeper-tenure",
+        "priorTenureReported": 4,
         "sourceCells": [
           "'2025 Draft'!A76",
           "'2025 Draft'!E76",
@@ -10931,6 +11358,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "reported-keeper-tenure",
+        "priorTenureReported": 2,
         "sourceCells": [
           "'2025 Draft'!A92",
           "'2025 Draft'!E92",
@@ -10955,10 +11386,17 @@
         "base2026": 12,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "base_2025_derived_from_round_13_payment_and_maximum_round",
           "tenure_inferred_from_complete_2024_draft_and_keeper_list"
         ],
+        "evidenceNotes": [
+          "base_2025_round_13_confirmed_from_complete_2024_undrafted_and_unkept_history",
+          "tenure_reconstructed_from_complete_2024_draft_and_keeper_list"
+        ],
+        "tenureBasis": "undrafted_after_2024_reentry",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A103",
           "'2025 Draft'!E103",
@@ -10979,6 +11417,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A29",
           "'2025 Draft'!E29",
@@ -10996,9 +11438,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -11014,9 +11462,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -11032,9 +11486,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -11050,9 +11510,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -11068,9 +11534,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -11087,6 +11559,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "reported-keeper-tenure",
+        "priorTenureReported": 3,
         "sourceCells": [
           "'2025 Draft'!A77",
           "'2025 Draft'!E77",
@@ -11111,9 +11587,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -11129,9 +11611,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -11148,6 +11636,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A11",
           "'2025 Draft'!E11",
@@ -11166,6 +11658,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A24",
           "'2025 Draft'!E24",
@@ -11184,6 +11680,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A27",
           "'2025 Draft'!E27",
@@ -11201,9 +11701,15 @@
         "base2026": 4,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "tenure_inferred_from_complete_2024_draft_and_keeper_list"
         ],
+        "evidenceNotes": [
+          "tenure_reconstructed_from_complete_2024_draft_and_keeper_list"
+        ],
+        "tenureBasis": "fresh_2024_draft_reset",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A40",
           "'2025 Draft'!E40",
@@ -11224,9 +11730,15 @@
         "base2026": 5,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "tenure_inferred_from_complete_2024_draft_and_keeper_list"
         ],
+        "evidenceNotes": [
+          "tenure_reconstructed_from_complete_2024_draft_and_keeper_list"
+        ],
+        "tenureBasis": "fresh_2024_draft_reset",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A43",
           "'2025 Draft'!E43",
@@ -11248,6 +11760,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A56",
           "'2025 Draft'!E56",
@@ -11268,6 +11784,10 @@
           "tenure_limit"
         ],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "reported-keeper-tenure",
+        "priorTenureReported": 4,
         "sourceCells": [
           "'2025 Draft'!A72",
           "'2025 Draft'!E72",
@@ -11295,6 +11815,10 @@
           "tenure_limit"
         ],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "reported-keeper-tenure",
+        "priorTenureReported": 4,
         "sourceCells": [
           "'2025 Draft'!A75",
           "'2025 Draft'!E75",
@@ -11320,6 +11844,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A88",
           "'2025 Draft'!E88",
@@ -11337,9 +11865,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -11355,9 +11889,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -11374,6 +11914,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A51",
           "'2025 Draft'!E51",
@@ -11391,9 +11935,15 @@
         "base2026": 13,
         "eligible": true,
         "ineligibilityReasons": [],
-        "reviewFlags": [
+        "reviewFlags": [],
+        "historicalReviewFlags": [
           "undrafted_first_season_tenure_one_is_an_explicit_inference"
         ],
+        "evidenceNotes": [
+          "initial_undrafted_season_tenure_one_and_round_13_are_established_rules"
+        ],
+        "tenureBasis": "undrafted-2025-rule",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A2:E105 (absent from complete draft)"
         ]
@@ -11410,6 +11960,10 @@
         "eligible": true,
         "ineligibilityReasons": [],
         "reviewFlags": [],
+        "historicalReviewFlags": [],
+        "evidenceNotes": [],
+        "tenureBasis": "fresh-2025-draft",
+        "priorTenureReported": null,
         "sourceCells": [
           "'2025 Draft'!A42",
           "'2025 Draft'!E42",
@@ -11437,11 +11991,10 @@
     "rawTargetRows": 154
   },
   "limitations": [
-    "The 2026 Draft tab is an unfilled template with blank player inputs and stale prior-year headers/references. It provides no independent expected 2026 player-cost table; 2026 is validated against the confirmed rules and frozen roster instead.",
     "Historical formula replay checks arithmetic against independent input columns, not the truth of every original draft-year entry. A formula match is not a complete transaction-history certification.",
     "2018–2021 lifecycle replay is not certified: the workbook includes a historical keeper-point system and incomplete rule-version/retention metadata. Those draft tabs must be imported with their own historical rules.",
-    "Seventeen retained players have inferred tenure rather than directly supplied tenure. The undrafted first-season tenure-one convention is separately labeled. Null source cells are never silently interpreted as zero.",
-    "Quentin Grimes and Josh Hart retain their commissioner-provisional 2025 base thirteen and projected 2026 base twelve pending the promised history check.",
+    "Seventeen retained players have blank supplied prior-tenure cells; their tenure is reconstructed from the completed 2024 draft and keeper list under the established initial-season rule. The original blanks and historical review flags remain visible, separate from current verification.",
+    "This generated evidence report does not establish whether the guarded database confirmations have been applied. Current verification and migration audit events remain authoritative for official submissions.",
     "Historical actual keeper payments are preserved; this audit does not certify historical pick availability or retroactively apply the current allocation policy."
   ]
 }

@@ -3,6 +3,10 @@
 import { useId, useRef, useState, type CSSProperties, type FormEvent } from 'react';
 import type { LeaguePlayer } from '@/lib/types';
 import type { LeagueAccount } from './league-account';
+import { z } from 'zod';
+import { workflowDraftKey, workflowDrafts } from '@/lib/workflow-drafts';
+import { useWorkflowDraft } from './use-workflow-draft';
+import { selectedReviewProfile } from '@/lib/keeper-review-selection';
 
 type Verification = 'confirmed' | 'provisional' | 'unresolved' | 'ineligible';
 type ProfileReview = {
@@ -12,13 +16,18 @@ type ProfileReview = {
   note: string;
 };
 
+const profileDraftSchema = z.object({ baseRound: z.string(), tenure: z.string(), decision: z.enum(['confirmed', 'provisional', 'unresolved', 'ineligible']), note: z.string().max(2000), source: z.string() });
+type ProfileDraft = z.infer<typeof profileDraftSchema>;
+function isProfileDraft(value: unknown): value is ProfileDraft { return profileDraftSchema.safeParse(value).success; }
+function profileSource(player: LeaguePlayer, verification: Verification) { return JSON.stringify([player.baseCost, player.tenure, verification, player.reason]); }
+
 const fieldStyle: CSSProperties = { display: 'grid', gap: 8, fontSize: 12, fontWeight: 600 };
 const inputStyle: CSSProperties = {
   width: '100%', minWidth: 0, minHeight: 44, padding: '10px 12px',
   border: '1px solid var(--line)', borderRadius: 6,
   background: 'var(--surface)', color: 'var(--ink)', font: 'inherit',
 };
-const helpStyle: CSSProperties = { fontSize: 11, fontWeight: 400, lineHeight: 1.8, color: 'var(--muted)' };
+const helpStyle: CSSProperties = { fontSize: 12, fontWeight: 400, lineHeight: 1.8, color: 'var(--muted)' };
 const verificationLabels: Record<Verification, string> = {
   confirmed: 'Confirmed eligible', provisional: 'Provisional', unresolved: 'Needs research', ineligible: 'Ineligible',
 };
@@ -30,19 +39,22 @@ function profileVerification(player: LeaguePlayer, account: LeagueAccount): Veri
     ? 'provisional' : 'unresolved';
 }
 
-function ProfileForm({ player, verification, draftRounds, disabled, saving, onSave }: {
+function ProfileForm({ player, verification, draftRounds, disabled, saving, draftKey, onSave }: {
   player: LeaguePlayer;
   verification: Verification;
   draftRounds: number;
+  draftKey: string;
   disabled: boolean;
   saving: boolean;
   onSave: (review: ProfileReview) => Promise<boolean>;
 }) {
   const id = useId();
-  const [baseRound, setBaseRound] = useState(player.baseCost === null ? '' : String(player.baseCost));
-  const [tenure, setTenure] = useState(player.tenure === null ? '' : String(player.tenure));
-  const [decision, setDecision] = useState<Verification>(verification);
-  const [note, setNote] = useState('');
+  const initial: ProfileDraft = { baseRound: player.baseCost === null ? '' : String(player.baseCost), tenure: player.tenure === null ? '' : String(player.tenure), decision: verification, note: '', source: profileSource(player, verification) };
+  const { draft, updateDraft, discardDraft, clearSubmittedDraft, persisted, hasDraft } = useWorkflowDraft(draftKey, initial, isProfileDraft);
+  const { baseRound, tenure, decision, note } = draft;
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const dirty = hasDraft && (baseRound !== initial.baseRound || tenure !== initial.tenure || decision !== initial.decision || Boolean(note));
+  const sourceChanged = hasDraft && draft.source !== initial.source;
   const [validationError, setValidationError] = useState('');
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -61,30 +73,33 @@ function ProfileForm({ player, verification, draftRounds, disabled, saving, onSa
       setValidationError('Confirmed eligibility needs a known cost and tenure from 1 to 4. A player at five years is ineligible under the current charter.'); return;
     }
     if (!note.trim()) { setValidationError('Add a review reason explaining the evidence behind this decision.'); return; }
-    if (await onSave({ baseRound: cost, tenureYears: years, verification: decision, note: note.trim() })) setNote('');
+    if (await onSave({ baseRound: cost, tenureYears: years, verification: decision, note: note.trim() })) clearSubmittedDraft(draft, { ...draft, note: '' });
   }
 
   return <form onSubmit={event => void submit(event)} style={{ marginTop: 20 }}>
+    {dirty && <p className="workflow-message" role="status">{persisted ? 'Private review draft saved in this tab. Switch players or sections and return to continue. Sign-out or closing this tab clears the draft.' : 'Private review draft retained during navigation. Browser storage is unavailable; refreshing or closing this tab may lose it.'}</p>}
+    {sourceChanged && <p className="workflow-message" role="status">The recorded profile changed since this draft began. Compare the recorded values above before saving, or discard the draft to load them.</p>}
+    {(dirty || sourceChanged) && <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 18 }}>{confirmDiscard ? <><span style={helpStyle}>Discard this player’s unsaved review?</span><button className="button button-subtle" type="button" disabled={saving} onClick={() => { discardDraft(); setConfirmDiscard(false); setValidationError(''); }}>Discard review draft</button><button className="text-button" type="button" onClick={() => setConfirmDiscard(false)}>Keep editing</button></> : <button className="text-button" type="button" disabled={saving} onClick={() => setConfirmDiscard(true)}>Discard draft…</button>}</div>}
     <fieldset disabled={disabled} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
       <legend style={{ fontWeight: 700, fontSize: 13, marginBottom: 16 }}>Commissioner decision</legend>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: 16 }}>
         <label htmlFor={`${id}-round`} style={fieldStyle}>Base keeper round
-          <input id={`${id}-round`} type="number" min={1} max={draftRounds} step={1} inputMode="numeric" value={baseRound} onChange={event => setBaseRound(event.target.value)} placeholder="Unknown" style={inputStyle} aria-describedby={`${id}-round-help`}/>
+          <input id={`${id}-round`} type="number" min={1} max={draftRounds} step={1} inputMode="numeric" value={baseRound} onChange={event => updateDraft({ baseRound: event.target.value })} placeholder="Unknown" style={inputStyle} aria-describedby={`${id}-round-help`}/>
           <span id={`${id}-round-help`} style={helpStyle}>Upcoming keeper cost before the owner assigns a payment pick. Leave blank if unknown.</span>
         </label>
         <label htmlFor={`${id}-tenure`} style={fieldStyle}>Tenure in years
-          <input id={`${id}-tenure`} type="number" min={1} max={100} step={1} inputMode="numeric" value={tenure} onChange={event => setTenure(event.target.value)} placeholder="Unknown" style={inputStyle} aria-describedby={`${id}-tenure-help`}/>
+          <input id={`${id}-tenure`} type="number" min={1} max={100} step={1} inputMode="numeric" value={tenure} onChange={event => updateDraft({ tenure: event.target.value })} placeholder="Unknown" style={inputStyle} aria-describedby={`${id}-tenure-help`}/>
           <span id={`${id}-tenure-help`} style={helpStyle}>The initial season counts as year one. Five years makes a player ineligible.</span>
         </label>
       </div>
       <label htmlFor={`${id}-decision`} style={{ ...fieldStyle, marginTop: 16 }}>Verification
-        <select id={`${id}-decision`} value={decision} onChange={event => setDecision(event.target.value as Verification)} style={inputStyle}>
+        <select id={`${id}-decision`} value={decision} onChange={event => updateDraft({ decision: event.target.value as Verification })} style={inputStyle}>
           {Object.entries(verificationLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
         </select>
         <span style={helpStyle}>Provisional and unresolved profiles remain unavailable for official keeper submissions.</span>
       </label>
       <label htmlFor={`${id}-note`} style={{ ...fieldStyle, marginTop: 16 }}>Review reason
-        <textarea id={`${id}-note`} rows={4} maxLength={2000} required value={note} onChange={event => setNote(event.target.value)} style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.7 }} aria-describedby={`${id}-note-help`} placeholder="Explain the draft or keeper history that supports this cost, tenure, and status."/>
+        <textarea id={`${id}-note`} rows={4} maxLength={2000} required value={note} onChange={event => updateDraft({ note: event.target.value })} style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.7 }} aria-describedby={`${id}-note-help`} placeholder="Explain the draft or keeper history that supports this cost, tenure, and status."/>
         <span id={`${id}-note-help`} style={helpStyle}>This reason appears on the public keeper profile. Include league evidence only; each decision is recorded in the audit trail.</span>
       </label>
       {validationError && <p className="workflow-message workflow-error" role="alert">{validationError}</p>}
@@ -94,11 +109,17 @@ function ProfileForm({ player, verification, draftRounds, disabled, saving, onSa
 }
 
 export function KeeperProfileReview({ account }: { account: LeagueAccount }) {
+  return <ScopedKeeperProfileReview key={JSON.stringify([account.session?.user?.id, account.seasonId])} account={account}/>;
+}
+
+function ScopedKeeperProfileReview({ account }: { account: LeagueAccount }) {
   const id = useId();
   const [query, setQuery] = useState('');
   const [teamId, setTeamId] = useState('all');
   const [reviewOnly, setReviewOnly] = useState(true);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [pinnedId, setPinnedId] = useState<number | null>(null);
+  const [lastChecked, setLastChecked] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const savingRef = useRef(false);
   const [error, setError] = useState('');
@@ -111,8 +132,9 @@ export function KeeperProfileReview({ account }: { account: LeagueAccount }) {
     (teamId === 'all' || player.teamId === Number(teamId)) &&
     player.name.toLowerCase().includes(query.trim().toLowerCase()),
   ).sort((a, b) => a.name.localeCompare(b.name));
-  // Keep a just-reviewed player visible even when they leave the review queue.
-  const selected = data.players.find(player => player.id === selectedId) || candidates[0];
+  // Only a successful review may pin a result outside the current queue. Any filter change clears it.
+  const selected = selectedReviewProfile(data.players, candidates, selectedId, pinnedId);
+  const outsideFilter = Boolean(selected && !candidates.some(player => player.id === selected.id));
   const verification = selected ? profileVerification(selected, account) : 'unresolved';
   const team = data.teams.find(item => item.id === selected?.teamId);
   const protectedSubmission = account.commissioner && selected ? account.submissions.find(submission =>
@@ -136,13 +158,14 @@ export function KeeperProfileReview({ account }: { account: LeagueAccount }) {
   else if (protectedSubmission?.status === 'locked') accessMessage = 'This player belongs to a locked keeper submission. Their profile is frozen.';
   else if (protectedSubmission) accessMessage = 'This player belongs to an approved submission. Return that submission with a note before changing the profile.';
   else if (!account.submissionsLoaded || account.loadingSubmissions) accessMessage = 'Loading submission approvals before enabling profile changes.';
-  else if (account.reloadRequired || refreshRequired) accessMessage = 'Reload the latest records before making another decision.';
+  else if (account.reloadRequired || refreshRequired) accessMessage = 'Refresh the latest records before making another decision.';
 
   async function refresh() {
     setRefreshing(true); setError('');
     try {
       const refreshed = await account.refreshOfficial();
       setRefreshRequired(refreshed === null);
+      if (refreshed !== null) setLastChecked(new Date().toISOString());
       if (refreshed === null) setError('The latest profiles and approvals could not be loaded. Editing remains paused.');
     } catch { setRefreshRequired(true); setError('The latest profiles and approvals could not be loaded. Editing remains paused.'); }
     finally { setRefreshing(false); }
@@ -151,6 +174,8 @@ export function KeeperProfileReview({ account }: { account: LeagueAccount }) {
   async function saveReview(review: ProfileReview) {
     if (editingDisabled || !selected || !account.live || savingRef.current) return false;
     savingRef.current = true; setSaving(true); setError(''); setNotice('');
+    const draftKey = workflowDraftKey(account.session!.user!.id, account.seasonId, 'profile', selected.id);
+    const submittedDraft = workflowDrafts.read(draftKey, isProfileDraft);
     // Pin the displayed player before refreshing: confirmation can remove them from the queue.
     setSelectedId(selected.id);
     let saved = false;
@@ -163,25 +188,30 @@ export function KeeperProfileReview({ account }: { account: LeagueAccount }) {
       if (!response.ok) {
         if (response.status === 401) throw new Error('Your session has expired. Sign in again before saving this review.');
         if (response.status === 403) throw new Error('Commissioner access is required to save this review.');
-        throw new Error(result?.message || 'The review could not be saved. Check the fields and reload the latest records before trying again.');
+        throw new Error(result?.message || 'The review could not be saved. Check the fields and refresh the latest records before trying again.');
       }
       saved = true;
+      if (submittedDraft) workflowDrafts.removeIfUnchanged(draftKey, submittedDraft);
+      setPinnedId(selected.id);
       setNotice(`Review saved for ${selected.name}.`);
       // Refresh both the public profile and private approval guards after a successful write.
       const refreshed = await account.refreshOfficial();
       setRefreshRequired(refreshed === null);
-      if (refreshed === null) setError('Your review was saved, but the latest records could not be loaded. Reload records to continue.');
+      if (refreshed !== null) setLastChecked(new Date().toISOString());
+      if (refreshed === null) setError('Your review was saved, but the latest records could not be loaded. Refresh records to continue.');
       return true;
     } catch (failure) {
-      if (saved) { setRefreshRequired(true); setError('Your review was saved, but the latest records could not be loaded. Reload records to continue.'); return true; }
+      if (saved) { setRefreshRequired(true); setError('Your review was saved, but the latest records could not be loaded. Refresh records to continue.'); return true; }
       setError(failure instanceof Error ? failure.message : 'The review could not be saved. Your edits remain in the form.');
       return false;
     } finally { savingRef.current = false; setSaving(false); }
   }
 
   function selectPlayer(playerId: number) {
-    setSelectedId(playerId); setError(''); setNotice('');
+    setSelectedId(playerId); setPinnedId(null); setError(''); setNotice('');
   }
+
+  function resetSelection() { setSelectedId(null); setPinnedId(null); setNotice(''); setError(''); }
 
   return <section className="panel" aria-labelledby={`${id}-title`}>
     <div className="panel-header" style={{ flexWrap: 'wrap', gap: 16 }}>
@@ -191,25 +221,27 @@ export function KeeperProfileReview({ account }: { account: LeagueAccount }) {
     <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--line)' }}>
       <p style={helpStyle}>Resolve uncertain keeper costs and tenure before approving submissions. Owners choose which of their picks pays for each eligible keeper.</p>
       {accessMessage && <p role="status" style={{ ...helpStyle, marginTop: 12, color: 'var(--ink)' }}>{accessMessage}</p>}
+      {lastChecked && <p style={helpStyle}>Profiles and approvals last checked {new Date(lastChecked).toLocaleString()} (your local time).</p>}
       {notice && <p className="workflow-message workflow-success" role="status">{notice}</p>}
       {error && <p className="workflow-message workflow-error" role="alert">{error}</p>}
-      {commissioner && <button className="text-button" type="button" style={{ marginTop: 12 }} disabled={busy} onClick={() => void refresh()}>{refreshing ? 'Reloading records…' : 'Reload profiles and approvals'}</button>}
+      {commissioner && <button className="text-button" type="button" style={{ marginTop: 12 }} disabled={busy} onClick={() => void refresh()}>{refreshing ? 'Refreshing…' : 'Refresh'}</button>}
     </div>
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))' }}>
       <div style={{ padding: 24, minWidth: 0 }}>
         <label htmlFor={`${id}-search`} style={fieldStyle}>Find a player
-          <input id={`${id}-search`} type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Search player names" style={inputStyle} disabled={saving}/>
+          <input id={`${id}-search`} type="search" value={query} onChange={event => { setQuery(event.target.value); resetSelection(); }} placeholder="Search player names" style={inputStyle} disabled={saving}/>
         </label>
         <label htmlFor={`${id}-team`} style={{ ...fieldStyle, marginTop: 14 }}>Team
-          <select id={`${id}-team`} value={teamId} onChange={event => setTeamId(event.target.value)} style={inputStyle} disabled={saving}>
+          <select id={`${id}-team`} value={teamId} onChange={event => { setTeamId(event.target.value); resetSelection(); }} style={inputStyle} disabled={saving}>
             <option value="all">All teams</option>
             {data.teams.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
           </select>
         </label>
         <label style={{ display: 'flex', gap: 9, alignItems: 'center', fontSize: 12, margin: '16px 0' }}>
-          <input type="checkbox" checked={reviewOnly} onChange={event => setReviewOnly(event.target.checked)} disabled={saving}/>Only profiles needing review
+          <input type="checkbox" checked={reviewOnly} onChange={event => { setReviewOnly(event.target.checked); resetSelection(); }} disabled={saving}/>Only profiles needing review
         </label>
         <p className="small muted" style={{ marginBottom: 10 }} aria-live="polite">{candidates.length} {candidates.length === 1 ? 'profile' : 'profiles'} shown</p>
+        {(query || teamId !== 'all' || reviewOnly) && <button className="text-button" type="button" disabled={saving} style={{ marginBottom: 14 }} onClick={() => { setQuery(''); setTeamId('all'); setReviewOnly(false); resetSelection(); }}>Reset filters</button>}
         <div style={{ maxHeight: 360, overflowY: 'auto', border: '1px solid var(--line)', borderRadius: 6 }} aria-label="Player profiles">
           {candidates.length === 0 && <p style={{ ...helpStyle, padding: 16 }}>No profiles match these filters. Clear the search or include verified players.</p>}
           {candidates.map(player => <button key={player.id} type="button" disabled={saving} aria-pressed={selected?.id === player.id} onClick={() => selectPlayer(player.id)} style={{
@@ -223,6 +255,7 @@ export function KeeperProfileReview({ account }: { account: LeagueAccount }) {
       </div>
       <div style={{ padding: 24, minWidth: 0, background: '#f7f8f0' }}>
         {selected ? <>
+          {outsideFilter && <p className="workflow-message" role="status">Just reviewed · this saved profile is pinned outside the current results. Select another player or change a filter to continue through the queue.</p>}
           <p className="eyebrow">SELECTED PROFILE · {team?.shortName || 'LEAGUE TEAM'}</p>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, margin: '10px 0 16px' }}>
             <h3 style={{ fontSize: 20, lineHeight: 1.4 }}>{selected.name}</h3>
@@ -234,7 +267,8 @@ export function KeeperProfileReview({ account }: { account: LeagueAccount }) {
           </dl>
           <p style={{ ...helpStyle, overflowWrap: 'anywhere' }}>{selected.reason || 'No review evidence has been recorded.'}</p>
           {commissioner && live && <ProfileForm
-            key={JSON.stringify([account.live?.seasonId, selected.id, selected.baseCost, selected.tenure, verification, selected.reason])}
+            key={JSON.stringify([account.session?.user?.id, account.live?.seasonId, selected.id, selected.baseCost, selected.tenure, verification, selected.reason])}
+            draftKey={workflowDraftKey(account.session!.user!.id, account.seasonId, 'profile', selected.id)}
             player={selected} verification={verification} draftRounds={draftRounds} disabled={editingDisabled} saving={saving} onSave={saveReview}
           />}
         </> : <p style={helpStyle}>Select a player to inspect their keeper cost and history.</p>}

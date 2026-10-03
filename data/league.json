@@ -104,7 +104,7 @@
       "baseCost": 2,
       "tenure": 2,
       "status": "eligible",
-      "reason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "reason": "Confirmed from the fresh 2024 draft and marked 2025 retention. The drafted season counts as tenure one; retention advances tenure to two while nominal cost remains separate from pick payment.",
       "wasKept": true,
       "previousRound": 3,
       "rosterSlot": "UTIL"
@@ -116,7 +116,7 @@
       "baseCost": 4,
       "tenure": 2,
       "status": "eligible",
-      "reason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "reason": "Confirmed from the fresh 2024 draft and marked 2025 retention. The drafted season counts as tenure one; retention advances tenure to two while nominal cost remains separate from pick payment.",
       "wasKept": true,
       "previousRound": 5,
       "rosterSlot": "SG"
@@ -224,7 +224,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "PF"
@@ -236,7 +236,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "BENCH"
@@ -320,7 +320,7 @@
       "baseCost": 6,
       "tenure": 2,
       "status": "eligible",
-      "reason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "reason": "Confirmed from the fresh 2024 draft and marked 2025 retention. The drafted season counts as tenure one; retention advances tenure to two while nominal cost remains separate from pick payment.",
       "wasKept": true,
       "previousRound": 7,
       "rosterSlot": "F"
@@ -356,7 +356,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "C"
@@ -368,7 +368,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "SG"
@@ -380,7 +380,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "BENCH"
@@ -404,7 +404,7 @@
       "baseCost": 7,
       "tenure": 2,
       "status": "eligible",
-      "reason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "reason": "Confirmed from the fresh 2024 draft and marked 2025 retention. The drafted season counts as tenure one; retention advances tenure to two while nominal cost remains separate from pick payment.",
       "wasKept": true,
       "previousRound": 7,
       "rosterSlot": "PG"
@@ -500,7 +500,7 @@
       "baseCost": 11,
       "tenure": 2,
       "status": "eligible",
-      "reason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "reason": "Confirmed from the fresh 2024 draft and marked 2025 retention. The drafted season counts as tenure one; retention advances tenure to two while nominal cost remains separate from pick payment.",
       "wasKept": true,
       "previousRound": 12,
       "rosterSlot": "BENCH"
@@ -512,7 +512,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "BENCH"
@@ -524,7 +524,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "BENCH"
@@ -548,7 +548,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "UTIL"
@@ -572,7 +572,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "SF"
@@ -632,7 +632,7 @@
       "baseCost": 4,
       "tenure": 2,
       "status": "eligible",
-      "reason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "reason": "Confirmed from the fresh 2024 draft and marked 2025 retention. The drafted season counts as tenure one; retention advances tenure to two while nominal cost remains separate from pick payment.",
       "wasKept": true,
       "previousRound": 5,
       "rosterSlot": "UTIL"
@@ -703,8 +703,8 @@
       "teamId": 4,
       "baseCost": 12,
       "tenure": 2,
-      "status": "review",
-      "reason": "Provisional round 12. Commissioner will double-check the 2024 free-agent history.",
+      "status": "eligible",
+      "reason": "Confirmed from complete 2024 undrafted and unkept history and marked 2025 retention: tenure two, nominal 2026 round-twelve cost. Actual 2025 round-12 payment is preserved separately.",
       "wasKept": true,
       "previousRound": 12,
       "rosterSlot": "G"
@@ -716,7 +716,7 @@
       "baseCost": 12,
       "tenure": 2,
       "status": "eligible",
-      "reason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "reason": "Confirmed from complete 2024 undrafted and unkept history and marked 2025 retention: tenure two, nominal 2026 round-twelve cost. Actual 2025 round-13 payment is preserved separately.",
       "wasKept": true,
       "previousRound": 13,
       "rosterSlot": "SF"
@@ -728,7 +728,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "IR"
@@ -740,7 +740,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "BENCH"
@@ -812,7 +812,7 @@
       "baseCost": 10,
       "tenure": 2,
       "status": "eligible",
-      "reason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "reason": "Confirmed from the fresh 2024 draft and marked 2025 retention. The drafted season counts as tenure one; retention advances tenure to two while nominal cost remains separate from pick payment.",
       "wasKept": true,
       "previousRound": 11,
       "rosterSlot": "BENCH"
@@ -848,7 +848,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "PG"
@@ -860,7 +860,7 @@
       "baseCost": 12,
       "tenure": 2,
       "status": "eligible",
-      "reason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "reason": "Confirmed from complete 2024 undrafted and unkept history and marked 2025 retention: tenure two, nominal 2026 round-twelve cost. Actual 2025 round-13 payment is preserved separately.",
       "wasKept": true,
       "previousRound": 13,
       "rosterSlot": "PF"
@@ -872,7 +872,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "UTIL"
@@ -884,7 +884,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "G"
@@ -896,7 +896,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "SG"
@@ -908,7 +908,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "BENCH"
@@ -980,7 +980,7 @@
       "baseCost": 10,
       "tenure": 2,
       "status": "eligible",
-      "reason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "reason": "Confirmed from the fresh 2024 draft and marked 2025 retention. The drafted season counts as tenure one; retention advances tenure to two while nominal cost remains separate from pick payment.",
       "wasKept": true,
       "previousRound": 11,
       "rosterSlot": "BENCH"
@@ -992,7 +992,7 @@
       "baseCost": 12,
       "tenure": 2,
       "status": "eligible",
-      "reason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "reason": "Confirmed from complete 2024 undrafted and unkept history and marked 2025 retention: tenure two, nominal 2026 round-twelve cost. Actual 2025 round-13 payment is preserved separately.",
       "wasKept": true,
       "previousRound": 13,
       "rosterSlot": "UTIL"
@@ -1004,7 +1004,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "PG"
@@ -1028,7 +1028,7 @@
       "baseCost": 11,
       "tenure": 2,
       "status": "eligible",
-      "reason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "reason": "Confirmed from the fresh 2024 draft and marked 2025 retention. The drafted season counts as tenure one; retention advances tenure to two while nominal cost remains separate from pick payment.",
       "wasKept": true,
       "previousRound": 12,
       "rosterSlot": "PF"
@@ -1040,7 +1040,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "UTIL"
@@ -1052,7 +1052,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "BENCH"
@@ -1063,8 +1063,8 @@
       "teamId": 6,
       "baseCost": 12,
       "tenure": 2,
-      "status": "review",
-      "reason": "Provisional round 12. Commissioner will double-check the 2024 free-agent history.",
+      "status": "eligible",
+      "reason": "Confirmed from complete 2024 undrafted and unkept history and marked 2025 retention: tenure two, nominal 2026 round-twelve cost. Actual 2025 round-11 payment is preserved separately.",
       "wasKept": true,
       "previousRound": 11,
       "rosterSlot": "SG"
@@ -1076,7 +1076,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "SF"
@@ -1136,7 +1136,7 @@
       "baseCost": 12,
       "tenure": 2,
       "status": "eligible",
-      "reason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "reason": "Confirmed from complete 2024 undrafted and unkept history and marked 2025 retention: tenure two, nominal 2026 round-twelve cost. Actual 2025 round-13 payment is preserved separately.",
       "wasKept": true,
       "previousRound": 13,
       "rosterSlot": "BENCH"
@@ -1160,7 +1160,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "BENCH"
@@ -1172,7 +1172,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "SF"
@@ -1184,7 +1184,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "G"
@@ -1196,7 +1196,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "UTIL"
@@ -1208,7 +1208,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "BENCH"
@@ -1232,7 +1232,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "UTIL"
@@ -1244,7 +1244,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "BENCH"
@@ -1292,7 +1292,7 @@
       "baseCost": 4,
       "tenure": 2,
       "status": "eligible",
-      "reason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "reason": "Confirmed from the fresh 2024 draft and marked 2025 retention. The drafted season counts as tenure one; retention advances tenure to two while nominal cost remains separate from pick payment.",
       "wasKept": true,
       "previousRound": 5,
       "rosterSlot": "UTIL"
@@ -1304,7 +1304,7 @@
       "baseCost": 5,
       "tenure": 2,
       "status": "eligible",
-      "reason": "Tenure inferred from first retention in the supplied 2024/2025 keeper lists.",
+      "reason": "Confirmed from the fresh 2024 draft and marked 2025 retention. The drafted season counts as tenure one; retention advances tenure to two while nominal cost remains separate from pick payment.",
       "wasKept": true,
       "previousRound": 6,
       "rosterSlot": "UTIL"
@@ -1364,7 +1364,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "F"
@@ -1376,7 +1376,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "SG"
@@ -1400,7 +1400,7 @@
       "baseCost": 13,
       "tenure": 1,
       "status": "eligible",
-      "reason": "Undrafted in 2025. Initial keeper cost is round 13; season tenure shown as year 1.",
+      "reason": "Absent from the complete 2025 draft and keeper selections. The established undrafted rule confirms tenure one and nominal 2026 round-thirteen cost.",
       "wasKept": false,
       "previousRound": null,
       "rosterSlot": "G"
@@ -9779,20 +9779,7 @@
       "status": "recorded"
     }
   ],
-  "reviewItems": [
-    {
-      "id": "player-3062679",
-      "player": "Josh Hart",
-      "detail": "Provisional round 12. Commissioner will double-check the 2024 free-agent history.",
-      "status": "provisional"
-    },
-    {
-      "id": "player-4397014",
-      "player": "Quentin Grimes",
-      "detail": "Provisional round 12. Commissioner will double-check the 2024 free-agent history.",
-      "status": "provisional"
-    }
-  ],
+  "reviewItems": [],
   "charter": [
     {
       "title": "League format",
@@ -9805,8 +9792,8 @@
     {
       "title": "Keepers",
       "paragraphs": [
-        "Keepers come from the previous season’s final roster. Newly drafted first-round players cannot be kept. The drafted season counts as tenure year one; a player with five completed consecutive seasons must return to the draft.",
-        "Each retention advances the underlying cost one round earlier. Paying an earlier pick because another round is unavailable does not accelerate future cost. An undrafted player starts at round 13.",
+        "Keepers come from the previous season’s final roster. Newly drafted first-round players cannot be kept. The initial season counts as tenure year one for both drafted and undrafted players; a player with five completed consecutive seasons must return to the draft.",
+        "Each retention advances the underlying cost one round earlier. Paying an earlier pick because another round is unavailable does not accelerate future cost. An undrafted player starts at nominal round 13 and tenure one; retaining them the next season advances tenure to two and the following nominal keeper cost to round 12.",
         "Trades and waiver moves preserve the keeper cycle. Re-entering the draft without being kept resets it. Keeper rights stay with the player.",
         "Owners choose their payment picks. Each pick can fund one keeper. If the required round is unavailable, move to the next available earlier round. Owners cannot voluntarily overpay while a suitable later pick remains.",
         "Submissions are private until every team is locked. Owners can edit until the commissioner locks them."

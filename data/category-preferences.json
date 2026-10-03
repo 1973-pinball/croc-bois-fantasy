@@ -1,0 +1,6091 @@
+{
+  "version": 1,
+  "leagueId": 139935,
+  "coverage": {
+    "draftYears": [
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "limitations": [
+      "Only completed regular-season matchups with observed nonzero scoring and official paired category results contribute. Playoffs, future matchups and unscored cancelled weeks are excluded.",
+      "Category win rate is (wins + half of ties) divided by recorded decisions. Missing category results are not losses; each category exposes its own denominator.",
+      "Category results describe outcomes rather than proving an owner intended to focus on a category. Franchise identity continues across manager changes."
+    ]
+  },
+  "seasons": [
+    {
+      "season": 2018,
+      "draftYear": 2017,
+      "source": {
+        "sha256": "3abf3f6de413bf08e133258c248bd1714f6e2dc5e40178fe1e7b584e0cdee8c7",
+        "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2018/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+        "capturedAt": "2026-10-03T15:58:24.794Z"
+      },
+      "regularSeasonMatchupPeriods": 19,
+      "completedMatchupPeriods": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "excludedUnscoredMatchups": 0,
+      "teams": [
+        {
+          "franchiseId": "1",
+          "espnTeamId": 1,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 9,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 9,
+              "ties": 2
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 9,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 8,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "2",
+          "espnTeamId": 2,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 15,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 7,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 9,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 7,
+              "ties": 1
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 11,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "3",
+          "espnTeamId": 3,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 17,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 7,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 10,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "4",
+          "espnTeamId": 4,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 3,
+              "losses": 16,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 15,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 11,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 15,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 10,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "5",
+          "espnTeamId": 5,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 15,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 8,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 15,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "6",
+          "espnTeamId": 6,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 15,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 8,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 3,
+              "losses": 16,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 3,
+              "ties": 1
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 8,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "7",
+          "espnTeamId": 7,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 17,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 10,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 14,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 3,
+              "losses": 16,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 3,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "8",
+          "espnTeamId": 8,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 13,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 11,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 11,
+              "ties": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "season": 2019,
+      "draftYear": 2018,
+      "source": {
+        "sha256": "fb072438290cf75f533538705e35fe913e963d7ef48f6d02f0a5c629220dc949",
+        "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2019/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+        "capturedAt": "2026-10-03T15:58:24.957Z"
+      },
+      "regularSeasonMatchupPeriods": 19,
+      "completedMatchupPeriods": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "excludedUnscoredMatchups": 0,
+      "teams": [
+        {
+          "franchiseId": "1",
+          "espnTeamId": 1,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 17,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 4,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 11,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 8,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "2",
+          "espnTeamId": 2,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 11,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 8,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 15,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "3",
+          "espnTeamId": 3,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 3,
+              "losses": 16,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 19,
+              "losses": 0,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 8,
+              "ties": 1
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 3,
+              "losses": 15,
+              "ties": 1
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 17,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 5,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "4",
+          "espnTeamId": 4,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 0,
+              "losses": 19,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 1,
+              "losses": 17,
+              "ties": 1
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 14,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 14,
+              "losses": 4,
+              "ties": 1
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "5",
+          "espnTeamId": 5,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 3,
+              "losses": 16,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 6,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 6,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 5,
+              "ties": 1
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 11,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "6",
+          "espnTeamId": 6,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 6,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 3,
+              "losses": 15,
+              "ties": 1
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 9,
+              "ties": 1
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "7",
+          "espnTeamId": 7,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 15,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 14,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 17,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 16,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 1,
+              "losses": 18,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 6,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "8",
+          "espnTeamId": 8,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 13,
+              "losses": 5,
+              "ties": 1
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 13,
+              "ties": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "season": 2020,
+      "draftYear": 2019,
+      "source": {
+        "sha256": "6fdce56650db424e31347062f6821670727add478e186e5a254f50fe189c00d0",
+        "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2020/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+        "capturedAt": "2026-10-03T15:58:25.087Z"
+      },
+      "regularSeasonMatchupPeriods": 19,
+      "completedMatchupPeriods": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "excludedUnscoredMatchups": 0,
+      "teams": [
+        {
+          "franchiseId": "1",
+          "espnTeamId": 1,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 17,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 0,
+              "losses": 19,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 12,
+              "ties": 2
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 14,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 16,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 14,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "2",
+          "espnTeamId": 2,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 17,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 9,
+              "ties": 2
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 17,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 7,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 5,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 10,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "3",
+          "espnTeamId": 3,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 1,
+              "losses": 18,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 17,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 4,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 4,
+              "ties": 2
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 6,
+              "losses": 11,
+              "ties": 2
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 5,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "4",
+          "espnTeamId": 4,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 14,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 8,
+              "ties": 2
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 5,
+              "losses": 13,
+              "ties": 1
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 7,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "5",
+          "espnTeamId": 5,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 6,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 6,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 5,
+              "ties": 3
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 6,
+              "losses": 12,
+              "ties": 1
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 14,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "6",
+          "espnTeamId": 6,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 11,
+              "ties": 1
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 12,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 4,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 5,
+              "ties": 3
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 3,
+              "losses": 16,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 11,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "7",
+          "espnTeamId": 7,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 13,
+              "ties": 1
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 4,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 5,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 3,
+              "losses": 15,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 17,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 1,
+              "losses": 18,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 7,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "8",
+          "espnTeamId": 8,
+          "matchups": 19,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 17,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 11,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 16,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 17,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 8,
+              "ties": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "season": 2021,
+      "draftYear": 2020,
+      "source": {
+        "sha256": "6932c7d96687946f251f54bec68e5d0f7408a18612e6a736025b7a9e8f6d88e6",
+        "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2021/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+        "capturedAt": "2026-10-03T15:58:25.235Z"
+      },
+      "regularSeasonMatchupPeriods": 17,
+      "completedMatchupPeriods": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "excludedUnscoredMatchups": 0,
+      "teams": [
+        {
+          "franchiseId": "1",
+          "espnTeamId": 1,
+          "matchups": 17,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 6,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 3,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 7,
+              "losses": 9,
+              "ties": 1
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 8,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "2",
+          "espnTeamId": 2,
+          "matchups": 17,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 1,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 5,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 5,
+              "ties": 1
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 3,
+              "losses": 14,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "3",
+          "espnTeamId": 3,
+          "matchups": 17,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 15,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 5,
+              "ties": 3
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 0,
+              "losses": 17,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 15,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 14,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 9,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "4",
+          "espnTeamId": 4,
+          "matchups": 17,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 14,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 3,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 6,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "5",
+          "espnTeamId": 5,
+          "matchups": 17,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 7,
+              "ties": 3
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 3,
+              "losses": 12,
+              "ties": 2
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 4,
+              "ties": 1
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 7,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "6",
+          "espnTeamId": 6,
+          "matchups": 17,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 1,
+              "losses": 16,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 2,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 8,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 8,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "7",
+          "espnTeamId": 7,
+          "matchups": 17,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 5,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 1,
+              "losses": 15,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 15,
+              "losses": 1,
+              "ties": 1
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 3,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 9,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "8",
+          "espnTeamId": 8,
+          "matchups": 17,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 11,
+              "ties": 2
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 10,
+              "losses": 5,
+              "ties": 2
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 7,
+              "ties": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "season": 2022,
+      "draftYear": 2021,
+      "source": {
+        "sha256": "1dd22865270e42a4268203670db6270ceab72cd6ab263c55aba839a204793627",
+        "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2022/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+        "capturedAt": "2026-10-03T15:58:25.395Z"
+      },
+      "regularSeasonMatchupPeriods": 20,
+      "completedMatchupPeriods": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "excludedUnscoredMatchups": 0,
+      "teams": [
+        {
+          "franchiseId": "1",
+          "espnTeamId": 1,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 15,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 3,
+              "losses": 16,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 16,
+              "ties": 2
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 13,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "2",
+          "espnTeamId": 2,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 17,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 6,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "3",
+          "espnTeamId": 3,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 18,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 1,
+              "losses": 19,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 12,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 18,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 16,
+              "ties": 2
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 19,
+              "losses": 1,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 0,
+              "losses": 20,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 12,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "4",
+          "espnTeamId": 4,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 3,
+              "losses": 17,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 11,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 9,
+              "losses": 10,
+              "ties": 1
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 6,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "5",
+          "espnTeamId": 5,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 14,
+              "ties": 2
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 4,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 4,
+              "losses": 15,
+              "ties": 1
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 15,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "6",
+          "espnTeamId": 6,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 17,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 12,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 8,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "7",
+          "espnTeamId": 7,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 6,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 4,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "8",
+          "espnTeamId": 8,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 15,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 10,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 4,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 6,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "season": 2023,
+      "draftYear": 2022,
+      "source": {
+        "sha256": "d75c99e5ee00be6d65a2b5bbd3c34338306eaa993a8e903777258f5d92f44654",
+        "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2023/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+        "capturedAt": "2026-10-03T15:58:25.554Z"
+      },
+      "regularSeasonMatchupPeriods": 20,
+      "completedMatchupPeriods": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "excludedUnscoredMatchups": 0,
+      "teams": [
+        {
+          "franchiseId": "1",
+          "espnTeamId": 1,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 16,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 3,
+              "losses": 17,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 15,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 17,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 16,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 7,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "2",
+          "espnTeamId": 2,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 5,
+              "ties": 1
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 19,
+              "losses": 1,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 10,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "3",
+          "espnTeamId": 3,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 18,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 1,
+              "losses": 19,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 16,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 17,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 15,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 7,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "4",
+          "espnTeamId": 4,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 12,
+              "ties": 1
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 15,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 3,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 6,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 12,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "5",
+          "espnTeamId": 5,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 18,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 9,
+              "ties": 2
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 7,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 3,
+              "losses": 17,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "6",
+          "espnTeamId": 6,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 11,
+              "ties": 1
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 13,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 5,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "7",
+          "espnTeamId": 7,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 18,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 18,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 15,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 3,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 4,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 6,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 18,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 1,
+              "losses": 19,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "8",
+          "espnTeamId": 8,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 8,
+              "ties": 1
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 4,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 10,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "season": 2024,
+      "draftYear": 2023,
+      "source": {
+        "sha256": "b8c4cdaa165da54c0dbd607af5faf1d62cbf7e5503b5f8e5e47eaa5c0a8bb6e3",
+        "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2024/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+        "capturedAt": "2026-10-03T15:58:25.744Z"
+      },
+      "regularSeasonMatchupPeriods": 20,
+      "completedMatchupPeriods": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "excludedUnscoredMatchups": 0,
+      "teams": [
+        {
+          "franchiseId": "1",
+          "espnTeamId": 1,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 18,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 15,
+              "losses": 3,
+              "ties": 2
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 18,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "2",
+          "espnTeamId": 2,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 8,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 10,
+              "ties": 2
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "3",
+          "espnTeamId": 3,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 15,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 3,
+              "losses": 17,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 18,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 14,
+              "losses": 5,
+              "ties": 1
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 5,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "4",
+          "espnTeamId": 4,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 15,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 15,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 11,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 11,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 11,
+              "losses": 8,
+              "ties": 1
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 5,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "5",
+          "espnTeamId": 5,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 3,
+              "losses": 17,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 13,
+              "ties": 2
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 1,
+              "losses": 19,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 18,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 12,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "6",
+          "espnTeamId": 6,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 10,
+              "ties": 2
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 14,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "7",
+          "espnTeamId": 7,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 0,
+              "losses": 20,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 3,
+              "losses": 15,
+              "ties": 2
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 18,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "8",
+          "espnTeamId": 8,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 13,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 12,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 9,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 4,
+              "losses": 14,
+              "ties": 2
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "season": 2025,
+      "draftYear": 2024,
+      "source": {
+        "sha256": "6aac4a458a00b3478946cea929d157ad095a7b2ca3c6b0616f02f975e8dee936",
+        "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2025/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+        "capturedAt": "2026-10-03T15:58:25.899Z"
+      },
+      "regularSeasonMatchupPeriods": 20,
+      "completedMatchupPeriods": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "excludedUnscoredMatchups": 0,
+      "teams": [
+        {
+          "franchiseId": "1",
+          "espnTeamId": 1,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 18,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 5,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 16,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 7,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "2",
+          "espnTeamId": 2,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 10,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 15,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 15,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 12,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "3",
+          "espnTeamId": 3,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 16,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 15,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 16,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 18,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "4",
+          "espnTeamId": 4,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 3,
+              "losses": 17,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 15,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 1,
+              "losses": 19,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 9,
+              "losses": 10,
+              "ties": 1
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 4,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "5",
+          "espnTeamId": 5,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 3,
+              "losses": 17,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 13,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 7,
+              "losses": 12,
+              "ties": 1
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 15,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "6",
+          "espnTeamId": 6,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 5,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 7,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 9,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 14,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "7",
+          "espnTeamId": 7,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 17,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 18,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 18,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 18,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 18,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 8,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 17,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 12,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "8",
+          "espnTeamId": 8,
+          "matchups": 20,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 12,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 6,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 17,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 7,
+              "ties": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "season": 2026,
+      "draftYear": 2025,
+      "source": {
+        "sha256": "cd37ab9913b3197e0108bae4a006b9c6e538d155d1a2f00bd84a4bed58498efd",
+        "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2026/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+        "capturedAt": "2026-10-03T15:58:26.024Z"
+      },
+      "regularSeasonMatchupPeriods": 18,
+      "completedMatchupPeriods": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "excludedUnscoredMatchups": 0,
+      "teams": [
+        {
+          "franchiseId": "1",
+          "espnTeamId": 1,
+          "matchups": 18,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 8,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 8,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 2,
+              "losses": 16,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 5,
+              "ties": 1
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 11,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "2",
+          "espnTeamId": 2,
+          "matchups": 18,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 5,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 6,
+              "losses": 11,
+              "ties": 1
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 9,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "3",
+          "espnTeamId": 3,
+          "matchups": 18,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 16,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 0,
+              "losses": 18,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 15,
+              "losses": 1,
+              "ties": 2
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 1,
+              "losses": 17,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 3,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "4",
+          "espnTeamId": 4,
+          "matchups": 18,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 10,
+              "losses": 8,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 2,
+              "losses": 15,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 6,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 9,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "5",
+          "espnTeamId": 5,
+          "matchups": 18,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 3,
+              "losses": 15,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 11,
+              "losses": 7,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 9,
+              "losses": 8,
+              "ties": 1
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 10,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 12,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "6",
+          "espnTeamId": 6,
+          "matchups": 18,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 4,
+              "losses": 14,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 9,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 5,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 9,
+              "losses": 8,
+              "ties": 1
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 7,
+              "ties": 3
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 13,
+              "losses": 5,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "7",
+          "espnTeamId": 7,
+          "matchups": 18,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 12,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 14,
+              "losses": 4,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 11,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 15,
+              "losses": 3,
+              "ties": 0
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 10,
+              "losses": 7,
+              "ties": 1
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 16,
+              "losses": 2,
+              "ties": 0
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 13,
+              "ties": 0
+            }
+          ]
+        },
+        {
+          "franchiseId": "8",
+          "espnTeamId": 8,
+          "matchups": 18,
+          "standingsMatch": true,
+          "categories": [
+            {
+              "id": 20,
+              "label": "FT%",
+              "lowerIsBetter": false,
+              "wins": 12,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 6,
+              "label": "REB",
+              "lowerIsBetter": false,
+              "wins": 5,
+              "losses": 13,
+              "ties": 0
+            },
+            {
+              "id": 0,
+              "label": "PTS",
+              "lowerIsBetter": false,
+              "wins": 7,
+              "losses": 11,
+              "ties": 0
+            },
+            {
+              "id": 1,
+              "label": "BLK",
+              "lowerIsBetter": false,
+              "wins": 6,
+              "losses": 11,
+              "ties": 1
+            },
+            {
+              "id": 17,
+              "label": "3PM",
+              "lowerIsBetter": false,
+              "wins": 9,
+              "losses": 8,
+              "ties": 1
+            },
+            {
+              "id": 2,
+              "label": "STL",
+              "lowerIsBetter": false,
+              "wins": 3,
+              "losses": 14,
+              "ties": 1
+            },
+            {
+              "id": 11,
+              "label": "TO",
+              "lowerIsBetter": true,
+              "wins": 12,
+              "losses": 6,
+              "ties": 0
+            },
+            {
+              "id": 3,
+              "label": "AST",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 8,
+              "ties": 2
+            },
+            {
+              "id": 19,
+              "label": "FG%",
+              "lowerIsBetter": false,
+              "wins": 8,
+              "losses": 10,
+              "ties": 0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

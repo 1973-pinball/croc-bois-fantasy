@@ -1,6 +1,19 @@
-import { registerHooks } from 'node:module';
+import { register } from 'node:module';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+/** Load the server service without requiring Next's bundler or Node 22.15+. */
+export async function loadHistoryService() {
+  // Next normally resolves this build-time marker. Keep the exception scoped to
+  // this explicit server CLI; node:module.register is supported throughout Node 22.
+  register(`data:text/javascript,${encodeURIComponent(`
+    export async function resolve(specifier, context, nextResolve) {
+      return nextResolve(specifier === 'server-only' ? 'next/dist/compiled/server-only/empty.js' : specifier, context);
+    }
+  `)}`, import.meta.url);
+  return import('../src/lib/espn-history-sync');
+}
 
 /** Trusted local server entrypoint; uses the same lease, extraction, protection and finish RPC as the app. */
 async function main() {
@@ -16,12 +29,7 @@ async function main() {
     const file = path.resolve(process.cwd(), name);
     if (existsSync(file)) process.loadEnvFile(file);
   }
-  // Next provides this build-time marker through its bundler. This explicitly
-  // server-side CLI resolves only the marker to Next's bundled server condition.
-  registerHooks({ resolve(specifier, context, nextResolve) {
-    return nextResolve(specifier === 'server-only' ? 'next/dist/compiled/server-only/empty.js' : specifier, context);
-  } });
-  const { synchronizeHistory, readHistorySyncStatus, readPublicHistory } = await import('../src/lib/espn-history-sync');
+  const { synchronizeHistory, readHistorySyncStatus, readPublicHistory } = await loadHistoryService();
   if (statusOnly) {
     const [status, saved] = await Promise.all([readHistorySyncStatus(), readPublicHistory()]);
     console.log(JSON.stringify({ configured: status.configured, needsConnection: status.needsConnection, running: status.running,
@@ -39,4 +47,6 @@ async function main() {
   }
 }
 
-main().catch(() => { console.error('ESPN history sync did not complete. Existing records were retained; inspect the private sync status before retrying.'); process.exitCode = 1; });
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  void main().catch(() => { console.error('ESPN history sync did not complete. Existing records were retained; inspect the private sync status before retrying.'); process.exitCode = 1; });
+}

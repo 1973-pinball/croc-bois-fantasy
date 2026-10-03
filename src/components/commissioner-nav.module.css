@@ -1,0 +1,40 @@
+.locked {
+  display: block;
+  position: relative;
+  border-radius: 7px;
+  cursor: not-allowed;
+}
+.locked > button {
+  opacity: .7;
+  pointer-events: none;
+}
+.locked:hover > button,
+.locked:focus > button {
+  background: #5b6560;
+  color: #d2d6d3;
+  opacity: 1;
+}
+.locked:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+.tooltip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 7px;
+  right: 7px;
+  z-index: 2;
+  padding: 8px 10px;
+  border-radius: 5px;
+  background: #e4e6e3;
+  color: #39443e;
+  font-size:12px;
+  line-height: 1.5;
+  box-shadow: 0 3px 10px #0002;
+  pointer-events: none;
+}
+.locked:hover .tooltip,
+.locked:focus .tooltip {
+  display: block;
+}

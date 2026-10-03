@@ -43,6 +43,6 @@
     "The 2025 return is corroborated by original/current ownership at '2025 Draft'!C20:D20 and C31:D31. The 2024 board likewise records Arod's original rounds 3 and 4 back with Arod at '2024 Draft'!C24:D24 and C27:D27.",
     "Voided trades 16 and 19 and unexercised options do not change verified holdings. No recorded pick transfer refers to a draft later than 2026; the 2027 grid is the only later-year pick reference.",
     "Original franchise, draft year, and round identify a pick. Per-round counts alone cannot prove identity or detect equal-round swaps. Historical draft-grid discrepancies are documented in docs/PICK_OWNERSHIP_RECONCILIATION.md.",
-    "The 2026 Draft tab contains A-H placeholders, so it is not evidence of the final draft order. Franchise 4 continues Edwin/Julian/Sebastian; franchise 6 continues Justin/Amber; franchise 8 continues Cars/Alex."
+    "The 2026 Draft tab is the workspace for the upcoming draft. Its A-H placeholders await the future draft order; verified current pick ownership is recorded separately in the pick grid and trade evidence. Franchise 4 continues Edwin/Julian/Sebastian; franchise 6 continues Justin/Amber; franchise 8 continues Cars/Alex."
   ]
 }

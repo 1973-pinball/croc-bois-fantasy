@@ -1,0 +1,284 @@
+.rosterPage {
+  padding-top: 20px;
+}
+
+.rosterPage :global(.connection-status) {
+  margin-bottom: 10px;
+}
+
+.rosterPage :global([aria-label='League schedule']) {
+  padding: 9px 13px;
+  margin-bottom: 14px;
+  gap: 3px 20px;
+}
+
+.rosterPage :global(.page-heading) {
+  margin-bottom: 14px;
+}
+
+.rosterPage :global(.page-heading .eyebrow) {
+  margin-bottom: 4px;
+}
+
+.rosterPage :global(.page-intro) {
+  margin-top: 5px;
+}
+
+.myTeamHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  margin-bottom: 12px;
+}
+
+.myTeamHeading :global(.page-heading) {
+  margin-bottom: 0;
+}
+
+.myTeamHeading :global(.filter-controls) {
+  width: auto;
+  gap: 9px;
+}
+
+.rosterPage :global(.button),
+.rosterPage :global(.team-tab),
+.rosterPage :global(.check-label),
+.rosterPage :global(.search-input) {
+  min-height: 44px;
+}
+
+.accessDetails {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  margin-bottom: 12px;
+}
+
+.accessDetails > summary {
+  min-height: 44px;
+  padding: 11px 14px;
+  font-size:12px;
+  font-weight: 600;
+  color: var(--green);
+  cursor: pointer;
+}
+
+.accessDetails > summary > span {
+  margin-left: 12px;
+  font-size:12px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.accessDetails > :global(.panel) {
+  margin-bottom: 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 6px 6px;
+}
+
+.rosterPage :global(.team-tabs) {
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.rosterPage :global(.team-tab) {
+  padding: 5px 9px;
+}
+
+.rosterPage :global(.team-feature) {
+  gap: 12px;
+  padding: 13px 16px;
+  margin-bottom: 14px;
+}
+
+.rosterPage :global(.team-feature > .team-avatar) {
+  width: 42px;
+  height: 42px;
+  font-size: 12px;
+  border-radius: 9px;
+}
+
+.rosterPage :global(.team-feature > div:nth-child(2)) {
+  flex: 1;
+  min-width: 0;
+}
+
+.rosterPage :global(.team-feature .eyebrow) {
+  font-size:12px;
+}
+
+.rosterPage :global(.team-feature h2) {
+  font-size: 25px;
+  margin: 3px 0;
+}
+
+.rosterPage :global(.team-feature-stat) {
+  gap: 3px;
+  padding: 0 8px;
+}
+
+.rosterPage :global(.team-feature-stat strong) {
+  font-size: 24px;
+}
+
+.rosterPanel :global(.panel-header) {
+  padding: 12px 16px;
+  gap: 10px 18px;
+}
+
+.rosterPanel :global(.panel-header h2) {
+  font-size: 23px;
+}
+
+.rosterPanel :global(.panel-header .eyebrow) {
+  margin-bottom: 3px;
+  font-size:12px;
+}
+
+.rosterPanel :global(.filter-controls) {
+  width: auto;
+  gap: 12px;
+}
+
+.rosterPanel :global(.search-input) {
+  padding: 9px 11px;
+}
+
+.table :global(.data-table) {
+  min-width: 550px;
+  font-size: 12px;
+}
+
+.table :global(.data-table th) {
+  padding: 3px 16px;
+}
+
+.table :global(.table-sort-button) {
+  min-height: 44px;
+}
+
+.table :global(.data-table td) {
+  padding: 4px 16px;
+}
+
+.table :global(.data-table td strong) {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.table :global(.cell-note) {
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+.playerName {
+  min-width: 160px;
+}
+
+.eligibility {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 10px;
+}
+
+.reason {
+  min-width: 0;
+}
+
+.reason > summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 44px;
+  min-width: 54px;
+  font-size:12px;
+  color: var(--green);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.reason > summary::-webkit-details-marker {
+  display: none;
+}
+
+.reason > summary::after {
+  content: '+';
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.reason[open] {
+  flex-basis: 100%;
+}
+
+.reason[open] > summary {
+  justify-content: flex-start;
+}
+
+.reason[open] > summary::after {
+  content: '−';
+}
+
+.reason > p {
+  max-width: 360px;
+  padding: 0 0 11px;
+  color: var(--muted);
+  font-size:12px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.mobileFacts,
+.mobileSort {
+  display: none;
+}
+
+@media (max-width: 980px) {
+  .myTeamHeading { flex-wrap: wrap; }
+  .rosterPage :global(.team-feature) { flex-wrap: wrap; }
+  .rosterPage :global(.team-feature > div:nth-child(2)) { flex-basis: calc(100% - 58px); }
+  .rosterPage :global(.team-feature-stat) { flex-direction: row; align-items: baseline; gap: 6px; padding: 0; }
+  .rosterPage :global(.team-feature > .button) { margin-left: auto; }
+  .rosterPanel :global(.panel-header) { flex-wrap: wrap; }
+}
+
+@media (max-width: 600px) {
+  .rosterPage { padding-top: 15px; }
+  .myTeamHeading { gap: 10px; }
+  .myTeamHeading :global(.filter-controls) { flex-wrap: wrap; }
+  .myTeamHeading :global(.button) { padding: 9px 11px; gap: 8px; }
+  .accessDetails > summary > span { display: none; }
+  .rosterPage :global(.team-tabs) { padding-bottom: 5px; margin-bottom: 8px; }
+  .rosterPage :global(.team-feature) { padding: 12px; gap: 10px; }
+  .rosterPage :global(.team-feature > .team-avatar) { width: 36px; height: 36px; }
+  .rosterPage :global(.team-feature > div:nth-child(2)) { flex-basis: calc(100% - 48px); }
+  .rosterPage :global(.team-feature h2) { font-size: 24px; }
+  .rosterPage :global(.team-feature-stat strong) { font-size: 21px; }
+  .rosterPage :global(.team-feature-stat span) { font-size:12px; white-space: normal; max-width: 80px; }
+  .rosterPage :global(.team-feature > .button) { padding: 9px 10px; font-size:12px; gap: 5px; }
+  .rosterPanel :global(.panel-header) { padding: 11px 12px; }
+  .rosterPanel :global(.filter-controls) { width: 100%; gap: 9px; }
+  .rosterPanel :global(.check-label) { font-size:12px; }
+  .rosterPanel :global(.search-input input) { font-size: 16px; }
+  .table :global(.data-table) { min-width: 0; table-layout: fixed; }
+  .table :global(.data-table thead) { display: none; }
+  .table :global(.data-table td) { padding: 7px 12px; vertical-align: top; }
+  .table .playerName { min-width: 0; width: 64%; }
+  .table .metadataColumn { display: none; }
+  .table :global(.data-table td strong) { font-size: 14px; overflow-wrap: anywhere; }
+  .table :global(.cell-note) { font-size:12px; }
+  .table :global(.data-table .status) { font-size:12px; padding: 4px 6px; }
+  .eligibility { flex-direction: row; align-items: center; gap: 0 6px; }
+  .reason > summary { justify-content: flex-start; min-height: 44px; }
+  .reason > p { font-size:12px; }
+  .mobileFacts { display: flex; flex-wrap: wrap; gap: 3px 9px; margin-top: 5px; font-size:12px; line-height: 1.5; color: var(--green); }
+  .mobileSort { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 5px 12px; background: #f8f8f1; }
+  .mobileSort label { font-size:12px; color: var(--muted); }
+  .mobileSort select { min-height: 44px; font-size:16px; padding: 8px 28px 8px 9px; }
+}

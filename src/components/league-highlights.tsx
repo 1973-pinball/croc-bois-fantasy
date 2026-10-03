@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import analytics from '../../data/analytics.json';
+import { managerLabel } from '@/lib/display-labels';
 import type { Team } from '@/lib/types';
 import styles from './league-highlights.module.css';
 
@@ -12,6 +13,8 @@ export interface HighlightStanding {
 
 export interface LeagueHighlightsProps {
   teams: readonly Team[];
+  /** Initial history request only. Keep verified standings visible during later refreshes. */
+  loading?: boolean;
   championships?: readonly HighlightStanding[];
   /** Only complete championship coverage may produce a championship ranking. */
   championshipsComplete?: boolean;
@@ -79,29 +82,31 @@ function PodiumMedal({ rank }: { rank?: number }) {
   </svg>;
 }
 
-function Podium({ title, standings, ready, coverage, teams }: {
+function Podium({ title, standings, ready, coverage, teams, loading }: {
   title: 'Championships' | 'Total wins';
   standings: readonly HighlightStanding[];
   ready: boolean;
   coverage: string;
   teams: readonly Team[];
+  loading: boolean;
 }) {
-  const ranks = ready ? rankHighlightStandings(standings) : [];
+  const ranks = ready && !loading ? rankHighlightStandings(standings) : [];
   const valid = ranks !== null && standings.every(entry => teams.some(team => String(team.id) === String(entry.franchiseId)));
-  const available = ready && valid && Boolean(ranks?.length);
+  const available = !loading && ready && valid && Boolean(ranks?.length);
   const trophy = title === 'Championships';
   const unavailableMessage = !ready
     ? 'Awaiting complete championship history'
     : !valid ? 'These totals need a data review'
     : trophy ? 'No championships recorded in this period' : 'No wins recorded in this period';
 
-  return <section className={`${styles.panel} ${trophy ? styles.championships : styles.wins}`} aria-label={title}>
+  return <section className={`${styles.panel} ${trophy ? styles.championships : styles.wins}`} aria-label={title} aria-busy={loading}>
     <div className={styles.heading}>
       <h2>{title}</h2>
       <span className={styles.icon}><HighlightIcon trophy={trophy}/></span>
     </div>
-    <p className={styles.coverage}>{coverage}</p>
-    {!available && <div className={styles.pending}><strong>{unavailableMessage}</strong><span>{!ready ? 'No leaders ranked until every season is confirmed.' : 'Only verified totals are ranked.'}</span></div>}
+    <p className={styles.coverage}>{loading ? 'Checking saved season history…' : coverage}</p>
+    {loading && <><div className={styles.podium} aria-hidden="true">{[1, 0, 2].map(position => <div key={position} className={`${styles.loadingPlace} ${position === 0 ? styles.loadingFirst : ''}`}><span className={styles.loadingMedal}/><span className={styles.loadingName}/><span className={styles.loadingTotal}/></div>)}</div><p className={styles.footnote} role="status">Loading verified {trophy ? 'championships' : 'win totals'}…</p></>}
+    {!loading && !available && <div className={styles.pending}><strong>{unavailableMessage}</strong><span>{!ready ? 'No leaders ranked until every season is confirmed.' : 'Only verified totals are ranked.'}</span></div>}
     {available && <div className={styles.podium} aria-label="Top three totals, including ties">
       {[1, 0, 2].map(position => {
         const group = ranks?.[position];
@@ -113,7 +118,7 @@ function Podium({ title, standings, ready, coverage, teams }: {
               const team = teams.find(item => String(item.id) === String(entry.franchiseId))!;
               return <div className={styles.competitor} key={entry.franchiseId}>
                 <span className={styles.teamMark} style={{ '--team-color': team.color } as CSSProperties} title={team.name}>{team.shortName}</span>
-                <span className={styles.manager}>{entry.managerLabel || team.owner}</span>
+                <span className={styles.manager}>{entry.managerLabel || managerLabel(team)}</span>
               </div>;
             }) : <span className={styles.placeholder} aria-hidden="true">—</span>}
           </div>
@@ -125,13 +130,13 @@ function Podium({ title, standings, ready, coverage, teams }: {
         </div>;
       })}
     </div>}
-    {available && <p className={styles.footnote}>Franchise totals · ties share a rank</p>}
+    {available && <p className={styles.footnote}>Franchise totals · ties share a rank{standings.some(entry => entry.managerLabel) ? ' · manager labels from the recorded period' : ''}</p>}
   </section>;
 }
 
-export function LeagueHighlights({ teams, championships = [], championshipsComplete = false, championshipCoverage = 'League championship history', wins, winsCoverage, className = '' }: LeagueHighlightsProps) {
+export function LeagueHighlights({ teams, loading = false, championships = [], championshipsComplete = false, championshipCoverage = 'League championship history', wins, winsCoverage, className = '' }: LeagueHighlightsProps) {
   return <div className={`${styles.highlights} ${className}`}>
-    <Podium title="Championships" standings={championships} ready={championshipsComplete} coverage={championshipCoverage} teams={teams}/>
-    <Podium title="Total wins" standings={wins ?? recordedWins} ready coverage={winsCoverage || (wins ? 'Recorded regular-season category wins' : '2018–2024 recorded regular-season category wins')} teams={teams}/>
+    <Podium title="Championships" standings={championships} ready={championshipsComplete} coverage={championshipCoverage} teams={teams} loading={loading}/>
+    <Podium title="Total wins" standings={wins ?? recordedWins} ready coverage={winsCoverage || (wins ? 'Recorded regular-season category wins' : '2018–2024 recorded regular-season category wins')} teams={teams} loading={loading}/>
   </div>;
 }

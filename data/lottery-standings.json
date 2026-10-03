@@ -1,0 +1,208 @@
+{
+  "version": 1,
+  "leagueId": 139935,
+  "priorEspnSeasonId": 2026,
+  "priorSeasonStartYear": 2025,
+  "draftYear": 2026,
+  "standings": [
+    {
+      "espnTeamId": 7,
+      "franchiseId": "6f828799-7d52-4fef-83d4-03579f52b2df",
+      "managerLabel": "James",
+      "displayName": "DeepMind AI",
+      "priorTeamName": "DeepMind AI",
+      "regularSeasonPlace": 1,
+      "finalPlace": 2,
+      "record": {
+        "wins": 102,
+        "losses": 58,
+        "ties": 2,
+        "percentage": 0.6358024691358025
+      },
+      "playoffQualified": true
+    },
+    {
+      "espnTeamId": 6,
+      "franchiseId": "0e926a61-0f4b-40ff-8ce0-f674fb0616be",
+      "managerLabel": "Amber",
+      "displayName": "Sister Stumpy",
+      "priorTeamName": "Sister Stumpy",
+      "regularSeasonPlace": 2,
+      "finalPlace": 3,
+      "record": {
+        "wins": 99,
+        "losses": 59,
+        "ties": 4,
+        "percentage": 0.6234567901234568
+      },
+      "playoffQualified": true
+    },
+    {
+      "espnTeamId": 2,
+      "franchiseId": "ea426552-e14c-41e0-831f-558ed0e91691",
+      "managerLabel": "Arod",
+      "displayName": "Bizarre Bazaar",
+      "priorTeamName": "Bizarre Bazaar",
+      "regularSeasonPlace": 3,
+      "finalPlace": 1,
+      "record": {
+        "wins": 89,
+        "losses": 71,
+        "ties": 2,
+        "percentage": 0.5555555555555556
+      },
+      "playoffQualified": true
+    },
+    {
+      "espnTeamId": 1,
+      "franchiseId": "91565de8-795e-4ebf-8353-29b83bbfecc7",
+      "managerLabel": "Jon",
+      "displayName": "Lo Fi Hip Hop Beats to Win To",
+      "priorTeamName": "Lo Fi Hip Hop Beats to Win To",
+      "regularSeasonPlace": 4,
+      "finalPlace": 4,
+      "record": {
+        "wins": 82,
+        "losses": 77,
+        "ties": 3,
+        "percentage": 0.5154320987654321
+      },
+      "playoffQualified": true
+    },
+    {
+      "espnTeamId": 8,
+      "franchiseId": "c81be1b5-6655-459d-8c3b-ace971b0f0fa",
+      "managerLabel": "Alex",
+      "displayName": "Double Trouble",
+      "priorTeamName": "Double Trouble",
+      "regularSeasonPlace": 5,
+      "finalPlace": 6,
+      "record": {
+        "wins": 70,
+        "losses": 87,
+        "ties": 5,
+        "percentage": 0.44753086419753085
+      },
+      "playoffQualified": false
+    },
+    {
+      "espnTeamId": 5,
+      "franchiseId": "f20ba68b-0d3f-46b7-82cf-5ca0b9417a4c",
+      "managerLabel": "Shane",
+      "displayName": "Paramaribo Potoos",
+      "priorTeamName": "Paramaribo Potoos",
+      "regularSeasonPlace": 6,
+      "finalPlace": 8,
+      "record": {
+        "wins": 70,
+        "losses": 91,
+        "ties": 1,
+        "percentage": 0.4351851851851852
+      },
+      "playoffQualified": false
+    },
+    {
+      "espnTeamId": 4,
+      "franchiseId": "5cc31eed-a450-4a8e-8380-feccd817c164",
+      "managerLabel": "Sebastian",
+      "displayName": "The ManyFacedBron",
+      "priorTeamName": "Luka Deez Nuts",
+      "regularSeasonPlace": 7,
+      "finalPlace": 5,
+      "record": {
+        "wins": 64,
+        "losses": 97,
+        "ties": 1,
+        "percentage": 0.39814814814814814
+      },
+      "playoffQualified": false
+    },
+    {
+      "espnTeamId": 3,
+      "franchiseId": "0a36f406-2ec5-447a-8202-7f602a30b7c9",
+      "managerLabel": "Wyndham",
+      "displayName": "Antiques Roadshow",
+      "priorTeamName": "Antiques Roadshow",
+      "regularSeasonPlace": 8,
+      "finalPlace": 7,
+      "record": {
+        "wins": 62,
+        "losses": 98,
+        "ties": 2,
+        "percentage": 0.3888888888888889
+      },
+      "playoffQualified": false
+    }
+  ],
+  "managerSource": {
+    "sha256": "7e3858cb3d2f966a5f2bfe31eb8ff0f0e3c92e9c638d5464af398fc9a2f67e0c",
+    "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2027/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+    "capturedAt": "2026-10-03T16:41:03.111Z",
+    "espnSeasonId": 2027,
+    "description": "Current team names and manager assignments were verified against the upcoming ESPN season. Display labels were explicitly confirmed by the commissioner on 2026-10-03: Jon means Jonathan, Arod means Anthony, and Amber is the chosen label among the current co-managers of team 6. Account identifiers are not published.",
+    "paths": [
+      "id",
+      "seasonId",
+      "teams[].{id,name,owners}",
+      "members[].{id,firstName}"
+    ]
+  },
+  "source": {
+    "sha256": "cd37ab9913b3197e0108bae4a006b9c6e538d155d1a2f00bd84a4bed58498efd",
+    "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2026/segments/0/leagues/139935?view=mTeam&view=mSettings&view=mMatchup&view=mMatchupScore&view=mStandings&view=mRoster",
+    "capturedAt": "2026-10-03T16:41:03.030Z",
+    "description": "Regular-season places are ESPN teams[].playoffSeed, checked against record.overall W/L/T and percentage. Postseason finalPlace is rankCalculatedFinal, corroborated by all four completed placement games. Playoff qualification comes separately from the first complete WINNERS_BRACKET round. Lottery configuration uses regular-season places from last to first.",
+    "paths": [
+      "status.finalScoringPeriod",
+      "scoringPeriodId",
+      "teams[].{name,playoffSeed,rankCalculatedFinal}",
+      "teams[].record.overall.{wins,losses,ties,percentage}",
+      "id",
+      "seasonId",
+      "settings.scheduleSettings.playoffTeamCount",
+      "teams[].id",
+      "schedule[72].{id,matchupPeriodId,playoffTierType,home.teamId,away.teamId,winner}",
+      "schedule[73].{id,matchupPeriodId,playoffTierType,home.teamId,away.teamId,winner}",
+      "schedule[76].{id,matchupPeriodId,playoffTierType,home.teamId,away.teamId,winner}",
+      "schedule[77].{id,matchupPeriodId,playoffTierType,home.teamId,away.teamId,winner}",
+      "schedule[78].{id,matchupPeriodId,playoffTierType,home.teamId,away.teamId,winner}",
+      "schedule[79].{id,matchupPeriodId,playoffTierType,home.teamId,away.teamId,winner}"
+    ],
+    "firstChampionshipMatchupPeriod": 19,
+    "qualifyingMatchupIds": [
+      73,
+      74
+    ],
+    "championshipMatchupId": 77,
+    "finalPlacementMatchups": [
+      {
+        "id": 77,
+        "winnerEspnTeamId": 2,
+        "loserEspnTeamId": 7,
+        "winnerPlace": 1,
+        "loserPlace": 2
+      },
+      {
+        "id": 78,
+        "winnerEspnTeamId": 6,
+        "loserEspnTeamId": 1,
+        "winnerPlace": 3,
+        "loserPlace": 4
+      },
+      {
+        "id": 79,
+        "winnerEspnTeamId": 4,
+        "loserEspnTeamId": 8,
+        "winnerPlace": 5,
+        "loserPlace": 6
+      },
+      {
+        "id": 80,
+        "winnerEspnTeamId": 3,
+        "loserEspnTeamId": 5,
+        "winnerPlace": 7,
+        "loserPlace": 8
+      }
+    ]
+  }
+}

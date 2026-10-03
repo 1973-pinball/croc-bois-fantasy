@@ -1,0 +1,22 @@
+.page { min-height: 100svh; padding: clamp(16px, 4vw, 44px); background: #24282a; color: #f4f2d7; }
+.canvas { width: 100%; max-width: 880px; margin: 0 auto; }
+.context { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px 20px; padding: 0 0 16px; border-bottom: 1px solid #454b50; }
+.context h1, .context p { font-family: inherit; font-size: 12px; line-height: 1.8; font-weight: 400; margin: 0; color: #c2cbd2; letter-spacing: .3px; }
+.stage { border: 0; border-radius: 0; padding: 26px 0; margin: 0; }
+.page button { min-height: 44px; padding: 10px 14px; font-size: 12px; line-height: 1.6; cursor: pointer; border: 1px solid #68737c; background: #343d45; color: #f5e8b3; border-radius: 5px; }
+.page button:hover { background: #414d57; }
+.page button:focus-visible { outline: 2px solid #f5e8b3; outline-offset: 4px; }
+.message { font-size: 14px; line-height: 1.8; padding: 32px 0; }
+.order { list-style: none; margin: 0; padding: 20px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 18px; border-top: 1px solid #454b50; }
+.order:empty { display: none; }
+.order li { display: flex; gap: 12px; align-items: center; padding: 10px 12px; border: 1px solid #495158; border-radius: 5px; background: #2b3034; min-width: 0; }
+.order li > span { width: 30px; height: 30px; display: grid; place-items: center; flex-shrink: 0; border-radius: 50%; background: #434f59; color: #f8eab3; font-size: 13px; font-variant-numeric: tabular-nums; }
+.order li > div { min-width: 0; overflow-wrap: anywhere; }
+.order strong, .order small { display: block; line-height: 1.6; }
+.order strong { font-size: 13px; font-weight: 500; color: #fff3d6; }
+.order small { font-size: 12px; color: #c2cbd2; }
+.controls { padding-top: 20px; }
+.explanation { margin: 20px 0 8px; color: #c2cbd2; font-size: 14px; line-height: 1.8; }
+.controls a { display: inline-flex; align-items: center; min-height: 44px; color: #f5e8b3; font-size: 14px; line-height: 1.7; text-decoration: underline; }
+.controls a:focus-visible { outline: 2px solid #f5e8b3; outline-offset: 4px; }
+@media (max-width: 600px) { .stage { gap: 20px; padding: 24px 0; } .order { grid-template-columns: minmax(0, 1fr); } }

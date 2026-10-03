@@ -13,7 +13,7 @@ export async function GET() {
   try {
     const league = await client.from('leagues').select('id').eq('espn_league_id', 139935).single();
     if (league.error || !league.data) return unavailable();
-    const seasonResult = await client.from('seasons').select('id,phase,draft_year,keepers_revealed_at,trading_opened_at').eq('league_id', league.data.id).eq('draft_year', leagueData.season).single();
+    const seasonResult = await client.from('seasons').select('id,phase,participant_count,draft_year,keepers_revealed_at,trading_opened_at,keeper_deadline,draft_at,season_time_zone,schedule_revision').eq('league_id', league.data.id).eq('draft_year', leagueData.season).single();
     if (seasonResult.error || !seasonResult.data) return unavailable();
     const season = seasonResult.data;
     const [franchises, participation, ownership, profiles, picks, snapshots, roster, keeperRecords] = await Promise.all([
@@ -65,7 +65,8 @@ export async function GET() {
       reviewItems: players.filter((p) => p.status === 'review').map((p) => ({ id: String(p.id), player: p.name, detail: p.reason, status: profileMap.get(p.id)?.verification === 'provisional' ? 'provisional' : 'needs-review' })),
     };
     const revealedKeepers = season.keepers_revealed_at ? keeperRecords.data!.map((k) => ({ playerId: k.player_id, teamId: numericIds.get(k.franchise_id), pickId: k.pick_id, baseRound: k.base_round, paymentRound: k.actual_payment_round })) : [];
-    return json({ configured: true, source: 'supabase', seasonId: season.id, phase: season.phase, keepersRevealedAt: season.keepers_revealed_at, tradingOpenedAt: season.trading_opened_at, franchiseIds,
+    return json({ configured: true, source: 'supabase', seasonId: season.id, phase: season.phase, participantCount: season.participant_count, keepersRevealedAt: season.keepers_revealed_at, tradingOpenedAt: season.trading_opened_at, franchiseIds,
+      keeperDeadline: season.keeper_deadline, draftAt: season.draft_at, seasonTimeZone: season.season_time_zone, scheduleRevision: season.schedule_revision,
       usedPickIds: picks.data!.filter((p) => p.status === 'used').map((p) => p.id),
       draftOrder: participation.data!.filter((p) => p.draft_position !== null).sort((a,b) => a.draft_position-b.draft_position).map((p) => numericIds.get(p.franchise_id)),
       data, players, picks: livePicks, revealedKeepers,

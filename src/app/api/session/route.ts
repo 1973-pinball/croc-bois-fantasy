@@ -1,3 +1,4 @@
+import { isAuthRetryableFetchError } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/server';
 import { isGoogleSignInEnabled, SETUP_MESSAGE } from '@/lib/supabase/config';
 import { json } from '@/lib/supabase/http';
@@ -7,6 +8,7 @@ export async function GET() {
   if (!client) return json({ error: 'SETUP_REQUIRED', message: SETUP_MESSAGE, configured: false, googleSignInEnabled: false }, 503);
   const googleSignInEnabled = isGoogleSignInEnabled();
   const { data, error } = await client.auth.getUser();
+  if (error && (isAuthRetryableFetchError(error) || (error.status ?? 0) >= 500)) return json({ configured: true, googleSignInEnabled, error: 'SESSION_UNAVAILABLE', message: 'Your saved sign-in could not be checked. Please try again when your connection returns.' }, 503);
   if (error || !data.user) return json({ configured: true, googleSignInEnabled, user: null, memberships: [], assignments: [] });
   const now = new Date().toISOString();
   const [memberships, assignments] = await Promise.all([
