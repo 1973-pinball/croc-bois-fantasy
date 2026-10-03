@@ -153,6 +153,12 @@
 .presenting .cell > strong { font-size: 16px; }
 .presenting .columnHeader strong { font-size: 14px; }
 .presenting .editPick { display: none; }
+@media (min-width: 1600px) {
+  .layout { padding: 16px; gap: 16px; }
+  .grid { min-width: 0; }
+  .boardRow { grid-template-columns: 32px repeat(var(--teams, 8), minmax(0, 1fr)); }
+  .cell { min-width: 0; padding: 8px 6px; }
+}
 @media (max-width: 1100px) { .layout { grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 16px; } .sidePanel { position: static; } .sidePanelBody { max-height: 640px; } .summary { flex-wrap: wrap; } }
 @media (max-width: 850px) { .playerPanel { padding: 20px; } .boardScroll { max-height: 640px; } .summary { padding: 18px; } .summary dl { gap: 24px; } .legend small { margin-left: 0; } }
 @media (max-width: 440px) { .layout { padding: 12px; } .orderFields, .readOnlyOrder { grid-template-columns: minmax(0, 1fr); } .playerPanel { padding: 16px; } .summary strong { font-size: 13px; } }

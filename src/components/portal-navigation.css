@@ -17,6 +17,9 @@
 .draft-view-tabs a[aria-current] { color: var(--green); border-color: var(--green); font-weight: 700; }
 .draft-view-tabs a:hover { background: var(--green-light); }
 .draft-archive { padding: 20px; }
+@media (min-width: 1101px) {
+  .main-content.draft-page { max-width: none; padding-left: 16px; padding-right: 16px; }
+}
 .team-tabs .team-tab { min-height: 48px; }
 .team-tabs .team-tab > span:last-child { max-width: 170px; white-space: normal; text-align: left; }
 .team-tab[aria-pressed=true] { box-shadow: inset 0 -3px var(--green); }
