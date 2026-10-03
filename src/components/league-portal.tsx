@@ -3,6 +3,9 @@
 import { createContext, useContext, useEffect, useId, useMemo, useRef, useState, type CSSProperties, type MouseEvent, type ReactNode } from 'react';
 import Image from 'next/image';
 import { leagueData as previewData } from '@/lib/league-data';
+import draftCatalogData from '../../data/draft-player-catalog.json';
+import type { DraftPlayerCatalog } from '@/lib/draft-player-catalog';
+import { buildPlayerPool, type PlayerPoolPlayer } from '@/lib/player-pool';
 import { validatePlanner } from '@/lib/planner';
 import { acceptKeeperDraftSave, editKeeperDraft, initializeKeeperDraft, loadKeeperDraft, type KeeperDraft } from '@/lib/keeper-draft';
 import type { LeaguePlayer, Team } from '@/lib/types';
@@ -28,6 +31,7 @@ import { managerLabel, seasonLabel } from '@/lib/display-labels';
 import './portal-navigation.css';
 
 const LeagueContext = createContext(previewData);
+const draftCatalog = draftCatalogData as DraftPlayerCatalog;
 
 type Assignment = { playerId: number; pickId: string };
 const navigation: { id: View; label: string; icon: string }[] = [
@@ -79,13 +83,13 @@ function Status({ status }: { status: string }) {
 
 type PlayerSortColumn = 'player' | 'team' | 'cost' | 'tenure';
 
-function PlayerTable({ players, showTeam = false, compact = false, sort, setSort }: { players: LeaguePlayer[]; showTeam?: boolean; compact?: boolean; sort: RosterSort; setSort: (sort: RosterSort) => void }) {
+function PlayerTable({ players, showTeam = false, compact = false, sort, setSort }: { players: PlayerPoolPlayer[]; showTeam?: boolean; compact?: boolean; sort: RosterSort; setSort: (sort: RosterSort) => void }) {
   const leagueData = useContext(LeagueContext);
   const sortId = useId();
   const sortedPlayers = useMemo(() => {
     const teamNames = new Map(leagueData.teams.map(team => [team.id, team.shortName]));
     const compareText = (a: string, b: string) => a.localeCompare(b, 'en', { sensitivity: 'base', numeric: true });
-    const value = (player: LeaguePlayer): string | number | null => sort.column === 'player' ? player.name : sort.column === 'team' ? teamNames.get(player.teamId) ?? null : sort.column === 'cost' ? player.baseCost : player.tenure;
+    const value = (player: PlayerPoolPlayer): string | number | null => sort.column === 'player' ? player.name : sort.column === 'team' ? (player.teamId === null ? null : teamNames.get(player.teamId) ?? null) : sort.column === 'cost' ? player.baseCost : player.tenure;
     return [...players].sort((a, b) => {
       const left = value(a), right = value(b);
       // Missing values remain last in either direction; ties stay alphabetical.
@@ -101,11 +105,11 @@ function PlayerTable({ players, showTeam = false, compact = false, sort, setSort
     return <th scope="col" aria-sort={active ? sort.direction : 'none'}><button type="button" className="table-sort-button" onClick={() => setSort({ column, direction: nextDirection })} aria-label={`Sort by ${label.toLowerCase()}, ${nextDirection}`}><span>{label}</span><span className="table-sort-indicator" aria-hidden="true">{active ? sort.direction === 'ascending' ? '↑' : '↓' : '↕'}</span></button></th>;
   }
   return <div className={'table-wrap' + (compact ? ` ${rosterStyles.table}` : '')}>
-    {compact && <div className={rosterStyles.mobileSort}><label htmlFor={sortId}>Sort roster</label><select id={sortId} value={`${sort.column}:${sort.direction}`} onChange={event => { const [column, direction] = event.target.value.split(':') as [PlayerSortColumn, 'ascending' | 'descending']; setSort({ column, direction }); }}>{(['player', ...(showTeam ? ['team'] : []), 'cost', 'tenure'] as PlayerSortColumn[]).flatMap(column => (['ascending', 'descending'] as const).map(direction => <option key={`${column}:${direction}`} value={`${column}:${direction}`}>{({ player: 'Player', team: 'Team', cost: 'Keeper cost', tenure: 'Tenure' })[column]} · {direction === 'ascending' ? 'ascending' : 'descending'}</option>))}</select></div>}
-    <table className="data-table"><caption className="visually-hidden">Roster players, keeper costs, tenure, and eligibility. Player details explain each eligibility decision.</caption><thead><tr>{sortableHeader('player', 'Player')}{showTeam && sortableHeader('team', 'Team')}{sortableHeader('cost', 'Keeper cost')}{sortableHeader('tenure', 'Tenure')}<th scope="col">Eligibility</th></tr></thead><tbody>
+    {compact && <div className={rosterStyles.mobileSort}><label htmlFor={sortId}>Sort players</label><select id={sortId} value={`${sort.column}:${sort.direction}`} onChange={event => { const [column, direction] = event.target.value.split(':') as [PlayerSortColumn, 'ascending' | 'descending']; setSort({ column, direction }); }}>{(['player', ...(showTeam ? ['team'] : []), 'cost', 'tenure'] as PlayerSortColumn[]).flatMap(column => (['ascending', 'descending'] as const).map(direction => <option key={`${column}:${direction}`} value={`${column}:${direction}`}>{({ player: 'Player', team: 'Team', cost: 'Keeper cost', tenure: 'Tenure' })[column]} · {direction === 'ascending' ? 'ascending' : 'descending'}</option>))}</select></div>}
+    <table className="data-table"><caption className="visually-hidden">Players, league teams, keeper costs, tenure, and eligibility. Player details explain each eligibility decision.</caption><thead><tr>{sortableHeader('player', 'Player')}{showTeam && sortableHeader('team', 'Team')}{sortableHeader('cost', 'Keeper cost')}{sortableHeader('tenure', 'Tenure')}<th scope="col">Eligibility</th></tr></thead><tbody>
     {sortedPlayers.map(player => <tr key={player.id}>
-      <td className={rosterStyles.playerName}><strong>{player.name}</strong><span className="cell-note">{player.wasKept ? 'Previously kept' : 'Roster player'}{player.rosterSlot ? ' · ' + player.rosterSlot : ''}</span>{compact && <span className={rosterStyles.mobileFacts}>{showTeam && <span>{leagueData.teams.find(team => team.id === player.teamId)?.shortName || 'Unassigned'}</span>}<span>{player.baseCost ? 'Round ' + player.baseCost : 'Cost —'}</span><span>Tenure {player.tenure === null ? '—' : player.tenure + '/5'}</span></span>}</td>
-      {showTeam && <td className={rosterStyles.metadataColumn}>{leagueData.teams.find(team => team.id === player.teamId)?.shortName || 'Unassigned'}</td>}
+      <td className={rosterStyles.playerName}><strong>{player.name}</strong><span className="cell-note">{player.teamId === null ? 'Unrostered' : player.wasKept ? 'Previously kept' : 'Roster player'}{player.rosterSlot ? ' · ' + player.rosterSlot : ''}</span>{compact && <span className={rosterStyles.mobileFacts}>{showTeam && <span>{player.teamId === null ? 'Unrostered' : leagueData.teams.find(team => team.id === player.teamId)?.shortName || 'Unassigned'}</span>}<span>{player.baseCost ? 'Round ' + player.baseCost : 'Cost —'}</span><span>Tenure {player.tenure === null ? '—' : player.tenure + '/5'}</span></span>}</td>
+      {showTeam && <td className={rosterStyles.metadataColumn}>{player.teamId === null ? 'Unrostered' : leagueData.teams.find(team => team.id === player.teamId)?.shortName || 'Unassigned'}</td>}
       <td className={rosterStyles.metadataColumn}><span className="round-label">{player.baseCost ? 'Round ' + player.baseCost : '—'}</span></td><td className={rosterStyles.metadataColumn}>{player.tenure === null ? '—' : player.tenure + ' / 5'}</td>
       <td>{compact ? <div className={rosterStyles.eligibility}><Status status={player.status}/><details className={rosterStyles.reason}><summary aria-label={`Eligibility details for ${player.name}`}>Details</summary><p>{player.reason}</p></details></div> : <><Status status={player.status}/><span className="cell-note reason-note">{player.reason}</span></>}</td>
     </tr>)}
@@ -150,7 +154,10 @@ export function LeaguePortal({ report, initialSearch = '' }: { report?: ReactNod
   const eligiblePlayers = leagueData.players.filter(player => player.status === 'eligible');
   const plannerErrors = useMemo(() => validatePlanner(activeTeam, assignments, leagueData), [activeTeam, assignments, leagueData]);
   const heading = navigation.find(item => item.id === view)?.label || 'Commissioner Tools';
-  const rosterPlayers = leagueData.players.filter(player => (allTeams || player.teamId === activeTeam) && player.name.toLowerCase().includes(search.trim().toLowerCase()));
+  const fullPlayerPool = view === 'teams' && allTeams;
+  const playerPool = useMemo(() => fullPlayerPool ? buildPlayerPool(leagueData.players, draftCatalog.players) : leagueData.players, [fullPlayerPool, leagueData.players]);
+  const rosterPlayers = playerPool.filter(player => (allTeams || player.teamId === activeTeam) && player.name.toLowerCase().includes(search.trim().toLowerCase()));
+  const unrosteredCount = rosterPlayers.filter(player => player.teamId === null).length;
   const matchingTrades = [...leagueData.trades].reverse().filter(trade => (trade.id + ' ' + trade.parties.join(' ') + ' ' + trade.summary + ' ' + trade.notes).toLowerCase().includes(tradeSearch.trim().toLowerCase()));
 
   useEffect(() => {
@@ -291,7 +298,7 @@ export function LeaguePortal({ report, initialSearch = '' }: { report?: ReactNod
           {view === 'teams' && <PageTitle eyebrow="THE FRANCHISES" title="Teams & players" description="A place for every roster, every keeper cost, and every future pick."/>}
           {(view === 'teams' || account.ownTeamIds.length > 1) && <div className="team-tabs" aria-label="Select a team">{leagueData.teams.filter(item => view === 'teams' || account.ownTeamIds.includes(item.id)).map(item => <button key={item.id} className={'team-tab' + (item.id === activeTeam && !allTeams ? ' selected' : '')} aria-pressed={item.id === activeTeam && !allTeams} onClick={() => changeTeam(item.id)}><TeamAvatar team={item} small/><span>{item.name}</span></button>)}</div>}
           {team && !allTeams && <section className="team-feature"><TeamAvatar team={team}/><div><p className="eyebrow">FRANCHISE PROFILE</p><h2>{team.name}</h2><p>{managerLabel(team)}</p></div><div className="team-feature-stat"><strong>{teamPlayers.length}</strong><span>roster players</span></div><div className="team-feature-stat"><strong>{ownedPicks.length}</strong><span>{leagueData.season} picks</span></div><button className="button button-green" onClick={() => navigate('keepers')}>Plan keepers <Icon name="arrow" size={17}/></button></section>}
-          <section className={`panel ${rosterStyles.rosterPanel}`}><div className="panel-header flexible-header"><div><p className="eyebrow">ROSTER SNAPSHOT</p><h2>{allTeams ? 'The entire player pool' : 'The roster'}</h2></div><div className="filter-controls">{view === 'teams' && <label className="check-label"><input type="checkbox" checked={allTeams} onChange={event => setAllTeams(event.target.checked)}/> All teams</label>}<SearchInput value={search} onChange={setSearch} placeholder="Find a player…" label="Search roster players"/></div></div><div className="filter-summary" aria-live="polite"><span>{rosterPlayers.length} {rosterPlayers.length === 1 ? 'player' : 'players'}{search ? ` matching “${search}”` : ''}</span>{(search || allTeams || location.sort.column !== 'player' || location.sort.direction !== 'ascending') && <button className="text-button" onClick={() => location.update({ roster: null, all: null, sort: null })}>Reset filters</button>}</div><PlayerTable players={rosterPlayers} showTeam={allTeams} compact sort={location.sort} setSort={sort => location.update({ sort: `${sort.column}:${sort.direction}` })}/></section>
+          <section className={`panel ${rosterStyles.rosterPanel}`}><div className="panel-header flexible-header"><div><p className="eyebrow">{fullPlayerPool ? 'PLAYER POOL' : 'ROSTER SNAPSHOT'}</p><h2>{allTeams ? 'The entire player pool' : 'The roster'}</h2></div><div className="filter-controls">{view === 'teams' && <label className="check-label"><input type="checkbox" checked={allTeams} onChange={event => setAllTeams(event.target.checked)}/> All teams</label>}<SearchInput value={search} onChange={setSearch} placeholder="Find a player…" label="Search players"/></div></div><div className="filter-summary" aria-live="polite"><span>{rosterPlayers.length} {rosterPlayers.length === 1 ? 'player' : 'players'}{search ? ` matching “${search}”` : ''}{fullPlayerPool && <span className="cell-note">{rosterPlayers.length - unrosteredCount} rostered · {unrosteredCount} unrostered · Unrostered players cannot be kept</span>}</span>{(search || allTeams || location.sort.column !== 'player' || location.sort.direction !== 'ascending') && <button className="text-button" onClick={() => location.update({ roster: null, all: null, sort: null })}>Reset filters</button>}</div><PlayerTable players={rosterPlayers} showTeam={allTeams} compact sort={location.sort} setSort={sort => location.update({ sort: `${sort.column}:${sort.direction}` })}/></section>
           {!allTeams && <TeamPickInventory account={account} teamId={activeTeam}/>}
         </>}
 
