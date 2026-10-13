@@ -9,6 +9,7 @@ import { franchiseColorStyle } from '@/lib/franchise-colors';
 import { assignDraftSlot, readDraftShortlist } from '@/lib/draft-workspace';
 import type { LeagueAccount } from './league-account';
 import { DraftRosters } from './draft-rosters';
+import { DraftClock, useDraftQueue } from './live-draft-controls';
 import styles from './live-draft-board.module.css';
 
 const catalog = catalogFile as DraftPlayerCatalog;
@@ -107,6 +108,7 @@ function DraftOrderEditor({ board, account, busy, publish, open = false }: { boa
 
 export function LiveDraftBoard({ account, openOrderEditor = false }: { account: LeagueAccount; openOrderEditor?: boolean }) {
   const seasonId = account.seasonId;
+  const seasonRef = useRef(seasonId); seasonRef.current = seasonId;
   const [board, setBoard] = useState<DraftBoard | null>(null);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -120,7 +122,7 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
   const [availableOnly, setAvailableOnly] = useState(false);
   const [shortlistOnly, setShortlistOnly] = useState(false);
   const [shortlist, setShortlist] = useState<{ key: string; ids: number[] }>({ key: '', ids: [] });
-  const [workspaceView, setWorkspaceView] = useState<'players' | 'rosters'>('players');
+  const [workspaceView, setWorkspaceView] = useState<'players' | 'queue' | 'rosters'>('players');
   const [previewBoard, setPreviewBoard] = useState(false);
   const [presenting, setPresenting] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
@@ -131,11 +133,12 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
   const [editingRevision, setEditingRevision] = useState<number | null>(null);
   const [changeNote, setChangeNote] = useState('');
   const [lastRead, setLastRead] = useState<string | null>(null);
-  const identity = `${seasonId}:${account.session?.user?.id || 'anonymous'}:${account.commissioner}:${account.connection}`;
+  const identity = `${seasonId}:${account.session?.user?.id || 'anonymous'}:${account.commissioner}:${account.connection}:${account.ownTeamIds.join(',')}`;
   const identityRef = useRef(identity);
   identityRef.current = identity;
   const shortlistKey = account.session?.user?.id && seasonId ? `croc-bois:draft-shortlist:${seasonId}:${account.session.user.id}` : '';
   const shortlistIds = shortlist.key === shortlistKey ? shortlist.ids : [];
+  const draftQueue = useDraftQueue(account, board);
   useEffect(() => {
     let ids: number[] = [];
     try { ids = shortlistKey ? readDraftShortlist(window.localStorage.getItem(shortlistKey), catalogIds) : []; } catch { /* Browser storage may be unavailable. */ }
@@ -167,7 +170,7 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
   }
 
   const acceptBoard = useCallback((next: DraftBoard) => {
-    setBoard(previous => !previous || previous.seasonId !== next.seasonId || next.revision >= previous.revision ? next : previous);
+    setBoard(previous => !previous || previous.seasonId !== next.seasonId || next.revision > previous.revision || next.revision === previous.revision && Date.parse(next.clock.serverNow) >= Date.parse(previous.clock.serverNow) ? next : previous);
   }, []);
 
   const reload = useCallback(async (signal?: AbortSignal) => {
@@ -179,13 +182,13 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
       if (!response.ok) throw new Error(body.message || 'The live draft board could not be loaded.');
       const next = draftBoardSchema.parse(body.board);
       if (next.seasonId !== seasonId) throw new Error('The draft response belongs to another season.');
-      if (signal?.aborted) return null;
+      if (signal?.aborted || seasonRef.current !== seasonId) return null;
       acceptBoard(next); setLastRead(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
       setError(''); return next;
     } catch (failure) {
-      if (!signal?.aborted) setError(failure instanceof Error ? failure.message : 'The live draft board could not be loaded.');
+      if (!signal?.aborted && seasonRef.current === seasonId) setError(failure instanceof Error ? failure.message : 'The live draft board could not be loaded.');
       return null;
-    } finally { if (!signal?.aborted) { setLoading(false); setRefreshing(false); } }
+    } finally { if (!signal?.aborted && seasonRef.current === seasonId) { setLoading(false); setRefreshing(false); } }
   }, [seasonId, acceptBoard]);
 
   useEffect(() => {
@@ -198,7 +201,7 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
       try { await reload(controller.signal); } finally { polling = false; }
     };
     void refresh();
-    const interval = window.setInterval(() => void refresh(), 5000);
+    const interval = window.setInterval(() => void refresh(), 2000);
     window.addEventListener('focus', refresh); document.addEventListener('visibilitychange', refresh);
     return () => { controller.abort(); window.clearInterval(interval); window.removeEventListener('focus', refresh); document.removeEventListener('visibilitychange', refresh); };
   }, [reload]);
@@ -208,7 +211,8 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
   }, [identity]);
 
   async function send(action: DraftAction, success: string) {
-    if (!account.session?.user || !account.commissioner || account.connection !== 'live' || error || busyRef.current) return false;
+    const owner = action.action === 'record' && board?.picks.some(pick => pick.id === action.pickId && board.teams.some(team => team.franchiseId === pick.currentOwnerId && team.espnTeamId !== null && account.ownTeamIds.includes(team.espnTeamId)));
+    if (!account.session?.user || (!account.commissioner && !owner) || account.connection !== 'live' || error || busyRef.current) return false;
     const actor = identityRef.current;
     busyRef.current = true; setBusy(true); setError(''); setNotice('');
     try {
@@ -232,6 +236,9 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
   }
 
   const occupied = useMemo(() => new Map((board?.picks || []).filter(pick => pick.playerId !== null).map(pick => [pick.playerId!, pick])), [board]);
+  const queuedIds = (draftQueue.queue?.playerIds || []).filter(id => catalogById.get(id)?.selectable && !occupied.has(id));
+  const queueClosed = Boolean(board && (board.clock.status === 'completed' || ['in_season', 'archived'].includes(board.phase)));
+  const canQueue = draftQueue.enabled && Boolean(draftQueue.queue) && !draftQueue.busy && !draftQueue.loading && !queueClosed;
   const profiles = useMemo(() => new Map(account.data.players.map(player => [player.id, player])), [account.data.players]);
   const teams = board?.teams || [];
   const teamName = (id: string | null) => teams.find(team => team.franchiseId === id)?.displayName || '';
@@ -254,7 +261,9 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
   const candidate = catalog.players.find(player => player.id === selected?.playerId);
   const selectionStale = Boolean(selected && (selected.revision !== board?.revision || selected.pickId !== target?.id));
   const editStale = Boolean(editingPickId && editingRevision !== board?.revision);
-  const canDraft = Boolean(account.session?.user && account.commissioner && account.connection === 'live' && board?.phase === 'draft_ready' && board.orderComplete && board.keepersRevealedAt && !busy && !error);
+  const currentPickOwned = Boolean(currentPick && teams.some(team => team.franchiseId === currentPick.currentOwnerId && team.espnTeamId !== null && account.ownTeamIds.includes(team.espnTeamId)));
+  const canCorrect = Boolean(account.session?.user && account.commissioner && account.connection === 'live' && board?.phase === 'draft_ready' && board.orderComplete && board.keepersRevealedAt && !busy && !error);
+  const canDraft = editingPick ? canCorrect : Boolean(account.session?.user && (account.commissioner || currentPickOwned) && account.connection === 'live' && board?.phase === 'draft_ready' && board.clock.status === 'running' && board.orderComplete && board.keepersRevealedAt && !busy && !error);
   const candidateAvailable = Boolean(candidate?.selectable && !occupied.has(candidate.id));
   const draftedCount = board?.picks.filter(pick => pick.status === 'selected').length || 0;
   const keeperCount = board?.picks.filter(pick => pick.status === 'keeper').length || 0;
@@ -271,12 +280,24 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
 
   function resetSelection() { setSelected(null); setEditingPickId(null); setEditingRevision(null); setChangeNote(''); void reload(); }
 
+  function toggleQueue(playerId: number) {
+    if (!canQueue || !catalogById.get(playerId)?.selectable || occupied.has(playerId)) return;
+    const next = queuedIds.includes(playerId) ? queuedIds.filter(id => id !== playerId) : [...queuedIds, playerId];
+    if (next.length <= 100) void draftQueue.save(next);
+  }
+  function moveQueuedPlayer(index: number, direction: -1 | 1) {
+    const next = [...queuedIds];
+    if (!canQueue || index + direction < 0 || index + direction >= next.length) return;
+    [next[index], next[index + direction]] = [next[index + direction], next[index]];
+    void draftQueue.save(next);
+  }
+
   const preferredFranchiseId = account.ownTeamIds.map(teamId => board?.teams.find(team => team.espnTeamId === teamId)?.franchiseId).find(Boolean);
 
   return <section ref={sectionRef} className={`panel ${styles.panel} ${presenting ? styles.presenting : ''}`} aria-labelledby="live-draft-title">
     <div className="panel-header">
       <div><p className="eyebrow">THE NEXT CHAPTER · {board?.draftYear || account.data.season}</p><h2 id="live-draft-title">Live draft board</h2></div>
-      <div className={styles.liveStatus}><span aria-hidden="true" className={error || account.connection !== 'live' ? styles.offlineDot : styles.liveDot}/>{loading ? 'Connecting…' : error ? 'Refresh needed' : account.connection !== 'live' ? 'Viewing board · official actions paused' : 'Updates every 5 seconds'}<button className="text-button" disabled={busy || loading || refreshing} onClick={() => void reload()}>{refreshing ? 'Refreshing…' : 'Refresh'}</button><button ref={presentationButtonRef} className="text-button" onClick={() => void togglePresentation()}>{presenting ? 'Exit presentation' : 'Present board'}</button></div>
+      <div className={styles.liveStatus}><span aria-hidden="true" className={error || account.connection !== 'live' ? styles.offlineDot : styles.liveDot}/>{loading ? 'Connecting…' : error ? 'Refresh needed' : account.connection !== 'live' ? 'Viewing board · official actions paused' : 'Live · updates every 2 seconds'}<button className="text-button" disabled={busy || loading || refreshing} onClick={() => void reload()}>{refreshing ? 'Refreshing…' : 'Refresh'}</button><button ref={presentationButtonRef} className="text-button" onClick={() => void togglePresentation()}>{presenting ? 'Exit presentation' : 'Present board'}</button></div>
     </div>
     <div className={styles.summary}>
       <div><strong>{board?.orderComplete ? currentPick ? `Pick ${currentPick.overallPick} · ${teamShortName(currentPick.currentOwnerId)}` : allPicksFilled ? 'Every pick is filled' : !board.keepersRevealedAt ? 'Waiting for keeper reveal' : 'Draft entry paused' : 'Draft order to be decided'}</strong><p>{!board?.orderComplete ? 'Pick owners will appear once the order is set.' : !board.keepersRevealedAt ? 'Keeper placements appear after every team is locked and keepers are revealed.' : 'Revealed keepers occupy their payment picks. Draft selections fill the remaining spots.'}</p></div>
@@ -287,6 +308,7 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
     {notice && <p className={styles.success} role="status">{notice}</p>}
     <div className={styles.layout}>
       <div className={styles.boardArea}>
+        {board && <DraftClock key={`clock:${identity}`} board={board} commissioner={Boolean(account.session?.user && account.commissioner && account.connection === 'live')} busy={busy} blocked={Boolean(error)} send={send} acceptBoard={acceptBoard}/>}
         {!board?.orderComplete && <div className={styles.unpublished}><h3>Draft order is unpublished</h3><p>The choice-priority lottery decides who chooses first. The board fills after the agreed slots are published.</p><button type="button" className="button button-subtle" aria-expanded={previewBoard} aria-controls="draft-board-preview" onClick={() => setPreviewBoard(value => !value)}>{previewBoard ? 'Hide empty board preview' : `Preview ${count * rounds} draft slots`}</button></div>}
         <div id="draft-board-preview" hidden={!board?.orderComplete && !previewBoard && !presenting}>
         <div className={styles.legend}><span><i className={styles.keeperSwatch}/>Kept</span><span><i className={styles.draftedSwatch}/>Drafted</span><span><i className={styles.nextSwatch}/>Next pick</span><small>{board?.draftFormat === 'linear' ? 'Linear' : 'Snake'} · {rounds} rounds</small></div>
@@ -310,10 +332,10 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
                   const roundPick = overall - (round - 1) * count;
                   return <div role="cell" key={index} style={franchiseColorStyle(pick?.currentOwnerId)} className={`${styles.cell} ${pick?.currentOwnerId ? styles.ownerColor : ''} ${keeper ? styles.keeperCell : drafted ? styles.draftedCell : ''} ${next ? styles.nextCell : ''} ${selectedCell ? styles.selectedCell : ''} ${drafted && account.commissioner ? styles.editableCell : ''}`}>
                     <span className={styles.pickLabel} aria-label={`Round ${round}, pick ${roundPick}, overall ${overall}`}><b>{round}.{String(roundPick).padStart(2, '0')}</b><span>#{overall}</span></span>
-                    <strong className={pick?.playerName ? '' : styles.emptyPick}>{pick?.playerName || (next ? 'On the clock' : board?.orderComplete ? 'Available' : 'Awaiting order')}</strong>
+                    <strong className={pick?.playerName ? '' : styles.emptyPick}>{pick?.playerName || (next ? board?.clock.status === 'running' ? 'On the clock' : 'Up next' : board?.orderComplete ? 'Available' : 'Awaiting order')}</strong>
                     {player && <span className={styles.playerMeta}><b>{player.primaryPosition || '—'}</b>{player.nbaTeam || 'FA'}</span>}
                     <div className={styles.cellFooter}><span title={pick?.currentOwnerId ? `Current owner: ${teamName(pick.currentOwnerId)}` : undefined}>{board?.orderComplete ? teamShortName(pick?.currentOwnerId || null) : `Slot ${index + 1}`}</span>{keeper ? <b className={styles.keeperBadge}>Kept</b> : drafted ? <b className={styles.draftedBadge}>Drafted</b> : next ? <b className={styles.nextBadge}>Next</b> : null}{pick && pick.currentOwnerId !== pick.originalFranchiseId && <small className={styles.via}>via {teamShortName(pick.originalFranchiseId)}</small>}</div>
-                    {drafted && account.commissioner && <button className={styles.editPick} disabled={!canDraft} aria-label={`Correct pick ${overall}: ${pick?.playerName}`} onClick={() => { setWorkspaceView('players'); setEditingPickId(pick!.id); setEditingRevision(board!.revision); setSelected(null); setChangeNote(''); setNotice(''); }}>Edit</button>}
+                    {drafted && account.commissioner && <button className={styles.editPick} disabled={!canCorrect} aria-label={`Correct pick ${overall}: ${pick?.playerName}`} onClick={() => { setWorkspaceView('players'); setEditingPickId(pick!.id); setEditingRevision(board!.revision); setSelected(null); setChangeNote(''); setNotice(''); }}>Edit</button>}
                   </div>;
                 })}
               </div>;
@@ -322,10 +344,10 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
         </div>
         </div>
         <p className={styles.footnote}>{lastRead ? `Last checked ${lastRead}. ` : ''}Keeper eligibility belongs to the player’s current franchise. Ineligible keepers can still be drafted.</p>
-        {board && <DraftOrderEditor key={identity} board={board} account={account} busy={busy || Boolean(error)} open={openOrderEditor} publish={draft => send({ action: 'set_order', seasonId, expectedRevision: draft.revision, franchiseIds: draft.ids, note: draft.note }, 'Draft order published.')}/>}
+        {board && <DraftOrderEditor key={`order:${identity}`} board={board} account={account} busy={busy || Boolean(error)} open={openOrderEditor} publish={draft => send({ action: 'set_order', seasonId, expectedRevision: draft.revision, franchiseIds: draft.ids, note: draft.note }, 'Draft order published.')}/>}
       </div>
       <aside className={styles.sidePanel} aria-label="Draft tools">
-        <div className={styles.workspaceSwitch} role="group" aria-label="Draft tools view">{(['players', 'rosters'] as const).map(view => <button key={view} type="button" aria-pressed={workspaceView === view} aria-controls={`draft-tools-${view}`} onClick={() => setWorkspaceView(view)}>{view === 'players' ? 'Players' : 'Rosters'}</button>)}</div>
+        <div className={styles.workspaceSwitch} role="group" aria-label="Draft tools view">{(['players', 'queue', 'rosters'] as const).map(view => <button key={view} type="button" aria-pressed={workspaceView === view} aria-controls={`draft-tools-${view}`} onClick={() => setWorkspaceView(view)}>{view === 'players' ? 'Players' : view === 'queue' ? `Queue${draftQueue.enabled ? ` (${queuedIds.length})` : ''}` : 'Rosters'}</button>)}</div>
         <div id="draft-tools-players" className={`${styles.sidePanelBody} ${workspaceView !== 'players' ? styles.workspaceHidden : ''}`}>
       <section className={styles.playerPanel} aria-labelledby="draft-player-pool-title">
         <p className="eyebrow">SCOUTING THE FIELD</p><h3 id="draft-player-pool-title">Player pool</h3>
@@ -339,28 +361,48 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
         {shortlistKey ? <><label className={styles.checkbox}><input type="checkbox" checked={shortlistOnly} onChange={event => setShortlistOnly(event.target.checked)}/>My shortlist only ({shortlistIds.length})</label><p className={styles.footnote}>Your shortlist is private to this account and season on this browser. It never records a draft pick.</p></> : <p className={styles.footnote}>Sign in to keep a private player shortlist on this browser.</p>}
         <div className={styles.filterSummary}><span>{matchingPlayers.length} matching players</span>{(query || position !== 'all' || eligibility !== 'all' || availableOnly || shortlistOnly) && <button type="button" className="text-button" onClick={() => { setQuery(''); setPosition('all'); setEligibility('all'); setAvailableOnly(false); setShortlistOnly(false); }}>Reset filters</button>}</div>
         <label className={styles.field}>Choose a player<select aria-label="Choose a player for the live draft" value={selected?.playerId || ''} onChange={event => event.target.value ? choosePlayer(Number(event.target.value)) : setSelected(null)} disabled={busy || !board}><option value="">Select from ESPN category rankings</option>{filteredPlayers.map(player => <option key={player.id} value={player.id} disabled={!player.selectable || occupied.has(player.id)}>{player.rank === null ? 'NR' : `#${player.rank}`} · {player.name} · {statusFor(player.id)}</option>)}</select></label>
-        {candidate && <div className={styles.candidate}><strong>{candidate.name}</strong><span>{candidate.primaryPosition || 'Position unavailable'} · {candidate.nbaTeam || 'NBA free agent'}</span><span>{statusFor(candidate.id)}{profiles.get(candidate.id)?.status === 'eligible' ? ` · R${profiles.get(candidate.id)?.baseCost}` : ''}</span>{shortlistKey && <button className="text-button" type="button" aria-pressed={shortlistIds.includes(candidate.id)} onClick={() => toggleShortlist(candidate.id)}>{shortlistIds.includes(candidate.id) ? 'Remove from my shortlist' : 'Add to my shortlist'}</button>}</div>}
-        {account.commissioner ? <div ref={correctionRef} tabIndex={-1} className={styles.pickActions} aria-label={editingPick ? `Correct pick ${editingPick.overallPick}` : 'Record next pick'}>
+        {candidate && <div className={styles.candidate}><strong>{candidate.name}</strong><span>{candidate.primaryPosition || 'Position unavailable'} · {candidate.nbaTeam || 'NBA free agent'}</span><span>{statusFor(candidate.id)}{profiles.get(candidate.id)?.status === 'eligible' ? ` · R${profiles.get(candidate.id)?.baseCost}` : ''}</span>{draftQueue.enabled && <button className="button button-subtle" type="button" disabled={!canQueue || !candidateAvailable || (!queuedIds.includes(candidate.id) && queuedIds.length >= 100)} aria-pressed={queuedIds.includes(candidate.id)} onClick={() => toggleQueue(candidate.id)}>{draftQueue.busy ? 'Saving queue…' : queuedIds.includes(candidate.id) ? 'Remove from team queue' : 'Add to team queue'}</button>}{shortlistKey && <button className="text-button" type="button" aria-pressed={shortlistIds.includes(candidate.id)} onClick={() => toggleShortlist(candidate.id)}>{shortlistIds.includes(candidate.id) ? 'Remove from my shortlist' : 'Add to my shortlist'}</button>}</div>}
+        {draftQueue.enabled && <p className={styles.footnote}>Queue for {teamName(draftQueue.franchiseId)} · <button type="button" className="text-button" onClick={() => setWorkspaceView('queue')}>Manage queue ({queuedIds.length})</button></p>}
+        {draftQueue.error && <p className={styles.queueError} role="alert">{draftQueue.error}<button className="text-button" onClick={() => void draftQueue.reload()}>Reload queue</button></p>}
+        {account.commissioner || currentPickOwned ? <div ref={correctionRef} tabIndex={-1} className={styles.pickActions} aria-label={editingPick ? `Correct pick ${editingPick.overallPick}` : 'Record next pick'}>
           <strong>{editingPick ? `Correct pick ${editingPick.overallPick}` : currentPick ? `Pick ${currentPick.overallPick ?? '—'}` : allPicksFilled ? 'Draft board complete' : board?.orderComplete ? 'Waiting for draft entry' : 'Order pending'}</strong>
           {target && <span>{teamName(target.currentOwnerId)}</span>}
           {!board?.orderComplete ? <p>Set the agreed draft order to place selections.</p> : !board.keepersRevealedAt ? <p>Live drafting opens after all keepers have been locked and revealed.</p> : board.phase !== 'draft_ready' && <p>Draft entry is closed for this season.</p>}
+          {!editingPick && board?.clock.status === 'waiting' && <p>The commissioner must start the draft before a player can be selected.</p>}
+          {!editingPick && board?.clock.status === 'paused' && <p>The draft is paused. The commissioner can resume the countdown.</p>}
           {editingPick && <><p>Currently {editingPick.playerName}. Choose a replacement above or remove this selection.</p><label className={styles.field}>Correction reason <span>Required · at least 5 characters</span><textarea rows={2} value={changeNote} maxLength={2000} required minLength={5} aria-describedby="draft-correction-help" aria-invalid={changeNote.length > 0 && changeNote.trim().length < 5} onChange={event => setChangeNote(event.target.value)} placeholder="Explain the correction or removal."/></label><p id="draft-correction-help">{changeNote.trim().length < 5 ? 'Add at least 5 non-space characters to save or remove this pick.' : 'Correction reason is ready.'}</p></>}
           {(selectionStale || editStale) && <p className={styles.error} role="alert">The board changed after you started this selection. Load the latest pick before recording.<button type="button" className="text-button" onClick={resetSelection}>Load latest pick</button></p>}
           <button className="button button-green" disabled={!canDraft || !selected || !candidateAvailable || selectionStale || editStale || !target || Boolean(editingPick && changeNote.trim().length < 5)} onClick={() => { if (!selected || !seasonId) return; void send(editingPick ? { action: 'correct', seasonId, expectedRevision: selected.revision, pickId: selected.pickId, playerId: selected.playerId, note: changeNote } : { action: 'record', seasonId, expectedRevision: selected.revision, pickId: selected.pickId, playerId: selected.playerId }, editingPick ? 'Draft selection corrected.' : 'Draft selection recorded.'); }}>{busy ? 'Saving…' : editingPick ? 'Save corrected pick' : 'Record draft pick'}</button>
           {editingPick && <><button className="button button-subtle" disabled={!canDraft || editStale || changeNote.trim().length < 5} onClick={() => { if (seasonId && editingRevision !== null) void send({ action: 'undo', seasonId, expectedRevision: editingRevision, pickId: editingPick.id, note: changeNote }, 'Draft selection removed; the pick is available again.'); }}>Remove this selection</button><button className="text-button" disabled={busy} onClick={resetSelection}>Back to next pick</button></>}
-        </div> : <p className={styles.viewerNote}>The commissioner records draft selections. This board updates automatically.</p>}
+        </div> : <p className={styles.viewerNote}>{account.session?.user ? 'You can draft when your team owns the pick on the clock. Add players to your team queue to prepare.' : 'Sign in with your team account to draft players and manage your queue.'} The board updates automatically.</p>}
         <div className={styles.poolHeading}><span>{!searchTerm && matchingPlayers.length > 200 ? 'Top 200 matches' : `${filteredPlayers.length} players shown`}</span><span>ESPN rank</span></div>
         <div className={styles.playerList} aria-label="Ranked players and keeper eligibility">
           {filteredPlayers.map(player => {
             const occupiedPick = occupied.get(player.id);
             return <div key={player.id} className={styles.playerEntry}><button type="button" className={`${styles.playerRow} ${occupiedPick ? styles.offBoard : ''} ${selected?.playerId === player.id ? styles.chosenPlayer : ''}`} disabled={busy || !board || !player.selectable || Boolean(occupiedPick)} onClick={() => choosePlayer(player.id)} aria-pressed={selected?.playerId === player.id} aria-label={`${player.name}, ${player.rank === null ? 'unranked' : `rank ${player.rank}`}, ${statusFor(player.id)}`}>
               <span className={styles.rank}>{player.rank ?? '—'}</span><span className={styles.playerInfo}><strong>{player.name}</strong><small>{player.primaryPosition || '—'} · {player.nbaTeam || 'FA'}</small><span className={`${styles.playerBadge} ${occupiedPick?.status === 'keeper' ? styles.keptBadge : profiles.get(player.id)?.status === 'eligible' ? styles.eligibleBadge : ''}`}>{statusFor(player.id)}</span></span>{occupiedPick && <span className={styles.offBoardMark} aria-hidden="true">✓</span>}
-            </button>{shortlistKey && <button type="button" className={styles.shortlistButton} aria-pressed={shortlistIds.includes(player.id)} aria-label={`${shortlistIds.includes(player.id) ? 'Remove' : 'Add'} ${player.name} ${shortlistIds.includes(player.id) ? 'from' : 'to'} my shortlist`} onClick={() => toggleShortlist(player.id)}><span aria-hidden="true">{shortlistIds.includes(player.id) ? '★' : '☆'}</span></button>}</div>;
+            </button>{draftQueue.enabled && <button type="button" className={styles.queueAddButton} disabled={!canQueue || !player.selectable || Boolean(occupiedPick) || (!queuedIds.includes(player.id) && queuedIds.length >= 100)} aria-pressed={queuedIds.includes(player.id)} aria-label={`${queuedIds.includes(player.id) ? 'Remove' : 'Add'} ${player.name} ${queuedIds.includes(player.id) ? 'from' : 'to'} team queue`} onClick={() => toggleQueue(player.id)}><span aria-hidden="true">{queuedIds.includes(player.id) ? '✓' : '+'}</span><small>Queue</small></button>}{shortlistKey && <button type="button" className={styles.shortlistButton} aria-pressed={shortlistIds.includes(player.id)} aria-label={`${shortlistIds.includes(player.id) ? 'Remove' : 'Add'} ${player.name} ${shortlistIds.includes(player.id) ? 'from' : 'to'} my shortlist`} onClick={() => toggleShortlist(player.id)}><span aria-hidden="true">{shortlistIds.includes(player.id) ? '★' : '☆'}</span></button>}</div>;
           })}
           {!filteredPlayers.length && <p className={styles.footnote}>No players match these filters.</p>}
         </div>
         <p className={styles.footnote}>ESPN’s supplied ROTO category ranking. Players without a supplied rank follow alphabetically. Keeper labels use the league’s current confirmed profiles.</p>
       </section>
+        </div>
+        <div id="draft-tools-queue" className={`${styles.sidePanelBody} ${workspaceView !== 'queue' ? styles.workspaceHidden : ''}`}>
+          <section className={styles.playerPanel} aria-labelledby="draft-queue-title"><p className="eyebrow">YOUR NEXT PICKS</p><h3 id="draft-queue-title">Team draft queue</h3>
+            <p className={styles.rankingSource}>When your pick times out, the first available player here is drafted. If this queue is empty, the highest available ESPN-ranked player is drafted.</p>
+            {!draftQueue.enabled ? <p className={styles.viewerNote}>{!account.session?.user ? 'Sign in with your team account to save a draft queue.' : account.connection !== 'live' ? 'Restore the live league connection to load your private team queue.' : 'A current team assignment is required to save a queue.'}</p> : <>
+              {draftQueue.teams.length > 1 ? <label className={styles.field}>Queue for<select value={draftQueue.franchiseId} onChange={event => draftQueue.selectTeam(event.target.value)} disabled={draftQueue.busy}>{draftQueue.teams.map(team => <option key={team.franchiseId} value={team.franchiseId}>{team.displayName}</option>)}</select></label> : <p className={styles.queueTeam}>{teamName(draftQueue.franchiseId)}</p>}
+              <p className={styles.footnote}>Private to your team’s managers · saved across devices. Drafted and kept players disappear from this list.</p>
+              {queueClosed && <p className={styles.viewerNote}>The draft is complete. Your saved queue is available to view.</p>}
+              {draftQueue.loading && <p role="status" className={styles.footnote}>Loading your queue…</p>}
+              {draftQueue.error && <p className={styles.queueError} role="alert">{draftQueue.error}<button className="text-button" onClick={() => void draftQueue.reload()}>Reload queue</button></p>}
+              {draftQueue.queue && <><div className={styles.poolHeading}><span>{queuedIds.length} / 100 queued</span><span aria-live="polite">{draftQueue.busy ? 'Saving…' : 'Saved'}</span></div><ol className={styles.queueList}>{queuedIds.map((id, index) => {
+                const player = catalogById.get(id)!;
+                return <li key={id}><span className={styles.queuePosition}>{index + 1}</span><button className={styles.queuePlayer} type="button" onClick={() => { choosePlayer(id); setWorkspaceView('players'); }}><strong>{player.name}</strong><small>{player.primaryPosition || '—'} · {player.nbaTeam || 'FA'} · {player.rank === null ? 'Unranked' : `ESPN #${player.rank}`}</small></button><div className={styles.queueActions}><button type="button" disabled={!canQueue || index === 0} onClick={() => moveQueuedPlayer(index, -1)} aria-label={`Move ${player.name} up in queue`}>↑</button><button type="button" disabled={!canQueue || index === queuedIds.length - 1} onClick={() => moveQueuedPlayer(index, 1)} aria-label={`Move ${player.name} down in queue`}>↓</button><button type="button" disabled={!canQueue} onClick={() => toggleQueue(id)} aria-label={`Remove ${player.name} from queue`}>×</button></div></li>;
+              })}</ol>{!queuedIds.length && <p className={styles.viewerNote}>Your queue is empty. Add players from the player pool, then move your favorites to the top.</p>}<button className="button button-subtle" type="button" onClick={() => { setAvailableOnly(true); setWorkspaceView('players'); }}>Find players to queue</button></>}
+            </>}
+          </section>
         </div>
         <div id="draft-tools-rosters" className={`${styles.sidePanelBody} ${workspaceView !== 'rosters' ? styles.workspaceHidden : ''}`}>
           {board ? <DraftRosters compact key={`${seasonId}:${account.session?.user?.id || 'public'}`} board={board} preferredFranchiseId={preferredFranchiseId}/> : <p className={styles.rosterLoading} role="status">{loading ? 'Loading draft rosters…' : 'Draft rosters will appear when the board is available.'}</p>}

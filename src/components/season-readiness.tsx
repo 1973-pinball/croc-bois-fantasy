@@ -2,20 +2,16 @@
 
 import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { seasonReadinessSchema, isSeasonTimeZone, type SeasonReadiness } from '@/lib/season-readiness';
-import { formatSeasonDate, scheduleInput, scheduleInstant } from '@/lib/season-schedule';
+import { scheduleInput, scheduleInstant } from '@/lib/season-schedule';
 import type { LeagueAccount } from './league-account';
+import { SeasonCountdowns } from './season-countdowns';
 import styles from './season-readiness.module.css';
 
 const stateLabels = { missing: 'Not saved', draft: 'Draft saved', submitted: 'Awaiting review', rejected: 'Returned to manager', approved: 'Approved · unlocked', locked: 'Locked' };
 
 export function SeasonScheduleNotice({ account }: { account: LeagueAccount }) {
   if (account.connection !== 'live' || !account.live) return null;
-  const season = account.live;
-  return <details className={styles.scheduleNotice}><summary>Schedule <span>Keeper deadline & draft time</span></summary>
-    <span><strong>Keeper deadline</strong> {formatSeasonDate(season.keeperDeadline, season.seasonTimeZone)}</span>
-    <span><strong>Draft</strong> {formatSeasonDate(season.draftAt, season.seasonTimeZone)}</span>
-    <small>Keepers remain editable until the commissioner locks your submission.</small>
-  </details>;
+  return <SeasonCountdowns schedule={account.live}/>;
 }
 
 function ScheduleEditor({ readiness, disabled, refresh, account, invalidateAccess }: { readiness: SeasonReadiness; disabled: boolean; refresh: () => Promise<SeasonReadiness | null>; account: LeagueAccount; invalidateAccess: () => void }) {
@@ -129,7 +125,7 @@ export function SeasonReadinessPanel({ account }: { account: LeagueAccount }) {
       {loading && !readiness && <p role="status">Loading all participating teams…</p>}
       {readiness && <>
         <dl className={styles.facts}><div><dt>Submitted for review</dt><dd>{submitted} / {readiness.participantCount}</dd></div><div><dt>Locked for reveal</dt><dd>{locked} / {readiness.participantCount}</dd></div><div><dt>Profiles needing verification</dt><dd>{unreviewed}</dd></div><div><dt>Teams with account access</dt><dd>{teams.filter(team => team.activeManagerCount > 0).length} / {readiness.participantCount}</dd></div></dl>
-        <dl className={styles.dates}><div><dt>Keeper deadline</dt><dd>{formatSeasonDate(readiness.keeperDeadline, readiness.seasonTimeZone)}</dd></div><div><dt>Draft</dt><dd>{formatSeasonDate(readiness.draftAt, readiness.seasonTimeZone)}</dd></div></dl>
+        <SeasonCountdowns schedule={readiness} label="Commissioner schedule countdowns"/>
         {(!readiness.hasFrozenSnapshot || !readiness.inventoryComplete || readiness.registeredCount !== readiness.participantCount) && <p className={styles.warning}>Season setup needs attention: {!readiness.hasFrozenSnapshot && 'a frozen eligibility snapshot is missing. '}{!readiness.inventoryComplete && `The pick inventory is incomplete (${readiness.totalPickCount} of ${readiness.expectedTotalPickCount} expected picks). `}{readiness.registeredCount !== readiness.participantCount && `${readiness.registeredCount} of ${readiness.participantCount} participating teams are registered.`}</p>}
         <div className="table-wrap"><table className={`data-table ${styles.table}`}><caption className={styles.srOnly}>Submission, onboarding, and keeper-profile readiness for each participating team</caption><thead><tr><th scope="col">Team</th><th scope="col">Submission</th><th scope="col">Account access</th><th scope="col">Profile review</th><th scope="col">Pick holdings</th></tr></thead><tbody>{teams.map(team => {
           const reviews = team.profileCounts.provisional + team.profileCounts.unresolved + team.profileCounts.missing;

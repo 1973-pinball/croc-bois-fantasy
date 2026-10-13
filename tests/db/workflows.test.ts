@@ -142,7 +142,6 @@ test('saving an approved selection creates a private revision and releases its r
 }));
 
 test('atomic trade failure leaves every owner unchanged and historical records never execute', () => isolated(async () => {
-  await db.exec(`update public.seasons set trading_opened_at=now() where id='${season}'`);
   await asUser(commissioner);
   const trade = await createTrade([{player_id:101,from_franchise_id:a,to_franchise_id:b}],[{pick_id:b5,from_franchise_id:a,to_franchise_id:b}]);
   await rejected(() => db.query('select public.finalize_trade($1)',[trade]), /no longer available/);
@@ -154,11 +153,13 @@ test('atomic trade failure leaves every owner unchanged and historical records n
   await rejected(() => db.query('select public.finalize_trade($1)',[trade]), /Historical records cannot be applied/);
 }));
 
-test('live trades preserve cost, tenure, and frozen provenance and cannot run twice', () => isolated(async () => {
-  await db.exec(`update public.seasons set trading_opened_at=now() where id='${season}'`);
+test('live trades finalize before any keeper submissions while preserving cost, tenure, provenance and replay protection', () => isolated(async () => {
   await asUser(commissioner);
+  assert.equal((await db.query('select * from public.keeper_submissions')).rows.length, 0);
+  assert.equal((await db.query<{ trading_opened_at: null }>('select trading_opened_at from public.seasons where id=$1',[season])).rows[0].trading_opened_at,null);
   const trade = await createTrade([{player_id:101,from_franchise_id:a,to_franchise_id:b}],[{pick_id:a5,from_franchise_id:a,to_franchise_id:b}]);
   await db.query('select public.finalize_trade($1)',[trade]);
+  assert.equal((await db.query<{ trading_opened_at: null }>('select trading_opened_at from public.seasons where id=$1',[season])).rows[0].trading_opened_at,null);
   assert.equal((await db.query<{franchise_id:string}>('select franchise_id from public.player_ownerships where player_id=101')).rows[0].franchise_id,b);
   assert.equal((await db.query<{franchise_id:string}>('select franchise_id from public.roster_entries where player_id=101')).rows[0].franchise_id,a);
   assert.deepEqual((await db.query('select base_round,tenure_years from public.keeper_profiles where player_id=101')).rows[0],{base_round:5,tenure_years:1});
@@ -169,7 +170,6 @@ test('live trades preserve cost, tenure, and frozen provenance and cannot run tw
 }));
 
 test('approved payment picks cannot be transferred', () => isolated(async () => {
-  await db.exec(`update public.seasons set trading_opened_at=now() where id='${season}'`);
   await asUser(userA);
   const k = await save(a,[{player_id:101,pick_id:a5}]);
   await transition(k.id,'submit');
@@ -177,6 +177,23 @@ test('approved payment picks cannot be transferred', () => isolated(async () => 
   await transition(k.id,'approve');
   const trade = await createTrade([],[{pick_id:a5,from_franchise_id:a,to_franchise_id:b}]);
   await rejected(() => db.query('select public.finalize_trade($1)',[trade]), /committed to an approved keeper/);
+}));
+
+test('partial keeper submissions do not delay trades, while approved players stay protected', () => isolated(async () => {
+  await asUser(userA);
+  const keeper = await save(a,[{player_id:101,pick_id:a5}]);
+  await transition(keeper.id,'submit');
+  await asUser(commissioner);
+  await transition(keeper.id,'approve');
+  assert.equal((await db.query<{ trading_opened_at: null }>('select trading_opened_at from public.seasons where id=$1',[season])).rows[0].trading_opened_at,null);
+  const protectedTrade = await createTrade([{player_id:101,from_franchise_id:a,to_franchise_id:b}],[{pick_id:b4,from_franchise_id:b,to_franchise_id:a}]);
+  await rejected(() => db.query('select public.finalize_trade($1)',[protectedTrade]), /Cannot trade an approved keeper/);
+  assert.equal((await db.query<{current_owner_id:string}>('select current_owner_id from public.draft_picks where id=$1',[b4])).rows[0].current_owner_id,b);
+  const allowedTrade = await createTrade([{player_id:102,from_franchise_id:a,to_franchise_id:b}]);
+  await db.query('select public.finalize_trade($1)',[allowedTrade]);
+  assert.equal((await db.query<{franchise_id:string}>('select franchise_id from public.player_ownerships where player_id=102')).rows[0].franchise_id,b);
+  assert.equal((await db.query<{status:string}>('select status from public.keeper_submissions where id=$1',[keeper.id])).rows[0].status,'approved');
+  assert.equal((await db.query('select * from public.keeper_submissions where franchise_id=$1',[b])).rows.length,0);
 }));
 
 test('incoming picks cannot invalidate locked keeper payment and a rejected trade rolls back every leg', () => isolated(async () => {
@@ -255,7 +272,6 @@ test('participant expansion blocks premature reveal until all configured teams j
 }));
 
 test('a manager may log a trade but only a commissioner can finalize after 24 hours', () => isolated(async () => {
-  await db.exec(`update public.seasons set trading_opened_at=now() where id='${season}'`);
   await asUser(userA);
   const trade = await createTrade([{player_id:101,from_franchise_id:a,to_franchise_id:b}],[],false);
   await rejected(() => db.query('select public.finalize_trade($1)',[trade]), /Commissioner access required/);

@@ -7,6 +7,7 @@ import { ownTeamIds as currentOwnTeamIds } from '@/lib/team-access';
 import { hasKeeperDraftConflict, type KeeperDraft } from '@/lib/keeper-draft';
 import { workflowDrafts } from '@/lib/workflow-drafts';
 import identityData from '../../data/identities.json';
+import { KeeperPaymentEditor } from './keeper-payment-editor';
 
 const identities = identityData as { leagueId: string; seasonId: string; franchises: Record<string, string>; picks: Record<string, string> };
 type PlannerAssignment = { playerId: number; pickId: string };
@@ -21,19 +22,20 @@ export type KeeperSubmission = {
   id: string; franchise_id: string; revision: number;
   status: 'draft' | 'submitted' | 'approved' | 'rejected' | 'locked';
   review_note?: string | null;
-  keeper_assignments: { player_id: number; pick_id: string }[];
+  keeper_assignments: { player_id: number; pick_id: string; base_round_at_submission?: number | null; tenure_at_submission?: number | null }[];
 };
 type LiveLeague = {
   configured: true; source: 'supabase'; seasonId: string;
   phase: string; participantCount: number; keepersRevealedAt: string | null; tradingOpenedAt: string | null;
   keeperDeadline?: string | null; draftAt?: string | null; seasonTimeZone?: string | null; scheduleRevision?: number;
   franchiseIds: Record<string, string>; data: LeagueData;
-  draftOrder?: number[]; usedPickIds?: string[];
+  draftOrder?: number[]; usedPickIds?: string[]; draftStarted?: boolean;
   revealedKeepers: { playerId: number; teamId: number; pickId: string; baseRound: number; paymentRound: number }[];
 };
-type Action = 'save' | 'submit' | 'approve' | 'reject' | 'lock';
+type Action = 'save' | 'submit' | 'approve' | 'reject' | 'lock' | 'reassign_payments';
 type SaveBody = { action: 'save'; seasonId: string; franchiseId: string; expectedRevision: number; assignments: PlannerAssignment[] };
-type TransitionBody = { action: Exclude<Action, 'save'>; submissionId: string; expectedRevision: number; note?: string };
+type TransitionBody = { action: Exclude<Action, 'save' | 'reassign_payments'>; submissionId: string; expectedRevision: number; note?: string };
+type PaymentBody = { action: 'reassign_payments'; submissionId: string; expectedRevision: number; assignments: PlannerAssignment[]; note: string };
 class RequestFailure extends Error { constructor(message: string, public status: number) { super(message); } }
 
 async function readResponse<T>(response: Response): Promise<T> {
@@ -61,8 +63,11 @@ export function useLeagueAccount() {
   const [actionError, setActionError] = useState('');
   const [actionNotice, setActionNotice] = useState('');
   const [reloadRequired, setReloadRequired] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
   const seasonId = live?.seasonId || identities.seasonId;
   const data = live?.data || previewData;
+  const keeperDeadlinePassed = Boolean(live?.keeperDeadline && now >= Date.parse(live.keeperDeadline));
+  useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 30000); return () => clearInterval(timer); }, []);
 
   const reloadLeague = useCallback(async () => {
     try {
@@ -158,7 +163,7 @@ export function useLeagueAccount() {
     } catch (error) { setActionError(error instanceof Error ? error.message : 'Unable to reload saved submissions.'); return null; }
   }
 
-  async function runAction(body: SaveBody | TransitionBody) {
+  async function runAction(body: SaveBody | TransitionBody | PaymentBody) {
     if (connection !== 'live' || !session?.user || !submissionsLoaded || reloadRequired || actionBusy) return null;
     const version = permissionVersion.current;
     setActionBusy(body.action === 'save' ? body.franchiseId : body.submissionId);
@@ -168,9 +173,9 @@ export function useLeagueAccount() {
       const result = await readResponse<{ submission: KeeperSubmission }>(response);
       if (version !== permissionVersion.current) throw new Error('Your account access changed while saving. Reload current submissions before continuing.');
       const previous = submissions.find(item => item.franchise_id === result.submission.franchise_id);
-      const saved = { ...result.submission, keeper_assignments: body.action === 'save' ? body.assignments.map(item => ({ player_id: item.playerId, pick_id: item.pickId })) : result.submission.keeper_assignments || previous?.keeper_assignments || [] };
+      const saved = { ...result.submission, keeper_assignments: result.submission.keeper_assignments || (body.action === 'save' || body.action === 'reassign_payments' ? body.assignments.map(item => ({ ...previous?.keeper_assignments.find(savedItem => Number(savedItem.player_id) === item.playerId), player_id: item.playerId, pick_id: item.pickId })) : previous?.keeper_assignments || []) };
       setSubmissions(current => [...current.filter(item => item.franchise_id !== saved.franchise_id), saved]);
-      const messages: Record<Action, string> = { save: live?.phase === 'setup' ? 'Private draft saved. You can return to it anytime; submission opens after season setup.' : 'Private draft saved. Submit it when you are ready for commissioner review.', submit: 'Keepers submitted for commissioner review.', approve: 'Submission approved. The manager can still revise it until it is locked.', reject: 'Submission returned to the manager with your review note.', lock: 'Submission locked. Keepers reveal automatically when every team is locked.' };
+      const messages: Record<Action, string> = { save: live?.phase === 'setup' ? 'Private draft saved. You can return to it anytime; submission opens after season setup.' : 'Private draft saved. Submit it when you are ready for commissioner review.', submit: 'Keepers submitted for commissioner review.', approve: 'Submission approved. Player choices can be revised before the deadline until locked.', reject: 'Submission returned to the manager with your review note.', lock: 'Submission locked. Keepers reveal automatically when every team is locked.', reassign_payments: 'Payment picks updated. Your keeper players and submission status are unchanged.' };
       setActionNotice(messages[body.action]);
       const refreshedLeague = await reloadLeague();
       if (body.action === 'lock' && refreshedLeague?.keepersRevealedAt) setActionNotice('Final submission locked. Every team’s keepers and payment picks are now public.');
@@ -193,7 +198,7 @@ export function useLeagueAccount() {
     finally { setActionBusy(null); }
   }
 
-  return { data, lastLeagueCheckedAt, session, sessionLoading, sessionError, reloadSession, ownTeamIds, live, connection, connectionError, submissions, submissionsLoaded, loadingSubmissions, commissioner, actionBusy, actionError, actionNotice, reloadRequired, seasonId, canManageTeam, franchiseId, officialPickId, toPlannerAssignments, submissionFor, refreshOfficial, runAction, openKeeperSelection, reloadLeague };
+  return { data, lastLeagueCheckedAt, session, sessionLoading, sessionError, reloadSession, ownTeamIds, live, connection, connectionError, submissions, submissionsLoaded, loadingSubmissions, commissioner, actionBusy, actionError, actionNotice, reloadRequired, seasonId, keeperDeadlinePassed, canManageTeam, franchiseId, officialPickId, toPlannerAssignments, submissionFor, refreshOfficial, runAction, openKeeperSelection, reloadLeague };
 }
 
 export type LeagueAccount = ReturnType<typeof useLeagueAccount>;
@@ -254,7 +259,7 @@ export function OfficialKeeperControls({ account, teamId, draft, onLoad, onSaved
   const key = (items: PlannerAssignment[]) => JSON.stringify([...items].sort((a, b) => a.playerId - b.playerId).map(item => [item.playerId, account.officialPickId(item.pickId)]));
   const dirty = key(assignments) !== key(serverAssignments);
   const locked = current?.status === 'locked';
-  const saveAvailable = account.connection === 'live' && !account.live?.keepersRevealedAt && ['setup', 'keeper_selection'].includes(account.live?.phase || '');
+  const saveAvailable = account.connection === 'live' && !account.keeperDeadlinePassed && !account.live?.keepersRevealedAt && ['setup', 'keeper_selection'].includes(account.live?.phase || '');
   const submitAvailable = saveAvailable && account.live?.phase === 'keeper_selection';
   const busy = Boolean(account.actionBusy) || account.loadingSubmissions;
   const conflict = account.submissionsLoaded && hasKeeperDraftConflict(draft, current?.revision ?? 0);
@@ -291,7 +296,8 @@ export function OfficialKeeperControls({ account, teamId, draft, onLoad, onSaved
         <button className="button button-cream" onClick={() => submitAvailable && !needsLoad && current && draft?.baseRevision !== null && draft?.baseRevision !== undefined && void account.runAction({ action: 'submit', submissionId: current.id, expectedRevision: draft.baseRevision })} disabled={!submitAvailable || !account.submissionsLoaded || busy || needsLoad || dirty || !current || !['draft', 'rejected'].includes(current.status) || errors.length > 0}>Submit for review</button>
       </>}
     </div>
-    <p className="official-privacy-note">Only assigned managers and the commissioner can see your selections before the league reveal. Saving a revision after approval requires a new review.</p>
+    <p className="official-privacy-note">Only assigned managers and the commissioner can see your selections before the league reveal. Changing keeper players before the deadline requires a new review. Payment-only changes preserve the current status.</p>
+    <KeeperPaymentEditor account={account} teamId={teamId}/>
   </div>;
 }
 
@@ -300,10 +306,10 @@ export function OfficialReviewPanel({ account }: { account: LeagueAccount }) {
   const [openingNote, setOpeningNote] = useState('');
   if (!account.session?.user || !account.commissioner) return null;
   const editable = account.connection === 'live' && account.live?.phase === 'keeper_selection' && account.submissionsLoaded && !account.reloadRequired && !account.actionBusy && !account.loadingSubmissions;
-  return <section className="panel official-review-panel"><div className="panel-header"><div><p className="eyebrow">PRIVATE COMMISSIONER WORKSPACE</p><h2>Official keeper submissions</h2></div><button className="text-button" disabled={account.loadingSubmissions || Boolean(account.actionBusy)} onClick={() => void account.refreshOfficial()}>{account.loadingSubmissions ? 'Refreshing…' : 'Refresh'}</button></div><div className="official-review-intro"><p>Review each team’s selected players and payment picks. Approve first, then lock after the deadline. The final lock reveals every team together.</p><WorkflowFeedback account={account}/>{account.live?.phase === 'setup' && <div className="open-season-controls"><h3>Ready to open keeper selection?</h3><p>Confirm that you have reviewed the league roster, pick ownership, and keeper rules before opening submissions.</p><label htmlFor="season-opening-note">Commissioner review note</label><textarea id="season-opening-note" rows={2} maxLength={2000} value={openingNote} onChange={event => setOpeningNote(event.target.value)}/><button className="button button-green" disabled={account.connection !== 'live' || Boolean(account.actionBusy) || !openingNote.trim()} onClick={() => void account.openKeeperSelection(openingNote)}>{account.actionBusy === 'open-season' ? 'Opening selections…' : 'Open keeper selection'}</button></div>}</div>{account.loadingSubmissions && <p className="empty-state" role="status">Loading official submissions…</p>}{!account.loadingSubmissions && account.submissions.length === 0 && <p className="empty-state">No saved keeper submissions are available for this season.</p>}{account.submissions.map(submission => {
+  return <section className="panel official-review-panel"><div className="panel-header"><div><p className="eyebrow">PRIVATE COMMISSIONER WORKSPACE</p><h2>Official keeper submissions</h2></div><button className="text-button" disabled={account.loadingSubmissions || Boolean(account.actionBusy)} onClick={() => void account.refreshOfficial()}>{account.loadingSubmissions ? 'Refreshing…' : 'Refresh'}</button></div><div className="official-review-intro"><p>Review each team’s selected players and payment picks. Approve first, then lock after the deadline. The final lock reveals every team together.</p>{account.keeperDeadlinePassed && <p>The deadline has passed, so keeper players cannot be returned for changes. You can still approve or lock submissions; use Change payment picks to adjust valid payment choices.</p>}<WorkflowFeedback account={account}/>{account.live?.phase === 'setup' && <div className="open-season-controls"><h3>Ready to open keeper selection?</h3><p>Confirm that you have reviewed the league roster, pick ownership, and keeper rules before opening submissions.</p><label htmlFor="season-opening-note">Commissioner review note</label><textarea id="season-opening-note" rows={2} maxLength={2000} value={openingNote} onChange={event => setOpeningNote(event.target.value)}/><button className="button button-green" disabled={account.connection !== 'live' || Boolean(account.actionBusy) || !openingNote.trim()} onClick={() => void account.openKeeperSelection(openingNote)}>{account.actionBusy === 'open-season' ? 'Opening selections…' : 'Open keeper selection'}</button></div>}</div>{account.loadingSubmissions && <p className="empty-state" role="status">Loading official submissions…</p>}{!account.loadingSubmissions && account.submissions.length === 0 && <p className="empty-state">No saved keeper submissions are available for this season.</p>}{account.submissions.map(submission => {
     const team = account.data.teams.find(item => account.franchiseId(item.id) === submission.franchise_id);
     const finalLock = submission.status === 'approved' && account.data.teams.length > 0 && account.data.teams.length === account.live?.participantCount && account.data.teams.every(item => item.id === team?.id || account.submissionFor(item.id)?.status === 'locked');
     const keeperCount = account.submissions.reduce((total, item) => total + item.keeper_assignments.length, 0);
-    return <article className="official-submission" key={submission.id}><div className="official-submission-heading"><h3>{team?.name || 'League team'}</h3><span className={'status status-' + submission.status}>{submission.status} · revision {submission.revision}</span></div><div className="review-keeper-picks">{submission.keeper_assignments.length === 0 ? <p>No keepers selected.</p> : submission.keeper_assignments.map(item => { const player = account.data.players.find(candidate => candidate.id === Number(item.player_id)); const pick = account.data.picks.find(candidate => account.officialPickId(candidate.id) === item.pick_id); return <div key={item.player_id}><strong>{player?.name || 'Player ' + item.player_id}</strong><span>{pick ? 'Round ' + pick.round + ' · originally ' + (account.data.teams.find(candidate => candidate.id === pick.originalTeamId)?.shortName || 'Unknown') : 'Pick unavailable in current records'}</span></div>; })}</div>{submission.review_note && <p className="review-previous-note">Previous note: {submission.review_note}</p>}{['submitted', 'approved'].includes(submission.status) && <><label className="review-note-label" htmlFor={'review-note-' + submission.id}>Review note <span>(required when returning a submission)</span></label><textarea id={'review-note-' + submission.id} rows={2} maxLength={2000} value={notes[submission.id] || ''} onChange={event => setNotes(previous => ({ ...previous, [submission.id]: event.target.value }))}/><div className="review-action-buttons">{submission.status === 'submitted' && <button className="button button-green" disabled={!editable} onClick={() => void account.runAction({ action: 'approve', submissionId: submission.id, expectedRevision: submission.revision, note: notes[submission.id] || undefined })}>Approve keepers</button>}<button className="button button-subtle" disabled={!editable || !(notes[submission.id] || '').trim()} onClick={() => void account.runAction({ action: 'reject', submissionId: submission.id, expectedRevision: submission.revision, note: notes[submission.id] })}>Return with note</button>{submission.status === 'approved' && <button className="button button-orange" disabled={!editable} onClick={() => void account.runAction({ action: 'lock', submissionId: submission.id, expectedRevision: submission.revision })}>{finalLock ? 'Lock final team and reveal keepers' : 'Lock keepers'}</button>}</div>{finalLock && <p className="workflow-message" role="status">Final lock: this reveals {keeperCount} keepers across all {account.data.teams.length} teams, including their payment picks, to the league. Every other team is already locked.</p>}</>}{submission.status === 'locked' && <p className="locked-note">Locked. This selection is preserved for the league reveal.</p>}{account.actionBusy === submission.id && <p role="status" className="small">Recording your decision…</p>}</article>;
+    return <article className="official-submission" key={submission.id}><div className="official-submission-heading"><h3>{team?.name || 'League team'}</h3><span className={'status status-' + submission.status}>{submission.status} · revision {submission.revision}</span></div><div className="review-keeper-picks">{submission.keeper_assignments.length === 0 ? <p>No keepers selected.</p> : submission.keeper_assignments.map(item => { const player = account.data.players.find(candidate => candidate.id === Number(item.player_id)); const pick = account.data.picks.find(candidate => account.officialPickId(candidate.id) === item.pick_id); return <div key={item.player_id}><strong>{player?.name || 'Player ' + item.player_id}</strong><span>{pick ? 'Round ' + pick.round + ' · originally ' + (account.data.teams.find(candidate => candidate.id === pick.originalTeamId)?.shortName || 'Unknown') : 'Pick unavailable in current records'}</span></div>; })}</div>{submission.review_note && <p className="review-previous-note">Previous note: {submission.review_note}</p>}{['submitted', 'approved'].includes(submission.status) && <><label className="review-note-label" htmlFor={'review-note-' + submission.id}>Review note <span>(required when returning a submission)</span></label><textarea id={'review-note-' + submission.id} rows={2} maxLength={2000} value={notes[submission.id] || ''} onChange={event => setNotes(previous => ({ ...previous, [submission.id]: event.target.value }))}/><div className="review-action-buttons">{submission.status === 'submitted' && <button className="button button-green" disabled={!editable} onClick={() => void account.runAction({ action: 'approve', submissionId: submission.id, expectedRevision: submission.revision, note: notes[submission.id] || undefined })}>Approve keepers</button>}<button className="button button-subtle" disabled={!editable || account.keeperDeadlinePassed || !(notes[submission.id] || '').trim()} onClick={() => !account.keeperDeadlinePassed && void account.runAction({ action: 'reject', submissionId: submission.id, expectedRevision: submission.revision, note: notes[submission.id] })}>Return with note</button>{submission.status === 'approved' && <button className="button button-orange" disabled={!editable} onClick={() => void account.runAction({ action: 'lock', submissionId: submission.id, expectedRevision: submission.revision })}>{finalLock ? 'Lock final team and reveal keepers' : 'Lock keepers'}</button>}</div>{finalLock && <p className="workflow-message" role="status">Final lock: this reveals {keeperCount} keepers across all {account.data.teams.length} teams, including their payment picks, to the league. Every other team is already locked.</p>}</>}{submission.status === 'locked' && <p className="locked-note">Locked. Keeper players are fixed; valid payment picks can still change before the live draft starts.</p>}{team && <KeeperPaymentEditor account={account} teamId={team.id}/>}{account.actionBusy === submission.id && <p role="status" className="small">Recording your decision…</p>}</article>;
   })}</section>;
 }

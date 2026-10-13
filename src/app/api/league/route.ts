@@ -16,7 +16,7 @@ export async function GET() {
     const seasonResult = await client.from('seasons').select('id,phase,participant_count,draft_year,keepers_revealed_at,trading_opened_at,keeper_deadline,draft_at,season_time_zone,schedule_revision').eq('league_id', league.data.id).eq('draft_year', leagueData.season).single();
     if (seasonResult.error || !seasonResult.data) return unavailable();
     const season = seasonResult.data;
-    const [franchises, participation, ownership, profiles, picks, snapshots, roster, keeperRecords] = await Promise.all([
+    const [franchises, participation, ownership, profiles, picks, snapshots, roster, keeperRecords, draftBoard] = await Promise.all([
       client.from('franchises').select('id,espn_team_id,name').eq('league_id', league.data.id).order('id'),
       client.from('season_teams').select('franchise_id,display_name,draft_position').eq('season_id', season.id),
       client.from('player_ownerships').select('player_id,franchise_id').eq('season_id', season.id),
@@ -25,8 +25,9 @@ export async function GET() {
       client.from('roster_snapshots').select('id,snapshot_date').eq('season_id', season.id).not('frozen_at', 'is', null).single(),
       client.from('roster_entries').select('player_id,lineup_slot,snapshot_id').eq('season_id', season.id),
       client.from('keeper_season_records').select('player_id,franchise_id,pick_id,base_round,actual_payment_round').eq('season_id', season.id),
+      client.rpc('get_draft_board', { p_season: season.id }),
     ]);
-    if ([franchises,participation,ownership,profiles,picks,snapshots,roster,keeperRecords].some((r) => r.error) || !snapshots.data || !ownership.data?.length || !participation.data?.length) return unavailable();
+    if ([franchises,participation,ownership,profiles,picks,snapshots,roster,keeperRecords,draftBoard].some((r) => r.error) || typeof draftBoard.data?.orderLocked !== 'boolean' || !snapshots.data || !ownership.data?.length || !participation.data?.length) return unavailable();
     const playerRows = await client.from('players').select('id,full_name').in('id', ownership.data.map((p) => p.player_id));
     if (playerRows.error || playerRows.data.length !== ownership.data.length) return unavailable();
     const profileMap = new Map(profiles.data!.map((p) => [p.player_id, p]));
@@ -67,6 +68,7 @@ export async function GET() {
     const revealedKeepers = season.keepers_revealed_at ? keeperRecords.data!.map((k) => ({ playerId: k.player_id, teamId: numericIds.get(k.franchise_id), pickId: k.pick_id, baseRound: k.base_round, paymentRound: k.actual_payment_round })) : [];
     return json({ configured: true, source: 'supabase', seasonId: season.id, phase: season.phase, participantCount: season.participant_count, keepersRevealedAt: season.keepers_revealed_at, tradingOpenedAt: season.trading_opened_at, franchiseIds,
       keeperDeadline: season.keeper_deadline, draftAt: season.draft_at, seasonTimeZone: season.season_time_zone, scheduleRevision: season.schedule_revision,
+      draftStarted: draftBoard.data.orderLocked,
       usedPickIds: picks.data!.filter((p) => p.status === 'used').map((p) => p.id),
       draftOrder: participation.data!.filter((p) => p.draft_position !== null).sort((a,b) => a.draft_position-b.draft_position).map((p) => numericIds.get(p.franchise_id)),
       data, players, picks: livePicks, revealedKeepers,

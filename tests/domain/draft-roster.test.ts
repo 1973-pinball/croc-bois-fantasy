@@ -29,6 +29,7 @@ function pick(playerId: number, overrides: Partial<DraftBoardPick> = {}): DraftB
 }
 function board(picks: DraftBoardPick[]): DraftBoard {
   return { seasonId: '72000000-0000-4000-8000-000000000001', draftYear: 2026, phase: 'draft_ready', draftFormat: 'snake', roundCount: 13, revision: 1,
+    clock: { status: 'completed', durationSeconds: 90, remainingSeconds: null, deadlineAt: null, startedAt: '2026-10-03T00:00:00Z', serverNow: '2026-10-03T00:00:00Z' },
     keepersRevealedAt: '2026-10-03T00:00:00Z', orderComplete: true, orderLocked: true, nextPickId: null,
     teams: [{ franchiseId: teamA, espnTeamId: 1, displayName: 'A', draftPosition: 1 }, { franchiseId: teamB, espnTeamId: 2, displayName: 'B', draftPosition: 2 }], picks };
 }

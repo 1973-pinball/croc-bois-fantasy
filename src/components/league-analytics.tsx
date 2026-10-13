@@ -10,6 +10,7 @@ import { calculateLuckbox, type PlayoffHistory } from '@/lib/playoff-history';
 import { managerLabel } from '@/lib/display-labels';
 import type { LeagueData } from '@/lib/types';
 import { updateQuery, useQueryFilter } from './use-portal-location';
+import { AiLeagueLab } from './ai-league-lab';
 import styles from './league-preferences.module.css';
 
 type PositionRow = { franchiseId: string; position: number; count: number; seasons: number[] };
@@ -138,6 +139,7 @@ export function LeagueAnalytics({ league, playoffHistory }: { league: LeagueData
 
   return <div className="league-lab">
     <div className="page-heading lab-heading"><div><p className="eyebrow">THE CROC BOIS CURIOSITY DEPARTMENT</p><h1>League Lab</h1><p className="page-intro">A little evidence for the group chat. Explore the patterns behind the picks, deals, and familiar faces.</p></div><span className="lab-stamp"><LabIcon kind="chart"/><span>HISTORICAL<br/>DEEP CUTS</span></span></div>
+    <AiLeagueLab league={league}/>
     <div className="lab-controls"><label>Spotlight a franchise<select value={spotlight} onChange={event => { setSpotlight(event.target.value); const found = observations.findIndex(item => item.franchiseId === event.target.value); if (found >= 0) setActivePoint(found); }}><option value="all">The whole league</option>{franchises.map(franchise => <option value={franchise.id} key={franchise.id}>{name(franchise.id)} · {currentManager(franchise.id)}</option>)}</select></label><p>Highlights the charts and filters both preference views.<br/><span>Current names follow franchise history across manager changes. Historical manager labels stay with their recorded seasons.</span></p>{spotlight !== 'all' && <button className="text-button" onClick={() => setSpotlight('all')}>Clear spotlight</button>}</div>
 
     <div className="lab-section-caption"><span>THE UNOFFICIAL HARDWARE</span><span>Every award comes with receipts</span></div>

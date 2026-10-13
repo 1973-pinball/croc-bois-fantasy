@@ -1,10 +1,12 @@
 import { z } from 'zod';
 import { authenticatedClient, json, readJson, rpcError, sameOrigin } from '@/lib/supabase/http';
+import { paymentRpcAssignments, reassignPaymentsSchema } from '@/lib/keeper-payment-contract';
 
 const uuid = z.string().uuid();
 const actionSchema = z.discriminatedUnion('action', [
   z.object({ action: z.literal('save'), seasonId: uuid, franchiseId: uuid, expectedRevision: z.number().int().min(0), assignments: z.array(z.object({ playerId: z.number().int().positive().max(Number.MAX_SAFE_INTEGER), pickId: uuid }).strict()).max(30) }).strict(),
   z.object({ action: z.enum(['submit', 'approve', 'reject', 'lock']), submissionId: uuid, expectedRevision: z.number().int().positive(), note: z.string().max(2000).optional() }).strict(),
+  reassignPaymentsSchema,
 ]);
 
 export async function GET(request: Request) {
@@ -26,6 +28,8 @@ export async function POST(request: Request) {
   const body = parsed.data;
   const result = body.action === 'save'
     ? await auth.client.rpc('save_keeper_submission', { p_season: body.seasonId, p_franchise: body.franchiseId, p_expected_revision: body.expectedRevision, p_assignments: body.assignments.map((a) => ({ player_id: a.playerId, pick_id: a.pickId })) })
-    : await auth.client.rpc('transition_keeper_submission', { p_submission: body.submissionId, p_expected_revision: body.expectedRevision, p_action: body.action, p_note: body.note ?? null });
+    : body.action === 'reassign_payments'
+      ? await auth.client.rpc('reassign_keeper_payments', { p_submission: body.submissionId, p_expected_revision: body.expectedRevision, p_assignments: paymentRpcAssignments(body.assignments), p_note: body.note })
+      : await auth.client.rpc('transition_keeper_submission', { p_submission: body.submissionId, p_expected_revision: body.expectedRevision, p_action: body.action, p_note: body.note ?? null });
   return result.error ? rpcError(result.error) : json({ submission: result.data });
 }

@@ -18,7 +18,7 @@ export const tradeComposerDraftSchema = z.object({
     z.object({ ...draftTeam, kind: z.literal('pick'), pickId: z.string() }),
     z.object({ ...draftTeam, kind: z.literal('obligation'), obligationKind: z.enum(['loan_return', 'conditional_pick', 'espn_action', 'other']), terms: z.string().max(10000), dueAt: z.string().nullable() }),
   ])).max(100),
-  kind: z.enum(['player', 'pick', 'obligation']), fromTeam: z.string(), toTeam: z.string(), assetId: z.string(),
+  kind: z.enum(['player', 'pick', 'obligation']), fromTeam: z.string(), toTeam: z.string(), assetId: z.string(), pickYear: z.string().optional(),
   obligationKind: z.enum(['loan_return', 'conditional_pick', 'espn_action', 'other']), obligationTerms: z.string().max(10000), dueAt: z.string(),
   correctsTradeId: z.string().uuid().nullable(),
 });
@@ -33,6 +33,7 @@ export function serializeTradeDraft(input: {
   seasonId: string; category: TradeCategory; terms: string; legs: TradeDraftLeg[];
   data: Pick<LeagueData, 'teams' | 'players' | 'picks'>;
   franchiseIds: Record<string, string>; usedPickIds: string[];
+  draftYear?: number; pickParticipantIds?: Record<string, number[]>;
 }) {
   if (input.legs.length < 1 || input.legs.length > 100) throw new Error('Add between 1 and 100 player, pick, or obligation entries.');
   if (input.terms.length > 10000) throw new Error('Trade terms must be 10,000 characters or fewer.');
@@ -54,7 +55,8 @@ export function serializeTradeDraft(input: {
       seen.add(key); players.push({ playerId: leg.playerId, fromFranchiseId, toFranchiseId });
     } else if (leg.kind === 'pick') {
       const pick = input.data.picks.find(p => p.id === leg.pickId);
-      if (!pick || pick.ownerTeamId !== leg.fromTeamId || input.usedPickIds.includes(pick.id)) throw new Error('A selected pick is no longer available to the sending team. Reload the league and review that entry.');
+      if (!pick || pick.ownerTeamId !== leg.fromTeamId || input.usedPickIds.includes(pick.id) || (input.draftYear !== undefined && pick.season < input.draftYear)) throw new Error('A selected pick is no longer available to the sending team. Reload the league and review that entry.');
+      if (input.pickParticipantIds && (!input.pickParticipantIds[pick.season]?.includes(leg.fromTeamId) || !input.pickParticipantIds[pick.season]?.includes(leg.toTeamId))) throw new Error('Both teams must participate in the selected pick’s draft season.');
       const key = `pick:${leg.pickId}`;
       if (seen.has(key)) throw new Error('Each pick can appear only once in a trade.');
       seen.add(key); picks.push({ pickId: leg.pickId, fromFranchiseId, toFranchiseId });

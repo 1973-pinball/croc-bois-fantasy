@@ -84,11 +84,16 @@ test('schedule changes require commissioner authority, valid values and current 
   assert.equal(audit.length, 1); assert.equal(audit[0].detail.previous.keeper_deadline, null); assert.equal(audit[0].detail.updated.schedule_revision, 1);
   await db.query('select public.open_keeper_selection($1,$2)', [season, 'Verified season setup.']);
   await asUser(owner);
+  await rejects(() => db.query('select public.save_keeper_submission($1,$2,0,$3::jsonb)', [season, teams[0], '[]']), /keeper deadline has passed/);
+  await asUser(commissioner);
+  assert.equal((await readiness()).phase, 'keeper_selection');
+  assert.equal((await readiness()).keepersRevealedAt, null);
+  await schedule(1, null, null, null);
+  assert.equal((await readiness()).keeperDeadline, null);
+  await asUser(owner);
   await db.query('select public.save_keeper_submission($1,$2,0,$3::jsonb)', [season, teams[0], '[]']);
   await asUser(commissioner);
   assert.equal((await readiness()).teams.find(t => t.franchiseId === teams[0])?.status, 'draft');
-  await schedule(1, null, null, null);
-  assert.equal((await readiness()).keeperDeadline, null);
 }));
 
 test('empty keeper submissions progress through readiness and reveal only after the final lock', () => isolated(async () => {

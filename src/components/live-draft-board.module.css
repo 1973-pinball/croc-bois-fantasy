@@ -12,6 +12,20 @@
 .summary dd { font-family: var(--heading); font-size: 25px; margin: 0; color: var(--green); }
 .layout { padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) 374px; gap: 20px; align-items: start; }
 .boardArea { min-width: 0; }
+.clockPanel { display: grid; grid-template-columns: minmax(150px, 1fr) auto; gap: 16px 24px; align-items: center; margin-bottom: 20px; padding: 20px; border: 1px solid #becfb2; border-radius: 7px; background: #edf2e6; }
+.clockReadout { display: flex; flex-direction: column; gap: 6px; }
+.clockReadout > span { font-size: 12px; color: #526247; }
+.clockReadout > strong { font-family: var(--heading); font-size: 48px; font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: 1px; color: var(--green); }
+.clockReadout > .clockUrgent { color: #a53f20; }
+.clockControls { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: flex-end; gap: 12px; }
+.clockControls :global(.button) { min-height: 44px; white-space: nowrap; font-size: 12px; }
+.timerSetting { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 8px; }
+.timerSetting label { display: flex; flex-direction: column; gap: 6px; color: #526247; font-size: 12px; }
+.timerSetting input { width: 105px; min-height: 44px; border: 1px solid #bec9b5; border-radius: 5px; color: var(--ink); background: var(--surface); padding: 10px; font-size: 14px; }
+.timerSetting input:disabled { color: #526247; opacity: 1; }
+.timerDuration { align-self: center; font-size: 12px; color: #526247; }
+.clockHelp { grid-column: 1 / -1; margin: 0; font-size: 12px; color: #526247; line-height: 1.7; }
+.clockError { grid-column: 1 / -1; margin: 0; color: #895d3e; font-size: 12px; line-height: 1.7; }
 .sidePanel { min-width: 0; position: sticky; top: 88px; border: 1px solid var(--line); border-radius: 7px; background: #f7f8f0; overflow: hidden; }
 .sidePanelBody { max-height: min(920px, calc(100svh - 180px)); overflow-y: auto; scrollbar-gutter: stable; }
 .rosterLoading { padding: 20px 16px; font-size: 14px; line-height: 1.7; color: var(--muted); }
@@ -144,6 +158,26 @@
 .playerRow { flex: 1; min-width: 0; border-bottom: 0; }
 .shortlistButton { min-width: 44px; min-height: 44px; align-self: stretch; border-left: 1px solid var(--line); color: var(--green); background: var(--surface); font-size: 22px; }
 .shortlistButton[aria-pressed='true'] { background: #f6ebce; color: #755114; }
+.queueAddButton { flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 3px; min-width: 44px; min-height: 44px; border-left: 1px solid var(--line); background: var(--surface); color: var(--green); }
+.queueAddButton > span { font-size: 22px; }
+.queueAddButton > small { font-size: 10px; }
+.queueAddButton[aria-pressed='true'] { background: #e3edda; }
+.queueAddButton:disabled { opacity: .45; }
+.queueTeam { margin: 16px 0 0; color: var(--green); font-weight: 600; font-size: 14px; }
+.queueList { margin: 0 0 18px; padding: 0; list-style: none; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; }
+.queueList:empty { display: none; }
+.queueList li { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; padding: 8px; border-bottom: 1px solid var(--line); background: var(--surface); }
+.queueList li:first-child { background: #edf2e6; }
+.queueList li:last-child { border-bottom: 0; }
+.queuePosition { min-width: 22px; color: #526247; font-family: var(--heading); font-size: 18px; text-align: center; }
+.queuePlayer { flex: 1; min-width: 140px; display: flex; flex-direction: column; gap: 6px; min-height: 44px; padding: 5px; color: var(--ink); background: transparent; text-align: left; }
+.queuePlayer strong { font-size: 14px; }
+.queuePlayer small { font-size: 12px; line-height: 1.5; color: var(--muted); }
+.queueActions { display: flex; margin-left: auto; gap: 3px; }
+.queueActions button { min-width: 44px; min-height: 44px; border: 1px solid var(--line); border-radius: 4px; color: var(--green); background: var(--surface); font-size: 18px; }
+.queueActions button:disabled { opacity: .4; }
+.queueError { margin: 14px 0; padding: 12px; color: #895d3e; background: #fbefe4; border: 1px solid #e3c9b6; border-radius: 5px; font-size: 12px; line-height: 1.7; }
+.queueError button { display: block; min-height: 44px; }
 .panel :is(button, input, select, textarea):focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
 .presenting { background: var(--surface); overflow: auto; padding: 20px; margin: 0; border-radius: 0; }
 .presenting .layout { display: grid; grid-template-columns: minmax(0, 1fr); }
@@ -162,3 +196,4 @@
 @media (max-width: 1100px) { .layout { grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 16px; } .sidePanel { position: static; } .sidePanelBody { max-height: 640px; } .summary { flex-wrap: wrap; } }
 @media (max-width: 850px) { .playerPanel { padding: 20px; } .boardScroll { max-height: 640px; } .summary { padding: 18px; } .summary dl { gap: 24px; } .legend small { margin-left: 0; } }
 @media (max-width: 440px) { .layout { padding: 12px; } .orderFields, .readOnlyOrder { grid-template-columns: minmax(0, 1fr); } .playerPanel { padding: 16px; } .summary strong { font-size: 13px; } }
+@media (max-width: 700px) { .clockPanel { grid-template-columns: 1fr; padding: 16px; } .clockControls { justify-content: flex-start; } .clockReadout > strong { font-size: 42px; } }

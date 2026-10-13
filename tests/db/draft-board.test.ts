@@ -37,6 +37,14 @@ async function board(): Promise<DraftBoard> { return draftBoardSchema.parse((awa
 async function change(action: string, revision: number | null, pick: string | null = null, player: number | null = null, order: string[] | null = null, note: string | null = 'Verified commissioner change.'): Promise<DraftBoard> {
   return draftBoardSchema.parse((await db.query<{ value: unknown }>('select public.update_draft_board($1,$2,$3,$4::uuid[],$5,$6,$7) as value', [season, revision, action, order, pick, player, note])).rows[0].value);
 }
+async function startDraft(value: DraftBoard): Promise<DraftBoard> {
+  return draftBoardSchema.parse((await db.query<{ value: unknown }>("select public.control_draft_clock($1,$2,'start',null) as value", [season, value.revision])).rows[0].value);
+}
+// Reads contain a fresh server timestamp and countdown; ledger comparisons retain the fixed deadline.
+function ledger(value: DraftBoard) {
+  const { serverNow: _serverNow, remainingSeconds: _remainingSeconds, ...clock } = value.clock;
+  return { ...value, clock };
+}
 async function trade(players: unknown[] = [], picks: unknown[] = [], obligations: unknown[] = []) {
   return (await db.query<{ id: string }>('select public.create_trade($1,$2,$3,$4::jsonb,$5::jsonb,$6::jsonb) as id', [season, picks.length || obligations.length ? 'advanced' : 'player_only', 'Reviewed trade fixture', JSON.stringify(players), JSON.stringify(picks), JSON.stringify(obligations)])).rows[0].id;
 }
@@ -67,10 +75,12 @@ async function openDraft(keep = false) {
 }
 
 test('database catalog matches the reviewed ESPN artifact and its import is inaccessible to browser roles', () => isolated(async () => {
-  const catalog = JSON.parse(await readFile(new URL('../../data/draft-player-catalog.json', import.meta.url), 'utf8')) as { source: { sha256: string }; espnSeasonId: number; players: { id: number; name: string; selectable: boolean }[] };
+  const catalog = JSON.parse(await readFile(new URL('../../data/draft-player-catalog.json', import.meta.url), 'utf8')) as { source: { sha256: string }; espnSeasonId: number; players: { id: number; name: string; selectable: boolean; rank: number | null }[] };
   const saved = (await db.query<{ player_id: number; full_name: string; selectable: boolean }>('select player_id,full_name,selectable from public.draft_player_catalog where source_sha256=$1 and source_season=$2 order by player_id', [catalog.source.sha256, catalog.espnSeasonId])).rows;
   assert.deepEqual(saved, [...catalog.players].sort((a, b) => a.id - b.id).map(p => ({ player_id: p.id, full_name: p.name, selectable: p.selectable })));
   assert.equal(saved.length, 1095);
+  const rankings = (await db.query<{ player_id: number; espn_rank: number | null }>('select player_id,espn_rank from private.draft_player_rankings where source_sha256=$1 and source_season=$2 order by player_id', [catalog.source.sha256, catalog.espnSeasonId])).rows;
+  assert.deepEqual(rankings, [...catalog.players].sort((a, b) => a.id - b.id).map(p => ({ player_id: p.id, espn_rank: p.rank })));
   for (const role of ['anon', 'authenticated']) {
     assert.equal((await db.query<{ allowed: boolean }>("select has_function_privilege($1,'private.import_draft_player_catalog(jsonb,text,integer)','EXECUTE') as allowed", [role])).rows[0].allowed, false);
   }
@@ -121,17 +131,17 @@ test('draft requires reveal and complete order, uses current traded owner, and c
   await db.exec('reset role');
   await db.query('update public.draft_picks set current_owner_id=$2 where id=$1', [value.picks[0].id, teams[5]]);
   await asUser(commissioner);
-  value = await board(); assert.equal(value.nextPickId, value.picks[0].id);
-  await rejects(() => change('record', 1, value.picks[1].id, candidates[0]), /next available/);
-  await rejects(() => change('record', 1, value.picks[0].id, 999999999), /verified ESPN catalog/);
-  await rejects(() => change('record', 1, value.picks[0].id, candidates[3]), /verified ESPN catalog/);
-  value = await change('record', 1, value.picks[0].id, candidates[0], null, null);
-  assert.equal(value.revision, 2); assert.equal(value.orderLocked, true); assert.equal(value.picks[0].status, 'selected'); assert.equal(value.picks[0].currentOwnerId, teams[5]);
+  value = await startDraft(await board()); assert.equal(value.nextPickId, value.picks[0].id);
+  await rejects(() => change('record', 2, value.picks[1].id, candidates[0]), /next available/);
+  await rejects(() => change('record', 2, value.picks[0].id, 999999999), /verified ESPN catalog/);
+  await rejects(() => change('record', 2, value.picks[0].id, candidates[3]), /verified ESPN catalog/);
+  value = await change('record', 2, value.picks[0].id, candidates[0], null, null);
+  assert.equal(value.revision, 3); assert.equal(value.orderLocked, true); assert.equal(value.picks[0].status, 'selected'); assert.equal(value.picks[0].currentOwnerId, teams[5]);
   assert.equal(value.picks[0].playerName, 'Verified player 1'); assert.equal(value.nextPickId, value.picks[1].id);
   await rejects(() => change('record', 1, value.picks[1].id, candidates[1]), /draft board changed/);
-  await rejects(() => change('record', 2, value.picks[0].id, candidates[1]), /already used/);
-  await rejects(() => change('record', 2, value.picks[1].id, candidates[0]), /already kept or drafted/);
-  await rejects(() => change('set_order', 2, null, null, [...teams].reverse()), /fixed after/);
+  await rejects(() => change('record', 3, value.picks[0].id, candidates[1]), /already used/);
+  await rejects(() => change('record', 3, value.picks[1].id, candidates[0]), /already kept or drafted/);
+  await rejects(() => change('set_order', 3, null, null, [...teams].reverse()), /fixed after/);
   await db.exec('reset role');
   assert.equal((await db.query<{ franchise_id: string }>('select franchise_id from public.live_draft_selections where voided_at is null')).rows[0].franchise_id, teams[5]);
   assert.deepEqual((await db.query('select season_id,player_id,franchise_id,source_snapshot_id from public.player_ownerships order by player_id')).rows, baseline.rows);
@@ -144,22 +154,23 @@ test('reveal exposes only finalized keepers, prevents duplicate players and keep
   let value = await change('set_order', 0, null, null, teams);
   const keptPick = value.picks.find(p => p.id === keeper.pick_id)!;
   assert.equal(keptPick.status, 'keeper'); assert.equal(keptPick.playerId, keeper.player_id);
-  for (const action of ['record', 'undo', 'correct']) await rejects(() => change(action, 1, keeper.pick_id, action === 'undo' ? null : candidates[0]), /keeper picks are immutable/);
-  await rejects(() => change('record', 1, value.nextPickId, keeper.player_id), /already kept or drafted/);
+  value = await startDraft(value);
+  for (const action of ['record', 'undo', 'correct']) await rejects(() => change(action, 2, keeper.pick_id, action === 'undo' ? null : candidates[0]), /keeper picks are immutable/);
+  await rejects(() => change('record', 2, value.nextPickId, keeper.player_id), /already kept or drafted/);
   const pick = value.nextPickId!;
-  value = await change('record', 1, pick, candidates[0]);
+  value = await change('record', 2, pick, candidates[0]);
   const originalSelection = value.picks.find(p => p.id === pick)!.selectionId;
-  await rejects(() => change('correct', 2, pick, keeper.player_id), /already kept or drafted/);
-  value = await change('correct', 2, pick, candidates[1]);
+  await rejects(() => change('correct', 3, pick, keeper.player_id), /already kept or drafted/);
+  value = await change('correct', 3, pick, candidates[1]);
   assert.equal(value.picks.find(p => p.id === pick)!.playerId, candidates[1]);
   assert.notEqual(value.picks.find(p => p.id === pick)!.selectionId, originalSelection);
-  value = await change('undo', 3, pick);
-  assert.equal(value.revision, 4); assert.equal(value.nextPickId, pick);
+  value = await change('undo', 4, pick);
+  assert.equal(value.revision, 5); assert.equal(value.nextPickId, pick);
   assert.equal(value.orderLocked, true);
-  await rejects(() => change('set_order', 4, null, null, [...teams].reverse()), /fixed after/);
+  await rejects(() => change('set_order', 5, null, null, [...teams].reverse()), /fixed after/);
   assert.equal(value.picks.find(p => p.id === pick)!.status, 'available'); assert.equal(value.picks.find(p => p.id === pick)!.playerId, null);
   assert.equal(value.picks.find(p => p.id === keeper.pick_id)!.status, 'keeper');
-  value = await change('record', 4, pick, candidates[0]); assert.equal(value.revision, 5);
+  value = await change('record', 5, pick, candidates[0]); assert.equal(value.revision, 6);
   await db.exec('reset role');
   const history = (await db.query<{ player_id: number; voided_at: string | null }>('select player_id,voided_at from public.live_draft_selections order by created_revision')).rows;
   assert.equal(history.length, 3); assert.ok(history[0].voided_at); assert.ok(history[1].voided_at); assert.equal(history[2].voided_at, null);
@@ -180,18 +191,19 @@ test('incomplete inventory and closed phases cannot accept order or draft writes
 test('failed correction rolls back every ledger field and cannot leak partially changed picks', () => isolated(async () => {
   await openDraft();
   let value = await change('set_order', 0, null, null, teams);
-  value = await change('record', 1, value.nextPickId, candidates[0]);
+  value = await startDraft(value);
+  value = await change('record', 2, value.nextPickId, candidates[0]);
   const firstPick = value.picks[0].id;
-  value = await change('record', 2, value.nextPickId, candidates[1]);
+  value = await change('record', 3, value.nextPickId, candidates[1]);
   const unchanged = value;
-  await rejects(() => change('correct', 3, firstPick, candidates[1]), /already kept or drafted/);
-  assert.deepEqual(await board(), unchanged);
+  await rejects(() => change('correct', 4, firstPick, candidates[1]), /already kept or drafted/);
+  assert.deepEqual(ledger(await board()), ledger(unchanged));
   await db.exec('reset role');
   assert.equal((await db.query('select 1 from public.live_draft_selections where voided_at is not null')).rows.length, 0);
   assert.equal((await db.query("select 1 from public.audit_events where event_type='draft_selection_corrected'")).rows.length, 0);
   await db.query("update public.seasons set phase='in_season' where id=$1", [season]);
   await asUser(commissioner);
-  await rejects(() => change('undo', 3, firstPick), /after every keeper/);
+  await rejects(() => change('undo', 4, firstPick), /after every keeper/);
 }));
 
 test('an unrevealed used pick never exposes a private keeper status or player', () => isolated(async () => {
@@ -217,11 +229,12 @@ test('keeper reveal blocks both new player trades and pre-reveal queued transfer
   await openDraft();
   let value = await change('set_order', 0, null, null, teams);
   assert.notEqual(value.picks[0].currentOwnerId, former.franchise_id);
-  value = await change('record', 1, value.nextPickId, former.player_id);
+  value = await startDraft(value);
+  value = await change('record', 2, value.nextPickId, former.player_id);
   const before = await db.query('select player_id,franchise_id from public.player_ownerships order by player_id');
   await rejects(() => trade([leg]), /Player trades pause after keeper reveal/);
   await rejects(() => db.query('select public.finalize_trade($1)', [queued]), /Player trades pause after keeper reveal/);
-  assert.deepEqual(await board(), value);
+  assert.deepEqual(ledger(await board()), ledger(value));
   assert.deepEqual((await db.query('select player_id,franchise_id from public.player_ownerships order by player_id')).rows, before.rows);
   assert.equal((await db.query<{ status: string }>('select status from public.trades where id=$1', [queued])).rows[0].status, 'proposed');
   await db.exec('reset role');
@@ -241,14 +254,15 @@ test('post-reveal pick trades retain review and used-pick guards, invalidate sta
   value = await board();
   assert.equal(value.revision, 2); assert.equal(value.picks[0].currentOwnerId, recipient); assert.equal(value.picks[1].currentOwnerId, recipient);
   await rejects(() => change('record', 1, first.id, candidates[0]), /draft board changed/);
-  value = await change('record', 2, first.id, candidates[0]);
+  value = await startDraft(value);
+  value = await change('record', 3, first.id, candidates[0]);
   assert.equal(value.picks[0].currentOwnerId, recipient);
   const used = await trade([], [{ pick_id: first.id, from_franchise_id: recipient, to_franchise_id: teams[4] }]);
   await matureTrade(used); await rejects(() => db.query('select public.finalize_trade($1)', [used]), /no longer available/);
-  assert.equal((await board()).revision, 3);
+  assert.equal((await board()).revision, 4);
   const obligation = await trade([], [], [{ from_franchise_id: teams[0], to_franchise_id: teams[1], kind: 'other', terms: 'Non-player obligation retained.' }]);
   await matureTrade(obligation); await db.query('select public.finalize_trade($1)', [obligation]);
-  assert.equal((await board()).revision, 3);
+  assert.equal((await board()).revision, 4);
 }));
 
 test('a finalized future pick transfer increments the future draft revision without rebasing an unaffected current draft', () => isolated(async () => {

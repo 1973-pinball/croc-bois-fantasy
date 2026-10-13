@@ -32,6 +32,6 @@ export async function GET() {
     }
     const live = buildLiveDraftPickGrids({ seasons, rules, franchises, participants, picks, referenceTeams: leagueData.teams });
     const liveYears = new Set(live.map(s => s.year));
-    return json({ source: 'supabase', seasons: [...buildReferencePickGrids(leagueData).filter(s => !liveYears.has(s.year)), ...live].sort((a, b) => a.year - b.year) });
+    return json({ source: 'supabase', usedPickIds: picks.filter(pick => pick.status === 'used').map(pick => pick.id), seasons: [...buildReferencePickGrids(leagueData).filter(s => !liveYears.has(s.year)), ...live].sort((a, b) => a.year - b.year) });
   } catch { return unavailable(); }
 }

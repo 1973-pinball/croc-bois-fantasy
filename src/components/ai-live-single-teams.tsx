@@ -1,0 +1,51 @@
+'use client';
+
+import { useId, useState } from 'react';
+import type { AiLeagueRun, AiStanding } from '@/lib/ai-league-types';
+import type { LeagueData } from '@/lib/types';
+import styles from './ai-single-team-replays.module.css';
+
+const signed = (value: number) => value > 0 ? `+${value}` : value < 0 ? `−${Math.abs(value)}` : '0';
+const record = (row?: AiStanding) => row?.played ? `${row.wins}–${row.losses}–${row.ties}` : 'Awaiting games';
+const time = (value: string) => new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York', timeZoneName: 'short' }).format(new Date(value));
+
+export function AiLiveSingleTeams({ mode, run, league, teamId, onTeamChange }: { mode: 'post_draft' | 'redraft'; run: AiLeagueRun; league: LeagueData; teamId: string; onTeamChange: (value: string) => void }) {
+  const heading = useId(), state = run.liveSingles;
+  const [page, setPage] = useState(1);
+  const name = (id: string) => league.teams.find(team => String(team.id) === id)?.name ?? id;
+  const players = new Map([...(run.initialPlayers ?? []), ...run.players, ...(state?.players ?? [])].map(player => [player.id, player.name]));
+  const playerName = (id: number) => players.get(id) ?? `Player ${id}`;
+  const scenarios = state?.scenarios.filter(scenario => scenario.mode === mode) ?? [];
+  const selected = scenarios.find(scenario => scenario.teamId === teamId) ?? scenarios[0];
+  const actual = (id: string) => state?.baseline.standings.find(row => row.teamId === id);
+  const simulated = (id: string) => scenarios.find(scenario => scenario.teamId === id)?.standings.find(row => row.teamId === id);
+  const verified = Boolean(state && !state.missedDates.length && !state.baselineIssues.length);
+  const comparable = (id: string) => verified && Boolean(actual(id)?.played) && actual(id)?.played === simulated(id)?.played && state!.baseline.results.filter(result => result.complete && !result.playoff).every(result => state!.verifiedPeriods.includes(result.period));
+  const rosterDecisions = selected?.decisions.filter(decision => decision.kind !== 'lineup' && decision.kind !== 'draft').slice().reverse() ?? [];
+  const pages = Math.max(1, Math.ceil(rosterDecisions.length / 8)), currentPage = Math.min(page, pages);
+  const latestLineup = selected?.lineups.at(-1);
+  const draft = selected?.decisions.filter(decision => decision.kind === 'draft') ?? [];
+  const status = state?.status === 'complete' ? 'Complete' : state?.status === 'needs_data' ? 'Coverage gap' : state?.status === 'active' ? 'In progress' : state?.ownerDraft ? 'Ready for opening day' : 'Waiting for the real draft';
+  return <section className={styles.section} aria-labelledby={heading}>
+    <div className={styles.heading}><p className={styles.eyebrow}>EIGHT INDEPENDENT LIVE EXPERIMENTS · 2026–27</p><h3 id={heading}>{mode === 'post_draft' ? 'Your real draft. An AI season.' : 'One AI draft. One live AI manager.'}</h3><p>{mode === 'post_draft' ? 'Each franchise starts with its completed real draft roster. AI manages that team’s daily lineups and pickups.' : 'After the real draft is complete, AI redrafts one franchise in its actual pick slots, then manages that team all season.'} Each experiment keeps the other seven owners’ actual daily lineups.</p></div>
+    <div className={styles.coverage}><span>{status}</span><span>{state?.scoredDates.length ?? 0} dates scored</span><span>{state?.verifiedPeriods.length ?? 0} owner matchup periods verified</span></div>
+    {state?.error && <p className={styles.notice} role="status">{state.error}</p>}
+    {!state?.ownerDraft ? <div className={styles.notice}><h4>No one-team draft results yet</h4><p>{state?.message ?? 'These two variations need the complete real 2026 draft: all 104 selections, including revealed keepers and traded pick slots. They will initialize through the scheduled source refresh after that board is complete.'}</p><p>The whole-league AI draft is already available in the first variation. No real owner selections, games or champion are assumed here.</p></div> : <>
+      {mode === 'redraft' && <p className={styles.constraint}>The seven owners’ completed real draft choices are reserved. AI chooses from the remaining pool in each controlled team’s actual slots, including keeper slots. This constraint is shared with the historical replay.</p>}
+      <p className={styles.note}>{state.message} Only completed regular-season matchup periods enter the records below.</p>
+      {state.missedDates.length > 0 && <p className={styles.constraint}>Missed first-tipoff locks: {state.missedDates.join(', ')}. These dates are never recreated after the games.</p>}
+      <div className={styles.tableScroll} role="region" tabIndex={0} aria-label="Live single-team results"><table className={styles.results}><caption className="visually-hidden">Eight separate live experiments. Each row automates only the named franchise.</caption><thead><tr><th scope="col">One AI franchise</th><th scope="col">Actual W–L–T</th><th scope="col">AI W–L–T</th><th scope="col">Win change</th><th scope="col">Champion</th></tr></thead><tbody>{scenarios.map(scenario => <tr key={scenario.teamId} className={selected?.teamId === scenario.teamId ? styles.selected : undefined}><th scope="row"><button type="button" aria-pressed={selected?.teamId === scenario.teamId} onClick={() => { setPage(1); onTeamChange(scenario.teamId); }}>{name(scenario.teamId)}</button></th><td>{record(actual(scenario.teamId))}</td><td>{record(simulated(scenario.teamId))}</td><td>{comparable(scenario.teamId) ? signed(simulated(scenario.teamId)!.wins - actual(scenario.teamId)!.wins) : '—'}</td><td>{scenario.status === 'complete' && scenario.champion ? name(scenario.champion) : 'Season unfinished'}</td></tr>)}</tbody></table></div>
+      <p className={styles.note}>Each row is a separate season. These eight AI franchises do not play one another.</p>
+      {selected && <>
+        <div className={styles.teamHeading}><div><p className={styles.eyebrow}>INSIDE THIS LIVE EXPERIMENT</p><h4>{name(selected.teamId)}</h4><p>{selected.status === 'complete' && selected.champion ? `Simulated champion: ${name(selected.champion)}` : 'Follow the saved roster and decisions as the season unfolds.'}</p></div><label>Automated franchise<select aria-label="Automated franchise in live experiment" value={selected.teamId} onChange={event => { setPage(1); onTeamChange(event.target.value); }}>{state.teams.map(team => <option key={team.id} value={team.id}>{name(team.id)}</option>)}</select></label></div>
+        <div className={styles.summary}><div><span>COMPLETED CATEGORY WIN CHANGE</span><strong>{comparable(selected.teamId) ? signed(simulated(selected.teamId)!.wins - actual(selected.teamId)!.wins) : '—'}</strong><p>Compared only after owner totals are verified.</p></div><div><span>AI PICKUPS / OWNER CLAIMS</span><strong>{selected.acquisitions} / {selected.forcedReturns}</strong><p>Owner claims take priority at the next daily lock.</p></div><div><span>DAILY LINEUPS SAVED</span><strong>{selected.lineups.length}</strong><p>{latestLineup ? `Latest: ${time(latestLineup.decidedAt)}` : 'Waiting for the first scoring date.'}</p></div></div>
+        {mode === 'redraft' && <div className={styles.draft}><div className={styles.subheading}><h5>This team’s AI draft results</h5><span>{draft.length} actual pick slots</span></div><ol>{draft.map(decision => <li key={decision.id}><span>#{decision.overallPick}<small>Round {decision.round}</small></span><div><strong>{decision.playerIds.map(playerName).join(', ')}</strong><small>Owner: {state.ownerDraft?.find(pick => pick.overallPick === decision.overallPick)?.name ?? 'Unavailable'}</small></div></li>)}</ol></div>}
+        <div className={styles.rosters}><details><summary>{mode === 'post_draft' ? 'Real draft roster' : 'AI draft roster'} · {selected.initialRoster.length} players</summary><ul>{selected.initialRoster.map(id => <li key={id}>{playerName(id)}</li>)}</ul></details><details><summary>Current AI roster · {selected.finalRoster.length} players</summary><ul>{selected.finalRoster.map(id => <li key={id}>{playerName(id)}</li>)}</ul></details></div>
+        {latestLineup && <details className={styles.fixed}><summary>Latest saved lineup · {latestLineup.date}</summary><p>Decision saved {time(latestLineup.decidedAt)}.</p><ul>{latestLineup.slots.map(slot => <li key={slot.playerId}>{playerName(slot.playerId)}</li>)}</ul></details>}
+        <div className={styles.changes}><div className={styles.subheading}><h5>What AI changed</h5><span>{rosterDecisions.length} roster decisions</span></div>{rosterDecisions.length ? <ol>{rosterDecisions.slice((currentPage - 1) * 8, currentPage * 8).map(decision => <li key={decision.id}><div><span>{decision.kind === 'forced_return' ? 'Owner claim' : decision.kind === 'initial_drop' ? 'Opening roster cut' : 'AI pickup'}</span><time>{decision.date}</time></div><strong>{decision.playerIds.map(playerName).join(', ')}</strong>{decision.droppedId && <p>Dropped {playerName(decision.droppedId)}</p>}<p>{decision.reason}</p></li>)}</ol> : <p>No roster changes are recorded yet.</p>}{pages > 1 && <div className={styles.pagination}><span>{currentPage} / {pages}</span><div><button type="button" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>Previous</button><button type="button" disabled={currentPage === pages} onClick={() => setPage(currentPage + 1)}>Next</button></div></div>}</div>
+      </>}
+    </>}
+    <details className={styles.method}><summary>How the live one-team experiments work</summary><ul>{(state?.limitations ?? ['The complete real draft must be published before either one-team experiment begins.', 'Daily decisions are saved before first tipoff. Missed locks remain gaps; no future outcomes are used to reconstruct decisions.', 'The existing whole-league AI experiment remains independent.']).map((item, index) => <li key={index}>{item}</li>)}</ul>{Boolean(state?.baselineIssues.length) && <ul>{state!.baselineIssues.map(issue => <li key={issue}>{issue}</li>)}</ul>}</details>
+    {state && <p className={styles.saved}>Saved {time(state.updatedAt)}{state.draftCapturedAt && <> · Real draft captured {time(state.draftCapturedAt)}</>} · Source updates daily; page checks every minute.</p>}
+  </section>;
+}

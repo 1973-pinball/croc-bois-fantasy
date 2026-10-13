@@ -22,12 +22,28 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   if (!sameOrigin(request)) return json({ error: 'INVALID_ORIGIN' }, 403);
-  const auth = await authenticatedClient();
-  if ('response' in auth) return auth.response;
   let parsed;
   try { parsed = draftActionSchema.safeParse(await readJson(request)); } catch { return json({ error: 'INVALID_BODY' }, 400); }
   if (!parsed.success) return json({ error: 'INVALID_BODY', message: parsed.error.issues[0]?.message || 'Check the draft change.' }, 400);
   const body = parsed.data;
+  // A tick supplies no pick, player, deadline or clock value. The database alone
+  // decides whether a locked, running turn has expired and selects its next player.
+  if (body.action === 'tick') {
+    const config = getSupabaseConfig();
+    if (!config) return setupResponse();
+    const client = createClient(config.url, config.key, { auth: { persistSession: false, autoRefreshToken: false } });
+    const { data, error } = await client.rpc('tick_draft_clock', { p_season: body.seasonId });
+    return error ? rpcError(error) : boardResponse(data);
+  }
+  const auth = await authenticatedClient();
+  if ('response' in auth) return auth.response;
+  if (body.action === 'configure' || body.action === 'start' || body.action === 'pause' || body.action === 'resume') {
+    const { data, error } = await auth.client.rpc('control_draft_clock', {
+      p_season: body.seasonId, p_expected_revision: body.expectedRevision, p_action: body.action,
+      p_duration_seconds: body.action === 'configure' ? body.durationSeconds : null,
+    });
+    return error ? rpcError(error) : boardResponse(data);
+  }
   const { data, error } = await auth.client.rpc('update_draft_board', {
     p_season: body.seasonId, p_expected_revision: body.expectedRevision, p_action: body.action,
     p_order: body.action === 'set_order' ? body.franchiseIds : null,
