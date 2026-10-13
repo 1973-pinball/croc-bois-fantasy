@@ -1,0 +1,20 @@
+.table { width: 100%; min-width: 1330px; border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
+.table caption { padding: 12px 14px; background: var(--surface); color: var(--muted); text-align: left; line-height: 1.7; }
+.table thead th { background: #edf0e5; color: var(--muted); font-weight: 600; }
+.table th, .table td { padding: 14px; border-bottom: 1px solid var(--line); text-align: right; vertical-align: top; white-space: nowrap; }
+.table tbody th { font-weight: 400; }
+.table th:first-child { position: sticky; left: 0; z-index: 1; min-width: 200px; max-width: 240px; text-align: left; white-space: normal; background: var(--surface); box-shadow: 1px 0 0 var(--line); }
+.table thead th:first-child { z-index: 2; background: #edf0e5; }
+.table tbody tr:last-child > * { border-bottom: 0; }
+.table small { display: block; margin-top: 6px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+.table td > strong { font-size: 15px; }
+.table .overall > strong { font-size: 19px; color: var(--green); }
+.table .selected > * { background: var(--green-light); }
+.table .selected > th:first-child { box-shadow: inset 4px 0 0 var(--green), 1px 0 0 var(--line); }
+.selectedBadge { display: block; width: fit-content; margin-top: 6px; padding: 2px 6px; border: 1px solid var(--green); border-radius: 4px; color: var(--green); font-size: 10px; font-weight: 700; }
+.table .missing, .underdog { color: #9b4c2c; }
+.favored { color: #276643; }
+.valuesTable { min-width: 950px; }
+.valuesTable td > strong { font-size: 13px; }
+.valuesTable abbr { text-decoration: none; cursor: help; }
+@media(max-width: 650px) { .table th, .table td { padding: 12px; } .table th:first-child { min-width: 155px; max-width: 180px; } }

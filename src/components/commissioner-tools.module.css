@@ -1,0 +1,102 @@
+.intro {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.tools {
+  display: grid;
+  gap: 12px;
+}
+
+.tool {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 82px;
+  padding: 18px 23px;
+  border-radius: 8px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.summary:hover {
+  background: var(--green-light);
+}
+
+.summary:focus-visible {
+  outline: 3px solid #c66c32;
+  outline-offset: 3px;
+}
+
+.label {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.title {
+  color: var(--ink);
+  font-family: var(--heading);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.chevron {
+  color: var(--green);
+  flex-shrink: 0;
+}
+
+.tool[open] > .summary {
+  border-bottom: 1px solid var(--line);
+  border-radius: 8px 8px 0 0;
+  background: var(--green-light);
+}
+
+.tool[open] > .summary .chevron {
+  transform: rotate(180deg);
+}
+
+.body {
+  min-width: 0;
+  padding: 16px;
+}
+
+.body > :last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 600px) {
+  .summary {
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .label :global(.eyebrow) {
+    font-size: 11px;
+    letter-spacing: 1.1px;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .body {
+    padding: 10px;
+  }
+}

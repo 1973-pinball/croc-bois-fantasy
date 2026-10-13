@@ -22,11 +22,13 @@ import { useEspnHistory, EspnHistoryNotice, EspnHistorySyncPanel } from './espn-
 import { SeasonReadinessPanel, SeasonScheduleNotice } from './season-readiness';
 import { LiveDraftBoard } from './live-draft-board';
 import { DraftLottery } from './draft-lottery';
+import { CommissionerStrategyTools } from './commissioner-strategy-tools';
 import heroStyles from './overview-hero.module.css';
 import rosterStyles from './roster-density.module.css';
 import commissionerNavStyles from './commissioner-nav.module.css';
+import commissionerToolsStyles from './commissioner-tools.module.css';
 import keeperPoolStyles from './keeper-pool-density.module.css';
-import { usePortalLocation, useViewFocus } from './use-portal-location';
+import { usePortalLocation, useQueryFilter, useViewFocus } from './use-portal-location';
 import type { PortalView as View, RosterSort } from '@/lib/portal-location';
 import { managerLabel, seasonLabel } from '@/lib/display-labels';
 import './portal-navigation.css';
@@ -82,6 +84,16 @@ function Status({ status }: { status: string }) {
   return <span className={'status status-' + status}><span/>{label[status] || status}</span>;
 }
 
+function CommissionerTool({ category, title, children }: { category: string; title: string; children: ReactNode }) {
+  return <details className={commissionerToolsStyles.tool}>
+    <summary className={commissionerToolsStyles.summary}>
+      <span className={commissionerToolsStyles.label}><span className="eyebrow">{category}</span><span className={commissionerToolsStyles.title}>{title}</span></span>
+      <svg className={commissionerToolsStyles.chevron} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </summary>
+    <div className={commissionerToolsStyles.body}>{children}</div>
+  </details>;
+}
+
 type PlayerSortColumn = 'player' | 'team' | 'cost' | 'tenure';
 
 function PlayerTable({ players, showTeam = false, compact = false, sort, setSort }: { players: PlayerPoolPlayer[]; showTeam?: boolean; compact?: boolean; sort: RosterSort; setSort: (sort: RosterSort) => void }) {
@@ -123,6 +135,7 @@ export function LeaguePortal({ report, initialSearch = '' }: { report?: ReactNod
   const location = usePortalLocation(report ? 'audit' : 'overview', initialSearch);
   const { search, tradeSearch, allTeams, draftView } = location;
   const view = report ? 'audit' : location.view;
+  const [commissionerView, setCommissionerView] = useQueryFilter('commissionerView', 'tools');
   useViewFocus(view);
   const commissionerTipId = useId();
   const leagueData = account.data;
@@ -339,12 +352,28 @@ export function LeaguePortal({ report, initialSearch = '' }: { report?: ReactNod
         </>}
 
         {view === 'commissioner' && account.commissioner && <>
-          <PageTitle eyebrow="THE COMMISSIONER’S DESK" title="Commissioner Tools" description="League setup, the draft lottery, keeper reviews, and team access."/>
-          <SeasonReadinessPanel account={account}/><CommissionerTeamAccess account={account}/><EspnHistorySyncPanel account={account} history={espnHistory}/><DraftLottery account={account}/><OfficialReviewPanel account={account}/><TradeWorkspace account={account}/><KeeperProfileReview account={account}/>
+          <PageTitle eyebrow="THE COMMISSIONER’S DESK" title="Commissioner Tools" description="League administration and your private draft and keeper analysis."/>
+          <nav className="draft-view-tabs" aria-label="Commissioner workspaces">{([['tools', 'League administration'], ['draft', 'Draft Tool'], ['keepers', 'Keeper Suggestions']] as const).map(([mode, label]) => <a key={mode} href={location.href({ commissionerView: mode })} aria-current={commissionerView === mode ? 'page' : undefined} onClick={event => { if (event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); setCommissionerView(mode); }}>{label}</a>)}</nav>
+          {commissionerView === 'draft' || commissionerView === 'keepers' ? <CommissionerStrategyTools account={account} view={commissionerView}/> : <>
+          <p className={commissionerToolsStyles.intro}>Expand a tool when you need it. Each tool starts collapsed.</p>
+          <div className={commissionerToolsStyles.tools}>
+          <CommissionerTool category="SEASON READINESS" title="Every team, every step"><SeasonReadinessPanel account={account}/></CommissionerTool>
+          <CommissionerTool category="TEAM ACCESS" title="Team access requests"><CommissionerTeamAccess account={account}/></CommissionerTool>
+          <CommissionerTool category="LEAGUE RECORDS" title="ESPN history"><EspnHistorySyncPanel account={account} history={espnHistory}/></CommissionerTool>
+          <CommissionerTool category="DRAFT-SLOT CHOICE PRIORITY" title="Draft-slot choice lottery"><DraftLottery account={account}/></CommissionerTool>
+          <CommissionerTool category="PRIVATE COMMISSIONER WORKSPACE" title="Official keeper submissions"><OfficialReviewPanel account={account}/></CommissionerTool>
+          <CommissionerTool category="CURRENT SEASON TRADES" title="Trade workspace"><TradeWorkspace account={account}/></CommissionerTool>
+          <CommissionerTool category="KEEPER ELIGIBILITY" title="Review player profiles"><KeeperProfileReview account={account}/></CommissionerTool>
+          <CommissionerTool category="BEFORE THE OPENING TIP" title="Reconciliation queue">
           <div className="info-banner"><Icon name="shield"/><p><strong>Read-only migration review:</strong> These are imported data questions, not private keeper submissions. Sign in and commissioner access are required before any official approval or correction can be recorded.</p></div>
           <div className="review-stats"><div><strong>{leagueData.reviewItems.length}</strong><span>items to reconcile</span></div><div><strong>{eligiblePlayers.length}</strong><span>players marked eligible</span></div><div><strong>{leagueData.players.filter(player => player.status === 'review').length}</strong><span>player records need review</span></div></div>
           <section className="panel review-list"><div className="panel-header"><div><p className="eyebrow">BEFORE THE OPENING TIP</p><h2>Reconciliation queue</h2></div><span className="muted small">Original records remain intact</span></div>{leagueData.reviewItems.map(item => <article className="review-item" key={item.id}><span className="review-item-icon"><Icon name="book"/></span><div><h3>{item.player}</h3><p>{item.detail}</p></div><Status status={item.status}/></article>)}{leagueData.reviewItems.length === 0 && <div className="empty-state">No reconciliation items in this snapshot.</div>}</section>
+          </CommissionerTool>
+          <CommissionerTool category="LEAGUE ACCOUNTS" title="Account setup">
           <section className="setup-callout"><Icon name="lock" size={28}/><div><h2>{account.connection === 'live' ? 'League accounts are connected' : 'The official league workflow comes next'}</h2><p>{account.connection === 'live' ? 'Sign in with your assigned league account to save private keeper drafts. Commissioners can review, approve, return, and lock submitted selections above.' : 'Authenticated team access, hidden keeper submissions, commissioner locking, and trade review will connect here once the league services are configured.'}</p></div><AccountButton account={account} className="button button-green" label="Account setup"/></section>
+          </CommissionerTool>
+          </div>
+          </>}
         </>}
         <footer className="page-footer"><span><Icon name="ball" size={15}/> CROC BOIS FANTASY BASKETBALL</span><span>Roster snapshot: {leagueData.snapshotDate}{account.lastLeagueCheckedAt ? ` · League checked ${new Date(account.lastLeagueCheckedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}` : ''}</span></footer>
       </main>

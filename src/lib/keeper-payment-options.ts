@@ -11,6 +11,8 @@ export type KeeperPaymentOptionsInput = {
   usedPickIds?: string[];
   /** Only keeper-consumed picks being reconciled by this operation; never live draft picks. */
   reusablePickIds?: string[];
+  /** Optimizers need the canonical legal allocation without enumerating UI alternatives. */
+  includeOptions?: boolean;
 };
 
 function paymentPool(input: KeeperPaymentOptionsInput) {
@@ -69,6 +71,7 @@ export function keeperPaymentOptions(input: KeeperPaymentOptionsInput, current: 
   };
   const assignments = complete();
   const options: Record<number, { pickId: string; assignments: PaymentAssignment[] }[]> = {};
+  if (input.includeOptions === false) return { assignments, options };
   for (const keeper of input.keepers) {
     options[keeper.playerId] = pool.slice().sort((a, b) => a.round - b.round || a.id.localeCompare(b.id)).flatMap(pick => {
       const result = complete({ playerId: keeper.playerId, pickId: pick.id });

@@ -1,0 +1,68 @@
+ .root { display: grid; gap: 20px; min-width: 0; }
+ .header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 24px; background: var(--green); color: var(--surface); border-radius: 12px; }
+ .header h2 { font: 700 30px/1.15 var(--heading); margin: 8px 0; }
+ .header p { max-width: 760px; line-height: 1.7; color: #d5e2ce; font-size: 13px; }
+ .badge { display: inline-flex; border: 1px solid #ffffff55; padding: 6px 9px; border-radius: 5px; font-size: 11px; letter-spacing: 1px; white-space: nowrap; }
+ .panel { padding: 22px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); min-width: 0; }
+ .panel h3 { font: 700 23px/1.25 var(--heading); }
+ .panel h4 { margin: 0; }
+ .subtle { color: var(--muted); font-size: 12px; line-height: 1.7; margin-top: 8px; }
+ .toolbar { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 14px; margin: 16px 0; }
+ .toolbar label, .field { display: flex; flex-direction: column; gap: 7px; font-size: 12px; font-weight: 600; min-width: 150px; }
+ .toolbar label:first-child { flex: 1; }
+ .toolbar select, .toolbar input { width: 100%; }
+ .root input:not([type=checkbox]), .root textarea { padding: 11px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); min-height: 44px; font: inherit; }
+ .root textarea { width: 100%; resize: vertical; font-size: 12px; margin-top: 10px; }
+ .root summary { padding: 10px 0; cursor: pointer; font-weight: 600; }
+ .actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 14px; }
+ .notice, .error { padding: 13px 16px; font-size: 12px; line-height: 1.8; border-radius: 7px; background: var(--orange-light); border: 1px solid #e6cbb4; }
+ .error { color: #8b3523; background: #fff0e9; }
+ .notice ul { margin: 7px 0 0; padding-left: 20px; }
+ .status { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+ .status strong { color: var(--green); }
+ .metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+ .metric { padding: 17px; background: var(--green-light); border-radius: 7px; }
+ .metric strong { display: block; font: 700 36px/1.2 var(--heading); color: var(--green); }
+ .metric span { display: block; font-size: 12px; margin-top: 6px; line-height: 1.6; }
+ .recommendations { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+ .recommendation { border-top: 4px solid var(--green); }
+ .recommendation:last-child { border-top-color: var(--orange); }
+ .recommendation h3 { margin: 10px 0 4px; font-size: 27px; }
+ .recommendation ul { color: var(--muted); font-size: 12px; line-height: 1.8; padding-left: 18px; }
+ .recommendation .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+ .gain { color: #276643; font-weight: 700; }
+ .negative { color: #9b4c2c; font-weight: 700; }
+ .tableWrap { overflow: auto; margin-top: 16px; border: 1px solid var(--line); border-radius: 7px; }
+ .table { width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap; }
+ .table th { background: #edf0e5; text-align: left; color: var(--muted); font-weight: 600; }
+ .table th, .table td { padding: 13px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+ .table tr:last-child td { border-bottom: 0; }
+ .table td:first-child, .table th:first-child { position: sticky; left: 0; background: var(--surface); z-index: 1; }
+ .table th:first-child { background: #edf0e5; z-index: 2; }
+ .table small { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; max-width: 260px; white-space: normal; line-height: 1.65; }
+ .table button { background: var(--green-light); color: var(--green); padding: 8px 12px; min-height: 36px; border-radius: 5px; }
+ .candidateTable { min-width: 950px; }
+ .candidateTable td:last-child { min-width: 230px; max-width: 280px; white-space: normal; }
+ .categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(95px, 1fr)); gap: 10px; margin-top: 18px; }
+ .category { border: 1px solid var(--line); border-radius: 7px; padding: 12px; }
+ .category strong { display: block; font-size: 22px; margin: 9px 0; }
+ .category span, .category small { font-size: 11px; color: var(--muted); }
+ .category progress { width: 100%; accent-color: var(--green); height: 6px; }
+ .sourceCards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 17px; }
+ .sourceCard { display: grid; gap: 9px; border: 1px solid var(--line); border-radius: 7px; padding: 14px; }
+ .sourceCard strong { font-size: 12px; }
+ .sourceCard span { color: var(--muted); font-size: 11px; line-height: 1.7; }
+ .sourceCard button { font-size: 12px; min-height: 38px; background: var(--green-light); border-radius: 5px; }
+ .importer { background: #f7f8f1; padding: 16px; margin-top: 16px; border-radius: 7px; border: 1px solid var(--line); }
+ .importer input[type=file] { max-width: 100%; background: transparent; }
+ .keep, .pass { display: inline-block; padding: 5px 8px; border-radius: 5px; font-size: 11px; font-weight: 700; }
+ .keep { background: var(--green-light); color: #245b39; }
+ .pass { background: var(--orange-light); color: #8e512e; }
+ .methodology { line-height: 1.8; font-size: 12px; color: var(--muted); }
+ .methodology ul { padding-left: 20px; }
+ .rosters { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-top: 16px; }
+ .roster { border: 1px solid var(--line); border-radius: 7px; padding: 14px; }
+ .roster h4 { font-size: 13px; }
+ .roster ul { font-size: 12px; line-height: 1.9; padding-left: 18px; margin-bottom: 0; }
+ @media(max-width: 900px) { .sourceCards { grid-template-columns: 1fr 1fr; } }
+ @media(max-width: 650px) { .header { flex-direction: column; padding: 20px; } .panel { padding: 16px; } .metrics { grid-template-columns: 1fr; } .metric strong { font-size: 29px; } .recommendations { grid-template-columns: 1fr; } .toolbar { align-items: stretch; } .toolbar label { width: 100%; } .sourceCards { grid-template-columns: 1fr; } .table th, .table td { padding: 12px; } }

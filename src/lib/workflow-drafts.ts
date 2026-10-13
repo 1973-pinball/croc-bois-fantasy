@@ -1,7 +1,7 @@
 const prefix = 'croc-bois:workflow:v1:';
 type DraftStorage = Pick<Storage, 'length' | 'key' | 'getItem' | 'setItem' | 'removeItem'>;
 
-export function workflowDraftKey(accountId: string, seasonId: string, kind: 'trade' | 'profile', playerId?: number) {
+export function workflowDraftKey(accountId: string, seasonId: string, kind: 'trade' | 'profile' | 'draft-tool', playerId?: number) {
   return `${prefix}${encodeURIComponent(accountId)}:${encodeURIComponent(seasonId)}:${kind}${playerId === undefined ? '' : `:${playerId}`}`;
 }
 
