@@ -27,8 +27,8 @@ test('quoted CSV fields, BOM, CRLF and repeated headers are accepted', () => {
   assert.throws(() => importDraftProjections(options(`${titles}\n"broken`)), /closing quote/);
 });
 
-test('Hashtag pasted TSV recognizes TREB and makes/attempts embedded in percent cells', () => {
-  const result = importDraftProjections({ ...options('PLAYER\tGP\tPTS\tTREB\tAST\tSTL\tBLK\tTO\t3PM\tFG%\tFT%\nNikola Jokic\t70\t28\t12\t10\t1.5\t0.8\t3\t2\t.556 (10/18)\t.750 (6/8)'), source: 'hashtag' });
+test('pasted TSV recognizes TREB and makes/attempts embedded in percent cells', () => {
+  const result = importDraftProjections(options('PLAYER\tGP\tPTS\tTREB\tAST\tSTL\tBLK\tTO\t3PM\tFG%\tFT%\nNikola Jokic\t70\t28\t12\t10\t1.5\t0.8\t3\t2\t.556 (10/18)\t.750 (6/8)'));
   assert.equal(result.players[0].stats.fgm, 10);
   assert.equal(result.players[0].stats.fta, 8);
 });
@@ -61,6 +61,53 @@ test('Basketball Monster short totals headers convert once and remain restricted
   assert.throws(() => importDraftProjections(options(text)), /Missing projection columns/);
 });
 
+const nativeTitles = 'player_id,last_name,first_name,games,minutes,field_goals_attempted,field_goals,free_throws_attempted,free_throws,threes,threes_attempted,offensive_rebounds,defensive_rebounds,assists,blocks,steals,turnovers,comments';
+// Entirely synthetic totals; provider ID intentionally belongs to another ESPN player.
+const nativeLine = '3,Jokic,Nikola,10,300,180,100,80,60,20,50,30,90,100,8,15,30,';
+
+test('native Basketball Monster CSV combines names, derives categories and automatically normalizes season totals', () => {
+  const nativeOptions = { ...options(`${nativeTitles}\n${nativeLine}`), source: 'basketball-monster' as const };
+  const result = importDraftProjections(nativeOptions);
+  assert.equal(result.players[0].id, 1);
+  assert.equal(result.players[0].name, 'Nikola Jokić');
+  assert.equal(result.players[0].games, 10);
+  assert.deepEqual(result.players[0].stats, { pts: 28, reb: 12, ast: 10, stl: 1.5, blk: .8, tov: 3, three: 2, fgm: 10, fga: 18, ftm: 6, fta: 8 });
+  assert.match(result.warnings.join(' '), /season-total export.*automatically/);
+  assert.match(result.warnings.join(' '), /PTS = 2 × field goals \+ threes \+ free throws/);
+  assert.match(result.warnings.join(' '), /REB = offensive rebounds \+ defensive rebounds/);
+  assert.deepEqual(importDraftProjections({ ...nativeOptions, basis: 'totals' }).players, result.players);
+});
+
+test('native detection is provider-specific and rejects mixed units or duplicate stat columns', () => {
+  assert.throws(() => importDraftProjections(options(`${nativeTitles}\n${nativeLine}`)), /Player\/Name or an explicit ESPN ID/);
+  assert.throws(() => importDraftProjections({ ...options(`${nativeTitles},p/g\n${nativeLine},28`), source: 'basketball-monster' }), /Do not mix native.*per-game/);
+  assert.throws(() => importDraftProjections({ ...options(`${nativeTitles},FGM\n${nativeLine},100`), source: 'basketball-monster' }), /More than one fgm column/);
+  assert.throws(() => importDraftProjections({ ...options(`${nativeTitles},first_name\n${nativeLine},Nikola`), source: 'basketball-monster' }), /More than one firstname column/);
+  // Merely splitting a name does not cause an arbitrary table to be treated as season totals.
+  assert.throws(() => importDraftProjections({ ...options('first_name,last_name,GP,PTS,REB,AST,STL,BLK,TO,3PM,FGM,FGA,FTM,FTA\nNikola,Jokic,10,28,12,10,1.5,.8,3,2,10,18,6,8'), source: 'basketball-monster' }), /Player\/Name or an explicit ESPN ID/);
+});
+
+test('native rows retain strict identity checks and warn for incomplete or invalid totals', () => {
+  const invalidRows = [
+    nativeLine.replace('3,Jokic,Nikola,', '1,Unknown,Person,'),
+    nativeLine.replace(',10,300,', ',0,300,'),
+    nativeLine.replace(',30,90,', ',,90,'),
+    nativeLine.replace(',180,100,', ',80,100,'),
+    nativeLine.replace(',Jokic,Nikola,', ',Jokic,,'),
+  ];
+  const result = importDraftProjections({ ...options(`${nativeTitles}\n${invalidRows.join('\n')}\n${nativeLine}`), source: 'basketball-monster' });
+  assert.equal(result.players.length, 1);
+  assert.match(result.warnings.join(' '), /5 rows excluded/);
+  assert.match(result.warnings.join(' '), /unique ESPN ID or full name/);
+  assert.match(result.warnings.join(' '), /positive GP\/Games/);
+  assert.match(result.warnings.join(' '), /Offensive and defensive rebounds/);
+  assert.match(result.warnings.join(' '), /Shooting makes exceed attempts/);
+  assert.match(result.warnings.join(' '), /both first_name and last_name/);
+  assert.throws(() => importDraftProjections({ ...options(`${nativeTitles}\n${nativeLine}`), source: 'basketball-monster', catalog: { ...catalog, players: [...catalog.players, player(9, 'Nikola Jokic')] } }), /unique ESPN ID or full name/);
+  assert.throws(() => importDraftProjections({ ...options(`${nativeTitles},ESPN ID\n${nativeLine},3`), source: 'basketball-monster' }), /does not match the supplied ESPN ID/);
+  assert.throws(() => importDraftProjections({ ...options(`${nativeTitles}\n${nativeLine}\n${nativeLine}`), source: 'basketball-monster' }), /Duplicate player projection/);
+});
+
 test('attempts plus percentage derive makes, and totals divide every counting stat by GP', () => {
   const result = importDraftProjections({ ...options('Name,GP,PTS,REB,AST,STL,BLK,TO,3,FG%,FGA,FT%,FTA\nNikola Jokic,10,280,120,100,15,8,30,20,50%,180,.75,80'), basis: 'totals', source: 'basketball-monster' });
   assert.equal(result.players[0].stats.pts, 28);
@@ -90,6 +137,63 @@ test('Yahoo provider ranks do not alter ESPN IDs, full names tolerate accents an
   assert.equal(result.players[0].id, 7);
   assert.throws(() => importDraftProjections(options(`${titles}\n${line}\n${line}`)), /Duplicate player projection/);
   assert.throws(() => importDraftProjections(options(`${titles}\n${line.replace(',28,', ',"1,5",')}`)), /ambiguous comma/);
+});
+
+test('name-only imports accept unique suffix differences but preserve explicit ID and duplicate checks', () => {
+  const suffixCatalog = { espnSeasonId: 2027, players: [player(7, 'Trey Murphy III'), player(8, 'Derrick Jones Jr.')] };
+  const noSuffix = line.replace('Nikola Jokic', 'Trey Murphy');
+  const result = importDraftProjections({ ...options(`${titles}\n${noSuffix}`), catalog: suffixCatalog });
+  assert.equal(result.players[0].id, 7);
+  assert.match(result.warnings.join(' '), /1 player name matched after ignoring/);
+  assert.throws(() => importDraftProjections({ ...options(`${titles},ESPN ID\n${noSuffix},7`), catalog: suffixCatalog }), /does not match the supplied ESPN ID/);
+  assert.throws(() => importDraftProjections({ ...options(`${titles},ESPN ID\n${noSuffix},999`), catalog: suffixCatalog }), /unique ESPN ID or full name/);
+  assert.throws(() => importDraftProjections({ ...options(`${titles}\n${noSuffix}\n${noSuffix.replace('Trey Murphy', 'Trey Murphy III')}`), catalog: suffixCatalog }), /Duplicate player projection/);
+  const native = nativeLine.replace('Jokic,Nikola', 'Jones,Derrick');
+  assert.equal(importDraftProjections({ ...options(`${nativeTitles}\n${native}`), source: 'basketball-monster', catalog: suffixCatalog }).players[0].id, 8);
+});
+
+test('suffix fallback rejects catalog collisions and never guesses nicknames or ambiguous exact names', () => {
+  const text = `${titles}\n${line.replace('Nikola Jokic', 'Other Player Jr.')}`;
+  const ambiguousCatalog = { ...catalog, players: [...catalog.players, player(4, 'Other Player Sr.')] };
+  assert.throws(() => importDraftProjections({ ...options(text), catalog: ambiguousCatalog }), /unique ESPN ID or full name/);
+  assert.equal(importDraftProjections({ ...options(`${titles}\n${line.replace('Nikola Jokic', 'Other Player')}`), catalog: ambiguousCatalog }).players[0].id, 3);
+  assert.throws(() => importDraftProjections(options(`${titles}\n${line.replace('Nikola Jokic', 'N. Jokic')}`)), /unique ESPN ID or full name/);
+  const duplicateExact = { ...catalog, players: [...catalog.players, player(4, 'Other Player'), player(5, 'Other Player Jr.')] };
+  assert.throws(() => importDraftProjections({ ...options(`${titles}\n${line.replace('Nikola Jokic', 'Other Player')}`), catalog: duplicateExact }), /unique ESPN ID or full name/);
+});
+
+const verifiedMonsterNames = [
+  ['Nicolas Claxton', 'Nic Claxton'], ['Alexandre Sarr', 'Alex Sarr'], ['Herb Jones', 'Herbert Jones'],
+  ['Cam Johnson', 'Cameron Johnson'], ['Lu Dort', 'Luguentz Dort'], ['Ron Holland', 'Ronald Holland II'], ['EJ Harkless', 'Elijah Harkless'],
+] as const;
+
+test('verified Basketball Monster name aliases resolve to unique catalog players without provider IDs', () => {
+  const aliasCatalog = { espnSeasonId: 2027, players: verifiedMonsterNames.map(([, name], index) => player(index + 20, name)) };
+  const nativeRows = verifiedMonsterNames.map(([name]) => {
+    const [first, ...last] = name.split(' ');
+    return nativeLine.replace('Jokic,Nikola', `${last.join(' ')},${first}`);
+  });
+  const result = importDraftProjections({ ...options(`${nativeTitles}\n${nativeRows.join('\n')}`), source: 'basketball-monster', catalog: aliasCatalog });
+  assert.deepEqual(result.players.map(({ id, name }) => [id, name]), aliasCatalog.players.map(({ id, name }) => [id, name]));
+  assert.match(result.warnings.join(' '), /7 Basketball Monster names matched through verified NBA\/team name aliases/);
+  const pasted = importDraftProjections({ ...options(`${titles}\n${line.replace('Nikola Jokic', 'E.J. Harkless')}`), source: 'basketball-monster', catalog: aliasCatalog });
+  assert.equal(pasted.players[0].name, 'Elijah Harkless');
+});
+
+test('BBM aliases stay source-scoped and never override explicit IDs, unknown names or ambiguous catalog identities', () => {
+  const aliasCatalog = { espnSeasonId: 2027, players: [player(20, 'Nic Claxton')] };
+  const aliasLine = line.replace('Nikola Jokic', 'Nicolas Claxton');
+  const base = { ...options(`${titles}\n${aliasLine}`), source: 'basketball-monster' as const, catalog: aliasCatalog };
+  assert.throws(() => importDraftProjections({ ...base, source: 'yahoo' }), /unique ESPN ID or full name/);
+  assert.throws(() => importDraftProjections({ ...base, text: `${titles},ESPN ID\n${aliasLine},20` }), /does not match the supplied ESPN ID/);
+  assert.throws(() => importDraftProjections({ ...base, text: `${titles},ESPN ID\n${aliasLine},999` }), /unique ESPN ID or full name/);
+  assert.throws(() => importDraftProjections({ ...base, text: `${titles}\n${aliasLine.replace('Nicolas', 'Nick')}` }), /unique ESPN ID or full name/);
+  assert.throws(() => importDraftProjections({ ...base, catalog: { ...aliasCatalog, players: [...aliasCatalog.players, player(21, 'Nic Claxton')] } }), /unique ESPN ID or full name/);
+  assert.throws(() => importDraftProjections({ ...base, catalog: { ...aliasCatalog, players: [...aliasCatalog.players, player(21, 'Nicolas Claxton Jr.'), player(22, 'Nicolas Claxton Sr.')] } }), /unique ESPN ID or full name/);
+  assert.throws(() => importDraftProjections({ ...base, text: `${titles}\n${aliasLine}\n${aliasLine.replace('Nicolas', 'Nic')}` }), /Duplicate player projection/);
+  // An exact supplied name remains authoritative over the verified alternate-name list.
+  const exact = importDraftProjections({ ...base, catalog: { ...aliasCatalog, players: [...aliasCatalog.players, player(21, 'Nicolas Claxton')] } });
+  assert.equal(exact.players[0].id, 21);
 });
 
 test('invalid shooting, malformed numeric values, and unsupported seasons are rejected', () => {

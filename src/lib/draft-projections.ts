@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { DraftCatalogPlayer, DraftPlayerCatalog } from './draft-player-catalog';
 
-export type DraftProjectionSource = 'espn' | 'yahoo' | 'hashtag' | 'basketball-monster';
+export type DraftProjectionSource = 'espn' | 'yahoo' | 'basketball-monster';
 export type DraftProjectionStats = { pts: number; reb: number; ast: number; stl: number; blk: number; tov: number; three: number; fgm: number; fga: number; ftm: number; fta: number };
 /** Stats are per NBA game; games is expected full-season appearances, when supplied. */
 export type DraftPlayerProjection = { id: number; name: string; games: number | null; stats: DraftProjectionStats };
@@ -10,14 +10,13 @@ export type DraftProjectionDataset = { source: DraftProjectionSource; sourceLabe
 export const PROJECTION_SOURCES: { id: DraftProjectionSource; label: string; url: string; help: string }[] = [
   { id: 'espn', label: 'ESPN projections', url: 'https://fantasy.espn.com/basketball/players/projections', help: 'Import this season’s ESPN projections through the league’s server connection, or paste a CSV/TSV export.' },
   { id: 'yahoo', label: 'Yahoo projections', url: 'https://basketball.fantasysports.yahoo.com/nba/players', help: 'Select projected statistics for the correct season, then paste or upload a CSV/TSV table with full player names and shooting makes/attempts.' },
-  { id: 'hashtag', label: 'Hashtag Basketball projections', url: 'https://hashtagbasketball.com/fantasy-basketball-projections', help: 'Paste or upload your projection table with full player names. FG% and FT% cells containing (makes/attempts) are supported. Abbreviated names must be replaced with full names or ESPN IDs.' },
-  { id: 'basketball-monster', label: 'Basketball Monster projections', url: 'https://basketballmonster.com/projections.aspx', help: 'Use your Basketball Monster account to export projections, save as CSV/TSV, and import here. Include shooting makes/attempts; your password is never needed here.' },
+  { id: 'basketball-monster', label: 'Basketball Monster projections', url: 'https://basketballmonster.com/projections.aspx', help: 'Upload your Basketball Monster Projections.csv export directly; its season totals and split names are recognized automatically. Copied projection tables also work with shooting makes/attempts. Your password is never needed here.' },
 ];
 
 const stat = z.number().finite().min(0).max(200);
 export const draftProjectionStatsSchema = z.object({ pts: stat, reb: stat, ast: stat, stl: stat, blk: stat, tov: stat, three: stat, fgm: stat, fga: stat, ftm: stat, fta: stat }).refine(value => value.fgm <= value.fga + 0.00001 && value.ftm <= value.fta + 0.00001 && value.three <= value.fgm + 0.00001, 'Shooting makes exceed attempts or threes exceed field goals.');
 export const draftProjectionDatasetSchema = z.object({
-  source: z.enum(['espn', 'yahoo', 'hashtag', 'basketball-monster']), sourceLabel: z.string().min(1).max(100),
+  source: z.enum(['espn', 'yahoo', 'basketball-monster']), sourceLabel: z.string().min(1).max(100),
   seasonId: z.number().int().min(2000).max(2100), importedAt: z.string().datetime(),
   players: z.array(z.object({ id: z.number().int().positive().max(Number.MAX_SAFE_INTEGER), name: z.string().min(1).max(150), games: z.number().finite().min(0).max(82).nullable(), stats: draftProjectionStatsSchema })).min(1).max(2000),
   warnings: z.array(z.string().max(500)).max(110),
@@ -27,6 +26,36 @@ export const draftProjectionDatasetSchema = z.object({
 export function normalizeDraftProjectionName(value: string) {
   return value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
 }
+function suffixNeutralName(value: string) {
+  return normalizeDraftProjectionName(value.trim().replace(/(?:,\s*|\s+)(?:Jr|Sr|II|III|IV)\.?$/i, ''));
+}
+// Verified BBM export names, 2026-10-13. Primary sources use both spellings.
+// These apply only after exact/suffix matching fails, only to BBM name-only
+// rows, and only when the canonical name uniquely identifies a catalog player.
+const basketballMonsterNameAliases: Record<string, string> = {
+  // NBA profile uses Nic; G League bio uses Nicolas for the same NBA player.
+  // https://www.nba.com/player/1629651/nicolas_claxton
+  // https://gleague.nba.com/player/1629651
+  nicolasclaxton: 'Nic Claxton',
+  // Draft profile heading Alexandre; interview heading Alex.
+  // https://www.nba.com/draft/2024/prospects/alexandre-sarr
+  alexandresarr: 'Alex Sarr',
+  // NBA article heading Herb; player photo caption Herbert.
+  // https://www.nba.com/news/herb-jones-pelicans-contract-extension
+  herbjones: 'Herbert Jones',
+  // Official Nuggets release heading Cameron; announcement text Cam.
+  // https://www.nba.com/nuggets/news/nuggets-acquire-cameron-johnson-from-brooklyn-nets-in-exchange-for-michael-porter-jr
+  camjohnson: 'Cameron Johnson',
+  // Official Thunder feature explicitly identifies Luguentz "Lu" Dort.
+  // https://www.nba.com/thunder/community/thunder-fit-crew-plus-lu-200123
+  ludort: 'Luguentz Dort',
+  // G League profile heading Ronald Holland II; biography Ron Holland.
+  // https://gleague.nba.com/player/1641842
+  ronholland: 'Ronald Holland II',
+  // Jazz 2025-26 game notes, p14: Elijah heading and E.J. Harkless biography.
+  // https://www.nba.com/gamenotes/jazz.pdf
+  ejharkless: 'Elijah Harkless',
+};
 const header = (value: string) => value.trim().toLowerCase().replace(/%/g, 'pct').replace(/[^a-z0-9]/g, '');
 const aliases: Record<string, string[]> = {
   name: ['player', 'name', 'playername', 'fullname'], id: ['espnid', 'espnplayerid', 'playerespnid'], games: ['gp', 'g', 'games', 'gamesplayed', 'projectedgames'],
@@ -40,6 +69,13 @@ const aliases: Record<string, string[]> = {
 const monsterAliases: Record<string, string[]> = {
   pts: ['p', 'pg'], reb: ['r', 'rg'], ast: ['a', 'ag'], stl: ['s', 'sg'], blk: ['b', 'bg'],
   three: ['3g'], tov: ['tog'], fgm: ['fgmg'], fga: ['fgag'], ftm: ['ftmg'], fta: ['ftag'],
+};
+// The native Projections.csv download uses season totals, split names and a
+// provider-specific player_id. Do not infer this format from stat magnitudes.
+const monsterNativeHeaders = ['playerid', 'lastname', 'firstname', 'games', 'minutes', 'fieldgoalsattempted', 'fieldgoals', 'freethrowsattempted', 'freethrows', 'threes', 'offensiverebounds', 'defensiverebounds', 'assists', 'blocks', 'steals', 'turnovers'];
+const monsterNativeAliases: Record<string, string[]> = {
+  firstName: ['firstname'], lastName: ['lastname'], offensiveRebounds: ['offensiverebounds'], defensiveRebounds: ['defensiverebounds'],
+  fgm: ['fieldgoals'], ftm: ['freethrows'],
 };
 const counting = ['pts', 'reb', 'ast', 'stl', 'blk', 'tov', 'three'] as const;
 const keys = [...counting, 'fgm', 'fga', 'ftm', 'fta'] as const;
@@ -92,7 +128,7 @@ function percentage(value: string, label: string): number | null {
   return result;
 }
 function shootingPair(value: string): [number, number] | null {
-  // Hashtag includes percentage and a rounded makes/attempts pair in the same cell.
+  // Copied tables may include percentage and a rounded makes/attempts pair in one cell.
   const pair = value.match(/^(?:[\d.]+%?\s*)?\(\s*([\d.]+)\s*\/\s*([\d.]+)\s*\)$/) ?? value.match(/^\s*([\d.]+)\s*[\/-]\s*([\d.]+)\s*$/);
   return pair ? [numeric(pair[1], 'Shooting makes')!, numeric(pair[2], 'Shooting attempts')!] : null;
 }
@@ -104,38 +140,59 @@ class DuplicateDraftProjectionError extends Error {}
 export function importDraftProjections(options: { source: DraftProjectionSource; text: string; basis: 'per-game' | 'totals'; seasonId: number; catalog: Pick<DraftPlayerCatalog, 'players' | 'espnSeasonId'>; importedAt?: string }): DraftProjectionDataset {
   if (options.seasonId !== options.catalog.espnSeasonId) throw new Error('These projections need the matching season’s ESPN player catalog.');
   const [titles, ...rows] = table(options.text), headers = titles.map(header), index: Record<string, number> = {};
-  if (options.source === 'basketball-monster' && options.basis === 'totals' && titles.some(title => /^(?:p|3|r|a|s|b|fgm|fga|ftm|fta|to)\s*\/\s*g$/i.test(title.trim()))) throw new Error('Basketball Monster columns labeled /g are per-game. Choose the per-game format.');
-  for (const [key, names] of Object.entries(aliases)) {
+  const nativeMonster = options.source === 'basketball-monster' && monsterNativeHeaders.every(name => headers.includes(name));
+  const basis = nativeMonster ? 'totals' : options.basis;
+  if (nativeMonster) for (const name of monsterNativeHeaders) {
+    if (headers.filter(value => value === name).length > 1) throw new Error(`More than one ${name} column was found. Keep one unambiguous column.`);
+  }
+  if (options.source === 'basketball-monster' && (options.basis === 'totals' || nativeMonster) && titles.some(title => /^(?:p|3|r|a|s|b|fgm|fga|ftm|fta|to)\s*\/\s*g$/i.test(title.trim()))) throw new Error(nativeMonster ? 'Do not mix native Basketball Monster season-total columns with /g per-game columns.' : 'Basketball Monster columns labeled /g are per-game. Choose the per-game format.');
+  for (const key of new Set([...Object.keys(aliases), ...(nativeMonster ? Object.keys(monsterNativeAliases) : [])])) {
+    const names = aliases[key] ?? [];
     // BM's toV is a turnover z-score; after case normalization it collides with
     // the usual TOV abbreviation. Require its unambiguous TO or to/g column.
-    const sourceNames = options.source === 'basketball-monster' ? [...names.filter(name => key !== 'tov' || name !== 'tov'), ...(monsterAliases[key] ?? [])] : names;
+    const sourceNames = options.source === 'basketball-monster' ? [...names.filter(name => key !== 'tov' || name !== 'tov'), ...(monsterAliases[key] ?? []), ...(nativeMonster ? monsterNativeAliases[key] ?? [] : [])] : names;
     const matches = headers.flatMap((value, i) => sourceNames.includes(value) || (key === 'id' && options.source === 'espn' && ['id', 'playerid'].includes(value)) ? [i] : []);
     if (matches.length > 1) throw new Error(`More than one ${key} column was found. Keep one unambiguous column.`);
     index[key] = matches[0] ?? -1;
   }
-  if (index.name === -1 && index.id === -1) throw new Error('Include Player/Name or an explicit ESPN ID column. Yahoo and Basketball Monster IDs are not ESPN IDs.');
-  const absent = counting.filter(key => index[key] === -1);
+  if (!nativeMonster && index.name === -1 && index.id === -1) throw new Error('Include Player/Name or an explicit ESPN ID column. Yahoo and Basketball Monster IDs are not ESPN IDs.');
+  const derivePoints = nativeMonster && index.pts === -1, deriveRebounds = nativeMonster && index.reb === -1;
+  const absent = counting.filter(key => index[key] === -1 && !(key === 'pts' && derivePoints) && !(key === 'reb' && deriveRebounds));
   if (absent.length) throw new Error(`Missing projection columns: ${absent.join(', ').toUpperCase()}.`);
-  const byId = new Map(options.catalog.players.map(player => [player.id, player])), byName = new Map<string, DraftCatalogPlayer[]>();
-  for (const player of options.catalog.players) { const name = normalizeDraftProjectionName(player.name); byName.set(name, [...(byName.get(name) ?? []), player]); }
-  const players: DraftPlayerProjection[] = [], warnings: string[] = [], seen = new Set<number>(); let skipped = 0;
+  const byId = new Map(options.catalog.players.map(player => [player.id, player])), byName = new Map<string, DraftCatalogPlayer[]>(), bySuffixNeutralName = new Map<string, DraftCatalogPlayer[]>();
+  for (const player of options.catalog.players) {
+    const name = normalizeDraftProjectionName(player.name), neutralName = suffixNeutralName(player.name);
+    byName.set(name, [...(byName.get(name) ?? []), player]);
+    bySuffixNeutralName.set(neutralName, [...(bySuffixNeutralName.get(neutralName) ?? []), player]);
+  }
+  const players: DraftPlayerProjection[] = [], warnings: string[] = nativeMonster ? ['Detected Basketball Monster native season-total export. Statistics are converted to per-game averages using Games automatically, regardless of the format selector. Split names are combined; provider player_id values are not ESPN IDs.'] : [], seen = new Set<number>(); let skipped = 0, suffixMatched = 0, providerAliasMatched = 0;
+  if (derivePoints || deriveRebounds) warnings.push(`Native export categories derived from season totals: ${[derivePoints ? 'PTS = 2 × field goals + threes + free throws' : '', deriveRebounds ? 'REB = offensive rebounds + defensive rebounds' : ''].filter(Boolean).join('; ')}.`);
   for (const [offset, row] of rows.entries()) {
     const value = (key: string) => index[key] < 0 ? '' : row[index[key]] ?? '';
     try {
       if (row.length !== titles.length) throw new Error('The number of cells does not match the header.');
       // Some copied source tables repeat their column header between groups.
       if (row.every((cell, i) => header(cell) === headers[i])) continue;
-      const suppliedId = numeric(value('id'), 'ESPN ID'), name = value('name');
+      const suppliedId = numeric(value('id'), 'ESPN ID');
+      if (nativeMonster && (!value('firstName') || !value('lastName'))) throw new Error('Native Basketball Monster rows need both first_name and last_name.');
+      const name = nativeMonster ? `${value('firstName')} ${value('lastName')}` : value('name');
+      if (nativeMonster && value('name') && normalizeDraftProjectionName(value('name')) !== normalizeDraftProjectionName(name)) throw new Error('Player name does not match the native first_name and last_name columns.');
       const matches = byName.get(normalizeDraftProjectionName(name)) ?? [];
-      const player = suppliedId !== null ? byId.get(suppliedId) : matches.length === 1 ? matches[0] : undefined;
+      const suffixMatches = suppliedId === null && matches.length === 0 ? bySuffixNeutralName.get(suffixNeutralName(name)) ?? [] : [];
+      const aliasTarget = suppliedId === null && options.source === 'basketball-monster' && matches.length === 0 && suffixMatches.length === 0 ? basketballMonsterNameAliases[normalizeDraftProjectionName(name)] : undefined;
+      const providerMatches = aliasTarget ? byName.get(normalizeDraftProjectionName(aliasTarget)) ?? [] : [];
+      const player = suppliedId !== null ? byId.get(suppliedId) : matches.length === 1 ? matches[0] : suffixMatches.length === 1 ? suffixMatches[0] : providerMatches.length === 1 ? providerMatches[0] : undefined;
       if (!player) throw new Error('Player did not match a unique ESPN ID or full name.');
       if (suppliedId !== null && name && normalizeDraftProjectionName(name) !== normalizeDraftProjectionName(player.name)) throw new Error('Player name does not match the supplied ESPN ID.');
       if (seen.has(player.id)) throw new DuplicateDraftProjectionError('Duplicate player projection. Remove the duplicate and import again.');
       const games = numeric(value('games'), 'Games');
       if (games !== null && games > 82) throw new Error('Projected games must be between 0 and 82.');
-      if (options.basis === 'totals' && (games === null || games <= 0)) throw new Error('Season totals need a positive GP/Games value.');
+      if (basis === 'totals' && (games === null || games <= 0)) throw new Error('Season totals need a positive GP/Games value.');
       const stats = {} as DraftProjectionStats;
-      for (const key of counting) { const number = numeric(value(key), key.toUpperCase()); if (number === null) throw new Error(`${key.toUpperCase()} is missing.`); stats[key] = number; }
+      for (const key of counting) {
+        if ((key === 'pts' && derivePoints) || (key === 'reb' && deriveRebounds)) continue;
+        const number = numeric(value(key), key.toUpperCase()); if (number === null) throw new Error(`${key.toUpperCase()} is missing.`); stats[key] = number;
+      }
       for (const shot of ['fg', 'ft'] as const) {
         const makeKey = `${shot}m` as 'fgm' | 'ftm', attemptKey = `${shot}a` as 'fga' | 'fta';
         const pair = shootingPair(value(`${shot}pair`)) ?? shootingPair(value(`${shot}pct`));
@@ -145,9 +202,17 @@ export function importDraftProjections(options: { source: DraftProjectionSource;
         if (makes === null || attempts === null) throw new Error(`${shot.toUpperCase()}% needs shooting makes and attempts, or attempts plus percentage. Percentages alone cannot be weighted.`);
         stats[makeKey] = makes; stats[attemptKey] = attempts;
       }
-      if (options.basis === 'totals') for (const key of keys) stats[key] /= games!;
+      if (derivePoints) stats.pts = 2 * stats.fgm + stats.three + stats.ftm;
+      if (deriveRebounds) {
+        const offensive = numeric(value('offensiveRebounds'), 'Offensive rebounds'), defensive = numeric(value('defensiveRebounds'), 'Defensive rebounds');
+        if (offensive === null || defensive === null) throw new Error('Offensive and defensive rebounds are required to derive REB.');
+        stats.reb = offensive + defensive;
+      }
+      if (basis === 'totals') for (const key of keys) stats[key] /= games!;
       const checked = draftProjectionStatsSchema.safeParse(stats);
       if (!checked.success) throw new Error(checked.error.issues[0]?.message || 'Projection statistics are invalid.');
+      if (suffixMatches.length === 1) suffixMatched++;
+      if (providerMatches.length === 1) providerAliasMatched++;
       seen.add(player.id); players.push({ id: player.id, name: player.name, games, stats: checked.data });
     } catch (error) {
       if (error instanceof DuplicateDraftProjectionError) throw error;
@@ -155,10 +220,12 @@ export function importDraftProjections(options: { source: DraftProjectionSource;
       if (warnings.length < 100) warnings.push(`Row ${offset + 2}: ${error instanceof Error ? error.message : 'Invalid projection.'}`);
     }
   }
-  if (!players.length) throw new Error(`No complete projections matched the ESPN catalog. ${warnings[0] ?? 'Check the column headers.'}`);
+  if (!players.length) throw new Error(`No complete projections matched the ESPN catalog. ${warnings.find(warning => warning.startsWith('Row ')) ?? 'Check the column headers.'}`);
   if (skipped) warnings.unshift(`${skipped} row${skipped === 1 ? '' : 's'} excluded; unmatched or incomplete players have no projection.`);
+  if (suffixMatched) warnings.push(`${suffixMatched} player name${suffixMatched === 1 ? '' : 's'} matched after ignoring a Jr/Sr/II/III/IV suffix. Each suffix-neutral name matched exactly one player in the ESPN catalog; explicit ESPN IDs still require an exact name match.`);
+  if (providerAliasMatched) warnings.push(`${providerAliasMatched} Basketball Monster name${providerAliasMatched === 1 ? '' : 's'} matched through verified NBA/team name aliases. Each canonical name matched exactly one ESPN catalog player; unknown or ambiguous names were not guessed.`);
   if (players.some(player => player.games === null)) warnings.push('Some players have no projected games. Availability is not estimated for those players.');
-  warnings.push('The import season and per-game/season-total choice are supplied by you; verify both against your export. Source rankings do not replace ESPN draft rankings.');
+  warnings.push(nativeMonster ? 'The import season is supplied by you; verify it against your export. Native Basketball Monster season totals were detected automatically. Source rankings do not replace ESPN draft rankings.' : 'The import season and per-game/season-total choice are supplied by you; verify both against your export. Source rankings do not replace ESPN draft rankings.');
   return dataset(options.source, options.seasonId, options.importedAt ?? new Date().toISOString(), players, warnings);
 }
 

@@ -1,15 +1,16 @@
 import { z } from 'zod';
 import identities from '../../../../data/identities.json';
-import { importDraftProjectionText, importEspnDraftProjections } from '@/lib/draft-projection-service';
+import { importDraftProjectionText, importEspnDraftProjections, importYahooDraftProjections } from '@/lib/draft-projection-service';
 import { authenticatedClient, json, sameOrigin } from '@/lib/supabase/http';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 30;
+export const maxDuration = 120;
 
 const bodySchema = z.discriminatedUnion('action', [
   z.object({ action: z.literal('espn'), seasonId: z.string().uuid() }).strict(),
-  z.object({ action: z.literal('import'), seasonId: z.string().uuid(), source: z.enum(['espn', 'yahoo', 'hashtag', 'basketball-monster']), text: z.string().min(1).max(2_000_000), basis: z.enum(['per-game', 'totals']) }).strict(),
+  z.object({ action: z.literal('yahoo'), seasonId: z.string().uuid(), refresh: z.boolean().optional() }).strict(),
+  z.object({ action: z.literal('import'), seasonId: z.string().uuid(), source: z.enum(['espn', 'yahoo', 'basketball-monster']), text: z.string().min(1).max(2_000_000), basis: z.enum(['per-game', 'totals']) }).strict(),
 ]);
 
 async function readImportBody(request: Request): Promise<unknown> {
@@ -53,7 +54,9 @@ export async function POST(request: Request) {
     try {
       const dataset = body.action === 'espn'
         ? await importEspnDraftProjections(espnSeasonId)
-        : importDraftProjectionText({ seasonId: espnSeasonId, source: body.source, text: body.text, basis: body.basis });
+        : body.action === 'yahoo'
+          ? await importYahooDraftProjections(espnSeasonId, { refresh: body.refresh })
+          : importDraftProjectionText({ seasonId: espnSeasonId, source: body.source, text: body.text, basis: body.basis });
       // No shared database, board, queue, analytics feed, or public cache receives these projections.
       return json({ dataset });
     } catch (error) {

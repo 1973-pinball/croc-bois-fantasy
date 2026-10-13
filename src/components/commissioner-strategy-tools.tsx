@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import catalogFile from '../../data/draft-player-catalog.json';
 import settingsFile from '../../data/draft-roster-settings.json';
 import eligibilityFile from '../../data/draft-roster-eligibility.json';
@@ -23,11 +23,15 @@ const catalog = catalogFile as DraftPlayerCatalog;
 const settings = settingsFile as DraftRosterSettings;
 const eligibility = eligibilityFile as DraftRosterEligibility;
 export type ProjectionLibrary = Partial<Record<DraftProjectionSource, DraftProjectionDataset>>;
+type DirectProjectionSource = 'espn' | 'yahoo';
+const DIRECT_PROJECTION_SOURCES: { id: DirectProjectionSource; label: string }[] = [{ id: 'espn', label: 'ESPN' }, { id: 'yahoo', label: 'Yahoo' }];
 const pct = (value: number | null) => value === null ? '—' : `${(value * 100).toFixed(1)}%`;
 const gain = (value: number | null) => value === null ? '—' : `${value >= 0 ? '+' : ''}${(value * 100).toFixed(1)} pp`;
 function validLibrary(value: unknown): value is ProjectionLibrary {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   return Object.entries(value).every(([source, dataset]) => {
+    // Retired provider entries are discarded during hydration without losing supported imports.
+    if (!PROJECTION_SOURCES.some(provider => provider.id === source)) return true;
     const parsed = draftProjectionDatasetSchema.safeParse(dataset);
     return parsed.success && parsed.data.source === source && parsed.data.seasonId === catalog.espnSeasonId;
   });
@@ -47,57 +51,106 @@ export function CommissionerStrategyTools({ account, view }: { account: LeagueAc
 function StrategyWorkspace({ account, view }: { account: LeagueAccount; view: 'draft' | 'keepers' }) {
   const storageKey = workflowDraftKey(account.session!.user!.id, account.seasonId, 'draft-tool');
   const [library, setLibrary] = useState<ProjectionLibrary>({});
+  const libraryRef = useRef<ProjectionLibrary>({});
+  const [hydrated, setHydrated] = useState(false);
   const [source, setSource] = useState<DraftProjectionSource>('espn');
   const [importSource, setImportSource] = useState<DraftProjectionSource | null>(null);
   const [text, setText] = useState('');
   const [basis, setBasis] = useState<'per-game' | 'totals'>('per-game');
   const [busy, setBusy] = useState(false);
+  const [directLoading, setDirectLoading] = useState<{ source: DirectProjectionSource; mode: 'automatic' | 'manual' } | null>(null);
+  const [directErrors, setDirectErrors] = useState<Partial<Record<DirectProjectionSource, string>>>({});
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const active = useRef(true);
   const request = useRef<AbortController | null>(null);
+  const automaticAttempted = useRef(new Set<DirectProjectionSource>());
   useEffect(() => {
     active.current = true;
-    setLibrary(workflowDrafts.read(storageKey, validLibrary) ?? {});
-    return () => { active.current = false; request.current?.abort(); };
+    const saved = workflowDrafts.read(storageKey, validLibrary) ?? {};
+    const cached = Object.fromEntries(Object.entries(saved).filter(([provider]) => PROJECTION_SOURCES.some(item => item.id === provider))) as ProjectionLibrary;
+    if (Object.keys(cached).length !== Object.keys(saved).length) workflowDrafts.write(storageKey, cached);
+    const previousFailures: Partial<Record<DirectProjectionSource, string>> = {};
+    const attempted = new Set<DirectProjectionSource>();
+    for (const provider of DIRECT_PROJECTION_SOURCES) {
+      const failure = workflowDrafts.read(`${storageKey}:${provider.id}-import-error`, (value): value is string => typeof value === 'string') ?? '';
+      if (failure) previousFailures[provider.id] = failure;
+      if (cached[provider.id] || failure) attempted.add(provider.id);
+    }
+    libraryRef.current = cached;
+    setLibrary(cached); setDirectErrors(previousFailures);
+    automaticAttempted.current = attempted;
+    setHydrated(true);
+    return () => { active.current = false; request.current?.abort(); request.current = null; };
   }, [storageKey]);
-  function save(next: ProjectionLibrary) {
+  const save = useCallback((next: ProjectionLibrary) => {
+    libraryRef.current = next;
     setLibrary(next);
     if (!workflowDrafts.write(storageKey, next)) setNotice('Imports are available for this visit. Browser storage is unavailable, so keep this page open.');
-  }
-  async function importData(provider: DraftProjectionSource, direct: boolean) {
-    if (busy || account.connection !== 'live') return;
+  }, [storageKey]);
+  const importData = useCallback(async (provider: DraftProjectionSource, direct: boolean, automatic = false) => {
+    if (request.current || account.connection !== 'live') return;
+    const directProvider = provider === 'espn' || provider === 'yahoo' ? provider : null;
+    if (direct && !directProvider) return;
     setBusy(true); setError(''); setNotice('');
+    if (direct && directProvider) {
+      setDirectErrors(current => ({ ...current, [directProvider]: '' }));
+      setDirectLoading({ source: directProvider, mode: automatic ? 'automatic' : 'manual' });
+      automaticAttempted.current.add(directProvider);
+    }
     const controller = new AbortController(); request.current = controller;
     try {
       const response = await fetch('/api/draft-projections', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
-        body: JSON.stringify(direct ? { action: 'espn', seasonId: account.seasonId } : { action: 'import', seasonId: account.seasonId, source: provider, text, basis }) });
+        body: JSON.stringify(direct ? { action: directProvider, seasonId: account.seasonId, ...(directProvider === 'yahoo' && !automatic ? { refresh: true } : {}) } : { action: 'import', seasonId: account.seasonId, source: provider, text, basis }) });
       const body = await response.json();
-      if (!active.current || controller.signal.aborted) return;
+      if (!active.current || controller.signal.aborted || request.current !== controller) return;
       if (!response.ok) {
         if ([401, 403].includes(response.status)) void account.reloadSession();
         throw new Error(body.message || 'The projection import could not be completed.');
       }
       const dataset = draftProjectionDatasetSchema.parse(body.dataset);
       if (dataset.source !== provider || dataset.seasonId !== catalog.espnSeasonId) throw new Error('The import returned a different source or season.');
-      setNotice(`${dataset.players.length} ${dataset.sourceLabel} loaded. Calculations now use this import.`);
-      save({ ...library, [provider]: dataset });
-      setSource(provider); setText(''); setImportSource(null);
-    } catch (failure) { if (active.current && !controller.signal.aborted) setError(failure instanceof Error ? failure.message : 'The import failed.'); }
-    finally { if (active.current) setBusy(false); }
-  }
+      setNotice(`${dataset.players.length} ${dataset.sourceLabel} loaded${automatic ? ' automatically' : ''}. Saved for this browser session.`);
+      save({ ...libraryRef.current, [provider]: dataset });
+      if (directProvider) { workflowDrafts.remove(`${storageKey}:${directProvider}-import-error`); setDirectErrors(current => ({ ...current, [directProvider]: '' })); }
+      if (!automatic) { if (!direct) setSource(provider); setText(''); setImportSource(null); }
+    } catch (failure) {
+      if (active.current && !controller.signal.aborted && request.current === controller) {
+        const message = failure instanceof Error ? failure.message : 'The import failed.';
+        if (direct && directProvider) { setDirectErrors(current => ({ ...current, [directProvider]: message })); workflowDrafts.write(`${storageKey}:${directProvider}-import-error`, message); }
+        else setError(message);
+      }
+    } finally {
+      if (active.current && request.current === controller) { request.current = null; setBusy(false); setDirectLoading(null); }
+    }
+  }, [account.connection, account.seasonId, account.reloadSession, basis, storageKey, save, text]);
+  useEffect(() => {
+    if (!hydrated || busy || account.connection !== 'live' || request.current) return;
+    const next = DIRECT_PROJECTION_SOURCES.find(provider => !automaticAttempted.current.has(provider.id) && !libraryRef.current[provider.id]);
+    if (!next) return;
+    automaticAttempted.current.add(next.id);
+    void importData(next.id, true, true);
+  }, [hydrated, busy, account.connection, importData]);
   const provider = PROJECTION_SOURCES.find(item => item.id === (importSource ?? source))!;
   const projections = library[source] ?? null;
   return <div className={styles.root}>
     <div className={styles.header}><div><span className={styles.badge}>COMMISSIONER ONLY</span><h2>{view === 'draft' ? 'Your draft edge' : 'Keeper Suggestions'}</h2><p>{view === 'draft' ? 'Live rosters, category win probabilities, and two ways to find your next pick.' : 'Compare every projection source at once. Find value in your roster and a legal way to pay for it.'}</p></div><span className={styles.badge}>PRIVATE STRATEGY</span></div>
     {account.connection !== 'live' && <p className={styles.error} role="alert">Restore the league connection to import projections or record draft picks. Showing the last loaded data.</p>}
     <section className={styles.panel} aria-label="Private projection library">
-      <h3>Projection library</h3><p className={styles.subtle}>Saved for your account and season in this browser session. Estimates and recommendations are visible only in Commissioner Tools. Other members see the usual draft board.</p>
-      {view === 'draft' ? <div className={styles.toolbar}><label>Projection source<select value={source} onChange={event => setSource(event.target.value as DraftProjectionSource)}>{PROJECTION_SOURCES.map(item => <option value={item.id} key={item.id}>{item.label}{library[item.id] ? ' · imported' : ' · import needed'}</option>)}</select></label><button type="button" className="button button-subtle" disabled={busy} onClick={() => { setImportSource(source); setText(''); }}>Import / refresh projections</button>{projections && <button type="button" className="text-button" disabled={busy} onClick={() => { const next = { ...library }; delete next[source]; save(next); }}>Remove this import</button>}</div> : <div className={styles.sourceCards}>{PROJECTION_SOURCES.map(item => <div key={item.id} className={styles.sourceCard}><strong>{item.label}</strong><span>{library[item.id] ? `${library[item.id]!.players.length} players · ${new Date(library[item.id]!.importedAt).toLocaleString()}` : 'No projections imported'}</span><button type="button" disabled={busy} onClick={() => { setImportSource(item.id); setText(''); }}>Import / refresh</button></div>)}</div>}
+      <h3>Projection library</h3><p className={styles.subtle}>ESPN and Yahoo projections load automatically when their imports are missing. Saved imports are shared by Draft Tool and Keeper Suggestions for your account and season in this browser session. Upload Basketball Monster once here to use it in both tools. Estimates and recommendations stay private to Commissioner Tools.</p>
+      {DIRECT_PROJECTION_SOURCES.map(item => {
+        const loading = directLoading?.source === item.id ? directLoading.mode : null;
+        const failure = directErrors[item.id];
+        const imported = library[item.id];
+        return <div key={item.id}>
+          <div className={styles.status}><strong>{item.label} projections</strong><span role="status">{loading ? loading === 'automatic' ? `Loading ${item.label} projections automatically…` : `Refreshing ${item.label} projections…` : imported ? `${imported.sourceLabel} · ${imported.players.length} players saved · updated ${new Date(imported.importedAt).toLocaleString()}` : failure ? `${item.label} import needs a retry.` : automaticAttempted.current.has(item.id) ? `No ${item.label} import saved.` : account.connection === 'live' ? `Waiting to import ${item.label} automatically…` : 'Waiting for the league connection.'}</span><button type="button" className="button button-subtle" disabled={!hydrated || busy || account.connection !== 'live'} onClick={() => void importData(item.id, true)}>{loading ? `Loading ${item.label} projections…` : failure ? `Retry ${item.label} projections` : imported ? `Refresh ${item.label} projections` : `Load ${item.label} projections`}</button></div>
+          {failure && <p className={styles.error} role="alert">{item.label} projections could not be loaded: {failure} {imported ? `Your saved ${item.label} import is still available.` : `Retry ${item.label} or import a projection table below.`}</p>}
+        </div>;
+      })}
+      {view === 'draft' ? <div className={styles.toolbar}><label>Projection source<select value={source} onChange={event => setSource(event.target.value as DraftProjectionSource)}>{PROJECTION_SOURCES.map(item => <option value={item.id} key={item.id}>{item.label}{library[item.id] ? ' · imported' : ' · import needed'}</option>)}</select></label><button type="button" className="button button-subtle" disabled={!hydrated || busy} onClick={() => { setImportSource(source); setText(''); }}>Import {PROJECTION_SOURCES.find(item => item.id === source)!.label.replace(/ projections$/, '')} CSV / TSV</button>{projections && <button type="button" className="text-button" disabled={busy} onClick={() => { const next = { ...libraryRef.current }; delete next[source]; save(next); }}>Remove this import</button>}</div> : <div className={styles.sourceCards}>{PROJECTION_SOURCES.map(item => <div key={item.id} className={styles.sourceCard}><strong>{item.label}</strong><span>{library[item.id] ? `${library[item.id]!.players.length} players · ${new Date(library[item.id]!.importedAt).toLocaleString()}` : 'No projections imported'}</span><button type="button" disabled={!hydrated || busy} onClick={() => { setImportSource(item.id); setText(''); }}>Import CSV / TSV</button></div>)}</div>}
       {view === 'draft' && projections && <p className={styles.subtle}>{projections.players.length} players · {projections.seasonId - 1}–{String(projections.seasonId).slice(-2)} · imported {new Date(projections.importedAt).toLocaleString()}</p>}
       {importSource && <div className={styles.importer}>
         <h4>{provider.label}</h4><p className={styles.subtle}>{provider.help} <a href={provider.url} target="_blank" rel="noreferrer">Open source ↗</a></p>
-        {importSource === 'espn' && <div className={styles.actions}><button className="button button-green" disabled={busy || account.connection !== 'live'} onClick={() => void importData('espn', true)}>{busy ? 'Importing…' : 'Import from ESPN'}</button></div>}
         <div className={styles.toolbar}><label>CSV / TSV file<input type="file" accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values" disabled={busy} onChange={async event => { try { const value = await readFile(event.target.files?.[0]); if (active.current && value !== null) setText(value); } catch (failure) { setError((failure as Error).message); } }}/></label><label>Projection basis<select value={basis} disabled={busy} onChange={event => setBasis(event.target.value as typeof basis)}><option value="per-game">Per game averages</option><option value="totals">Season totals (GP required)</option></select></label></div>
         <label className={styles.field}>Or paste the projection table<textarea rows={5} value={text} disabled={busy} maxLength={2_000_000} onChange={event => setText(event.target.value)} placeholder="Player,GP,PTS,REB,AST,STL,BLK,TO,3PM,FGM,FGA,FTM,FTA"/></label>
         <p className={styles.subtle}>Include full player names or ESPN IDs, all nine categories, and shooting attempts. Player identity and missing columns are checked before use. Source ranks do not replace ESPN’s draft display order.</p>
@@ -182,33 +235,42 @@ function DraftAdvisorView({ account, projections }: { account: LeagueAccount; pr
   const [scheduleError, setScheduleError] = useState('');
   const [ranking, setRanking] = useState<'espn' | 'fit'>('espn');
   const request = useRef<AbortController | null>(null);
-  useEffect(() => () => request.current?.abort(), []);
+  const autoScheduleAttempted = useRef(false);
+  const { connection, reloadSession } = account;
+  useEffect(() => () => { request.current?.abort(); request.current = null; }, []);
   const ownFranchiseId = live.board?.teams.find(team => team.espnTeamId !== null && account.ownTeamIds.includes(team.espnTeamId))?.franchiseId;
   const franchiseId = live.board?.teams.find(team => team.franchiseId === choice)?.franchiseId ?? ownFranchiseId ?? live.board?.teams[0]?.franchiseId ?? '';
   const report = useMemo(() => live.board ? buildDraftAdvisor({ board: live.board, catalog, settings, eligibility, projections, franchiseId, schedule }) : null, [live.board, projections, franchiseId, schedule]);
-  async function loadSchedule() {
-    if (scheduleBusy || account.connection !== 'live') return;
+  const loadSchedule = useCallback(async (date = '') => {
+    if (request.current || connection !== 'live') return;
     setScheduleBusy(true); setScheduleError('');
     const controller = new AbortController(); request.current = controller;
     try {
-      const response = await fetch(`/api/draft-schedule?seasonId=${catalog.espnSeasonId}${startDate ? `&startDate=${encodeURIComponent(startDate)}` : ''}`, { cache: 'no-store', credentials: 'same-origin', signal: controller.signal });
+      const response = await fetch(`/api/draft-schedule?seasonId=${catalog.espnSeasonId}${date ? `&startDate=${encodeURIComponent(date)}` : ''}`, { cache: 'no-store', credentials: 'same-origin', signal: controller.signal });
       const body = await response.json();
-      if (!response.ok) { if ([401, 403].includes(response.status)) void account.reloadSession(); throw new Error(body.message || 'The schedule could not be loaded.'); }
+      if (!response.ok) { if ([401, 403].includes(response.status)) void reloadSession(); throw new Error(body.message || 'The schedule could not be loaded.'); }
       const next = draftAdvisorScheduleSchema.parse(body.schedule);
       if (next.seasonId !== catalog.espnSeasonId) throw new Error('The NBA schedule belongs to another season.');
       if (!controller.signal.aborted) { setSchedule(next); setStartDate(next.startDate); }
     } catch (failure) { if (!controller.signal.aborted) setScheduleError(failure instanceof Error ? failure.message : 'The schedule could not be loaded.'); }
-    finally { if (!controller.signal.aborted) setScheduleBusy(false); }
-  }
+    finally { if (request.current === controller) request.current = null; if (!controller.signal.aborted) setScheduleBusy(false); }
+  }, [connection, reloadSession]);
+  useEffect(() => {
+    if (connection !== 'live' || autoScheduleAttempted.current) return;
+    // Defer past effect setup so development remount checks do not leave an aborted first load.
+    const timer = window.setTimeout(() => { autoScheduleAttempted.current = true; void loadSchedule(); }, 0);
+    return () => window.clearTimeout(timer);
+  }, [connection, loadSchedule]);
   const selected = report?.selectedTeam;
   const candidates = ranking === 'fit' ? report?.fitRanking : report?.topAvailable;
   return <>
     <section className={styles.panel} aria-label="Draft analysis controls"><div className={styles.status}><strong>Live draft connection</strong><span>{live.checkedAt ? `Checked ${new Date(live.checkedAt).toLocaleTimeString()} · revision ${live.board?.revision} · refreshes every 2 seconds` : 'Loading draft board…'}</span><button type="button" className="text-button" disabled={live.refreshing || account.connection !== 'live'} onClick={() => void live.refresh()}>Refresh now</button></div>
       {live.error && <p className={styles.error} role="alert">{live.error} Recommendations below use the last successful refresh.</p>}
-      <div className={styles.toolbar}><label>My draft team<select value={franchiseId} onChange={event => setChoice(event.target.value)}>{live.board?.teams.map(team => <option key={team.franchiseId} value={team.franchiseId}>{team.displayName}</option>)}</select></label><label>Schedule week starts<input type="date" value={startDate} onChange={event => setStartDate(event.target.value)}/></label><button type="button" className="button button-subtle" disabled={scheduleBusy || account.connection !== 'live'} onClick={() => void loadSchedule()}>{scheduleBusy ? 'Loading…' : 'Load NBA schedule'}</button></div>
-      <p className={styles.subtle}>{schedule ? `${schedule.startDate} through ${schedule.endDate} · ${schedule.sourceLabel} · daily active-slot congestion included.` : 'Load a schedule week to compare usable games. Until then, roster-fit recommendations use equal games for every NBA team.'}</p>
+      <div className={styles.toolbar}><label>My draft team<select value={franchiseId} onChange={event => setChoice(event.target.value)}>{live.board?.teams.map(team => <option key={team.franchiseId} value={team.franchiseId}>{team.displayName}</option>)}</select></label><label>Schedule week starts<input type="date" value={startDate} onChange={event => setStartDate(event.target.value)}/></label><button type="button" className="button button-subtle" disabled={scheduleBusy || account.connection !== 'live'} onClick={() => void loadSchedule(startDate)}>{scheduleBusy ? 'Loading ESPN…' : schedule ? 'Refresh ESPN schedule' : 'Load ESPN schedule'}</button></div>
+      <p className={styles.subtle}>The NBA schedule loads automatically from ESPN when you open Draft Tool. It helps compare scheduled games and crowded lineup days for the schedule-and-roster-fit recommendation.</p>
+      <p className={styles.subtle} aria-live="polite">{schedule ? `${schedule.startDate} through ${schedule.endDate} · ${schedule.sourceLabel} · daily active-slot congestion included.` : scheduleBusy ? 'Loading the next published seven-day schedule from ESPN…' : 'No schedule loaded. Roster-fit recommendations currently use equal games for every NBA team. Use Load ESPN schedule to include scheduled games.'}</p>
       {scheduleError && <p className={styles.error} role="alert">{scheduleError}{schedule ? ` The loaded window remains ${schedule.startDate}–${schedule.endDate}.` : ''}</p>}
-      <details className={styles.methodology}><summary>Import a schedule or use equal games</summary><p>CSV/TSV headers: date,team. Include one row per NBA team playing each day and all games in the selected seven-day window.</p><label className={styles.field}>Schedule CSV / TSV<input type="file" accept=".csv,.tsv,.txt" disabled={scheduleBusy} onChange={async event => { try { const text = await readFile(event.target.files?.[0]); if (text !== null) { setSchedule(parseDraftScheduleText(text, { seasonId: catalog.espnSeasonId, startDate })); setScheduleError(''); } } catch (failure) { setScheduleError((failure as Error).message); } }}/></label>{schedule && <button className="text-button" type="button" disabled={scheduleBusy} onClick={() => setSchedule(null)}>Use equal games instead</button>}</details>
+      <details className={styles.methodology}><summary>Other schedule options</summary><p>No upload is needed for ESPN. To use a custom schedule, import CSV/TSV with headers date,team and one row per NBA team playing each day in the selected seven-day window.</p><label className={styles.field}>Schedule CSV / TSV<input type="file" accept=".csv,.tsv,.txt" disabled={scheduleBusy} onChange={async event => { try { const text = await readFile(event.target.files?.[0]); if (text !== null) { setSchedule(parseDraftScheduleText(text, { seasonId: catalog.espnSeasonId, startDate })); setScheduleError(''); } } catch (failure) { setScheduleError((failure as Error).message); } }}/></label>{schedule && <button className="text-button" type="button" disabled={scheduleBusy} onClick={() => { setSchedule(null); setScheduleError(''); }}>Use equal games instead</button>}</details>
     </section>
     {report?.warnings.length ? <details className={styles.notice} open={!report.available}><summary>Projection coverage and draft assumptions ({report.warnings.length})</summary><ul>{report.warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul></details> : null}
     {report && !report.available && <p className={styles.notice}>{report.unavailableReason}</p>}

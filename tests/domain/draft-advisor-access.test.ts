@@ -46,10 +46,10 @@ function fixture(options: FixtureOptions = {}) {
   const http = moduleWithDependencies('../../src/lib/supabase/http.ts', {
     'next/server': require('next/server'), './server': { createClient: async () => options.configured === false ? null : db }, './config': { SETUP_MESSAGE: 'Fixture setup is unavailable.' },
   });
-  const service = (kind: string, output: unknown) => (args: unknown) => { calls.push(kind); if (options.serviceError) throw new Error(options.serviceError); return { ...output as object, args }; };
+  const service = (kind: string, output: unknown) => (args: unknown, serviceOptions?: unknown) => { calls.push(kind); if (options.serviceError) throw new Error(options.serviceError); return { ...output as object, args, ...(serviceOptions ? { serviceOptions } : {}) }; };
   const projections = moduleWithDependencies('../../src/app/api/draft-projections/route.ts', {
     zod: require('zod'), '../../../../data/identities.json': identities, '@/lib/supabase/http': http,
-    '@/lib/draft-projection-service': { importEspnDraftProjections: service('espn', { marker: 'projection-result' }), importDraftProjectionText: service('text', { marker: 'projection-result' }) },
+    '@/lib/draft-projection-service': { importEspnDraftProjections: service('espn', { marker: 'projection-result' }), importYahooDraftProjections: service('yahoo', { marker: 'projection-result' }), importDraftProjectionText: service('text', { marker: 'projection-result' }) },
   });
   const schedule = moduleWithDependencies('../../src/app/api/draft-schedule/route.ts', {
     '../../../../data/identities.json': identities, '@/lib/supabase/http': http,
@@ -141,4 +141,69 @@ test('schedule validates season/window after authorization and sends no private 
   for (const query of ['seasonId=https://attacker.invalid', 'seasonId=2027&startDate=2025-10-20', 'seasonId=2027&startDate=2026-02-30']) {
     const invalid = fixture(); assert.equal((await invalid.get(scheduleRequest(query))).status, 400); assert.ok(!invalid.calls.includes('schedule'));
   }
+});
+
+test('Yahoo automatic imports use the same commissioner gate and verified season with private responses', async () => {
+  const yahoo = { ...body, action: 'yahoo' };
+  for (const options of [{ userId: null }, { role: 'manager' }, { role: 'commissioner', active: false }, { membershipError: true }]) {
+    const app = fixture(options);
+    assert.ok([401, 403, 503].includes((await app.post(request(yahoo))).status));
+    assert.ok(!app.calls.includes('yahoo'));
+  }
+  const app = fixture(); const response = await app.post(request(yahoo));
+  assert.equal(response.status, 200); assert.equal(response.headers.get('Cache-Control'), 'private, no-store');
+  assert.deepEqual((await response.json()).dataset, { marker: 'projection-result', args: 2027, serviceOptions: {} });
+  assert.deepEqual(app.calls, ['auth', 'league_memberships', 'seasons', 'yahoo']);
+  const manual = await app.post(request({ ...yahoo, refresh: true }));
+  assert.equal(manual.status, 200);
+  assert.deepEqual((await manual.json()).dataset, { marker: 'projection-result', args: 2027, serviceOptions: { refresh: true } });
+  const invalidRefresh = fixture();
+  assert.equal((await invalidRefresh.post(request({ ...yahoo, refresh: 'yes' }))).status, 400);
+  assert.ok(!invalidRefresh.calls.includes('yahoo'));
+  for (const extra of [{ url: 'https://attacker.invalid' }, { cookies: 'untrusted' }, { leagueId: 'another-league' }]) {
+    const blocked = fixture(); assert.equal((await blocked.post(request({ ...yahoo, ...extra }))).status, 400); assert.ok(!blocked.calls.includes('yahoo'));
+  }
+  const foreign = fixture(); assert.equal((await foreign.post(request({ ...yahoo, seasonId: '00000000-0000-4000-8000-000000000000' }))).status, 400);
+  assert.ok(!foreign.calls.includes('yahoo'));
+  const failure = fixture({ serviceError: 'Yahoo is limiting projection requests.' });
+  const rejected = await failure.post(request(yahoo)); assert.equal(rejected.status, 503);
+  assert.equal((await rejected.json()).error, 'PROJECTION_IMPORT_FAILED');
+});
+
+test('Yahoo caches successful reads by season with their source timestamp, while manual refresh deduplicates and preserves cache on failure', async () => {
+  type Dataset = { seasonId: number; importedAt: string };
+  const calls: number[] = [];
+  let resolveRead: ((dataset: Dataset) => void) | undefined;
+  let rejectRead: ((reason: Error) => void) | undefined;
+  const service = moduleWithDependencies('../../src/lib/draft-projection-service.ts', {
+    'server-only': {}, '../../data/draft-player-catalog.json': { espnSeasonId: 2027, players: [] },
+    './ai-league-feed': {}, './draft-projections': {}, './espn-history-sync-core': {},
+    './yahoo-draft-projections': {
+      fetchYahooDraftProjections: (seasonId: number) => {
+        calls.push(seasonId);
+        return new Promise<Dataset>((resolve, reject) => { resolveRead = resolve; rejectRead = reject; });
+      },
+    },
+  }).importYahooDraftProjections as (seasonId: number, options?: { refresh?: boolean }) => Promise<Dataset>;
+  const original = { seasonId: 2027, importedAt: '2026-10-13T12:00:00.000Z' };
+  const first = service(2027), concurrent = service(2027);
+  assert.deepEqual(calls, [2027]);
+  resolveRead!(original);
+  assert.equal(await first, original); assert.equal(await concurrent, original);
+  assert.equal(await service(2027), original); assert.deepEqual(calls, [2027]);
+  const refresh = service(2027, { refresh: true }), secondRefresh = service(2027, { refresh: true });
+  assert.deepEqual(calls, [2027, 2027]);
+  const updated = { seasonId: 2027, importedAt: '2026-10-13T12:01:00.000Z' };
+  resolveRead!(updated);
+  assert.equal(await refresh, updated); assert.equal(await secondRefresh, updated);
+  assert.equal(await service(2027), updated);
+  const failed = service(2027, { refresh: true });
+  rejectRead!(new Error('Rate limited'));
+  await assert.rejects(failed, /Rate limited/);
+  assert.equal(await service(2027), updated);
+  const otherSeason = service(2028);
+  assert.deepEqual(calls, [2027, 2027, 2027, 2028]);
+  const future = { seasonId: 2028, importedAt: '2027-10-13T12:00:00.000Z' };
+  resolveRead!(future); assert.equal(await otherSeason, future);
+  assert.equal(await service(2027), updated);
 });
