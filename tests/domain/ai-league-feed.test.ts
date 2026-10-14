@@ -100,6 +100,15 @@ test('read-only credential fetch uses the fixed league URL, blocks redirects, an
   } finally { globalThis.fetch = original; }
 });
 
+test('player pool fetch preserves raw ESPN ROTO draft ranks for projection imports', async () => {
+  const original = globalThis.fetch;
+  const payload = { players: [player([], { draftRanksByRankType: { ROTO: { rank: 42, rankType: 'ROTO', slotId: 0, published: false }, STANDARD: { rank: 3 } } })] };
+  globalThis.fetch = (async () => Response.json(payload)) as typeof fetch;
+  try {
+    assert.deepEqual(await fetchAiPlayerPool(2027, { espnS2: 'example-s2', swid: 'example-swid' }), payload);
+  } finally { globalThis.fetch = original; }
+});
+
 test('public daily stats never receive ESPN cookies and empty scheduled days are explicit', async () => {
   const original = globalThis.fetch;
   globalThis.fetch = (async (_url: string | URL | Request, init?: RequestInit) => {

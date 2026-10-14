@@ -11,6 +11,8 @@ import { buildDraftAdvisor, type DraftAdvisorCandidate, type DraftAdvisorTeam } 
 import { buildDraftTeamValues } from '@/lib/draft-team-values';
 import { draftAdvisorScheduleSchema, parseDraftScheduleText, type DraftAdvisorSchedule } from '@/lib/draft-advisor-schedule';
 import { draftProjectionDatasetSchema, PROJECTION_SOURCES, type DraftProjectionDataset, type DraftProjectionSource } from '@/lib/draft-projections';
+import { draftProjectionRankSnapshotSchema, needsDirectRankRefresh } from '@/lib/draft-projection-ranks';
+import type { DraftCandidateRankSnapshots } from '@/lib/draft-candidate-ranks';
 import { workflowDraftKey, workflowDrafts } from '@/lib/workflow-drafts';
 import type { LeagueAccount } from './league-account';
 import { useAdvisorBoard } from './use-advisor-board';
@@ -56,6 +58,8 @@ export function CommissionerStrategyTools({ account, view }: { account: LeagueAc
 function StrategyWorkspace({ account, view }: { account: LeagueAccount; view: 'draft' | 'keepers' }) {
   const storageKey = workflowDraftKey(account.session!.user!.id, account.seasonId, 'draft-tool');
   const [library, setLibrary] = useState<ProjectionLibrary>({});
+  const [rankSnapshots, setRankSnapshots] = useState<DraftCandidateRankSnapshots>({});
+  const [rankStatus, setRankStatus] = useState('');
   const libraryRef = useRef<ProjectionLibrary>({});
   const [hydrated, setHydrated] = useState(false);
   const [source, setSource] = useState<DraftProjectionSource>('espn');
@@ -78,9 +82,11 @@ function StrategyWorkspace({ account, view }: { account: LeagueAccount; view: 'd
     const previousFailures: Partial<Record<DirectProjectionSource, string>> = {};
     const attempted = new Set<DirectProjectionSource>();
     for (const provider of DIRECT_PROJECTION_SOURCES) {
+      const migrateRanks = needsDirectRankRefresh(provider.id, cached[provider.id], catalog.espnSeasonId)
+        && !workflowDrafts.read(`${storageKey}:${provider.id}-ranks-v1-attempted`, (value): value is boolean => value === true);
       const failure = workflowDrafts.read(`${storageKey}:${provider.id}-import-error`, (value): value is string => typeof value === 'string') ?? '';
-      if (failure) previousFailures[provider.id] = failure;
-      if (cached[provider.id] || failure) attempted.add(provider.id);
+      if (failure && !migrateRanks) previousFailures[provider.id] = failure;
+      if ((cached[provider.id] || failure) && !migrateRanks) attempted.add(provider.id);
     }
     libraryRef.current = cached;
     setLibrary(cached); setDirectErrors(previousFailures);
@@ -93,6 +99,30 @@ function StrategyWorkspace({ account, view }: { account: LeagueAccount; view: 'd
     setLibrary(next);
     if (!workflowDrafts.write(storageKey, next)) setNotice('Imports are available for this visit. Browser storage is unavailable, so keep this page open.');
   }, [storageKey]);
+  useEffect(() => {
+    if (!hydrated || account.connection !== 'live') return;
+    const controller = new AbortController();
+    setRankStatus('Restoring your saved BBM player ranks…');
+    void (async () => {
+      try {
+        const response = await fetch(`/api/draft-projection-ranks?seasonId=${account.seasonId}`, { credentials: 'same-origin', cache: 'no-store', signal: controller.signal });
+        const body = await response.json();
+        if (!response.ok) throw new Error('Saved BBM ranks could not be loaded. Refresh this page to retry; current imports remain available.');
+        if (body.snapshot !== null) {
+          const snapshot = draftProjectionRankSnapshotSchema.parse(body.snapshot);
+          if (snapshot.source !== 'basketball-monster' || snapshot.seasonId !== catalog.espnSeasonId) throw new Error('Saved BBM ranks belong to another season.');
+          if (!controller.signal.aborted) setRankSnapshots(current => {
+            const previous = current['basketball-monster'];
+            return previous && Date.parse(previous.importedAt) > Date.parse(snapshot.importedAt) ? current : { ...current, 'basketball-monster': snapshot };
+          });
+        }
+        if (!controller.signal.aborted) setRankStatus('');
+      } catch (failure) {
+        if (!controller.signal.aborted) setRankStatus(failure instanceof Error ? failure.message : 'Saved BBM ranks could not be loaded.');
+      }
+    })();
+    return () => controller.abort();
+  }, [hydrated, account.connection, account.seasonId]);
   const importData = useCallback(async (provider: DraftProjectionSource, direct: boolean, automatic = false) => {
     if (request.current || account.connection !== 'live') return;
     const directProvider = provider === 'espn' || provider === 'yahoo' ? provider : null;
@@ -102,11 +132,14 @@ function StrategyWorkspace({ account, view }: { account: LeagueAccount; view: 'd
       setDirectErrors(current => ({ ...current, [directProvider]: '' }));
       setDirectLoading({ source: directProvider, mode: automatic ? 'automatic' : 'manual' });
       automaticAttempted.current.add(directProvider);
+      if (automatic && needsDirectRankRefresh(directProvider, libraryRef.current[directProvider], catalog.espnSeasonId)) {
+        workflowDrafts.write(`${storageKey}:${directProvider}-ranks-v1-attempted`, true);
+      }
     }
     const controller = new AbortController(); request.current = controller;
     try {
       const response = await fetch('/api/draft-projections', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
-        body: JSON.stringify(direct ? { action: directProvider, seasonId: account.seasonId, ...(directProvider === 'yahoo' && !automatic ? { refresh: true } : {}) } : { action: 'import', seasonId: account.seasonId, source: provider, text, basis }) });
+        body: JSON.stringify(direct ? { action: directProvider, seasonId: account.seasonId, ...(directProvider === 'yahoo' && (!automatic || needsDirectRankRefresh('yahoo', libraryRef.current.yahoo, catalog.espnSeasonId)) ? { refresh: true } : {}) } : { action: 'import', seasonId: account.seasonId, source: provider, text, basis }) });
       const body = await response.json();
       if (!active.current || controller.signal.aborted || request.current !== controller) return;
       if (!response.ok) {
@@ -115,8 +148,18 @@ function StrategyWorkspace({ account, view }: { account: LeagueAccount; view: 'd
       }
       const dataset = draftProjectionDatasetSchema.parse(body.dataset);
       if (dataset.source !== provider || dataset.seasonId !== catalog.espnSeasonId) throw new Error('The import returned a different source or season.');
+      const importedRanks = body.rankSnapshot ? draftProjectionRankSnapshotSchema.parse(body.rankSnapshot) : null;
+      if (importedRanks && (importedRanks.source !== provider || importedRanks.seasonId !== dataset.seasonId)) throw new Error('Saved ranks returned a different source or season.');
       setNotice(`${dataset.players.length} ${dataset.sourceLabel} loaded${automatic ? ' automatically' : ''}. Saved for this browser session.`);
       save({ ...libraryRef.current, [provider]: dataset });
+      if (importedRanks) {
+        setRankSnapshots(current => {
+          const previous = current[importedRanks.source];
+          return previous && Date.parse(previous.importedAt) > Date.parse(importedRanks.importedAt) ? current : { ...current, [importedRanks.source]: importedRanks };
+        });
+        setRankStatus('');
+      }
+      if (typeof body.rankSaveError === 'string') setNotice(body.rankSaveError);
       if (directProvider) { workflowDrafts.remove(`${storageKey}:${directProvider}-import-error`); setDirectErrors(current => ({ ...current, [directProvider]: '' })); }
       if (!automatic) { if (!direct) setSource(provider); setText(''); setImportSource(null); }
     } catch (failure) {
@@ -131,7 +174,8 @@ function StrategyWorkspace({ account, view }: { account: LeagueAccount; view: 'd
   }, [account.connection, account.seasonId, account.reloadSession, basis, storageKey, save, text]);
   useEffect(() => {
     if (!hydrated || busy || account.connection !== 'live' || request.current) return;
-    const next = DIRECT_PROJECTION_SOURCES.find(provider => !automaticAttempted.current.has(provider.id) && !libraryRef.current[provider.id]);
+    const next = DIRECT_PROJECTION_SOURCES.find(provider => !automaticAttempted.current.has(provider.id)
+      && (!libraryRef.current[provider.id] || needsDirectRankRefresh(provider.id, libraryRef.current[provider.id], catalog.espnSeasonId)));
     if (!next) return;
     automaticAttempted.current.add(next.id);
     void importData(next.id, true, true);
@@ -142,7 +186,7 @@ function StrategyWorkspace({ account, view }: { account: LeagueAccount; view: 'd
     <div className={styles.header}><div><span className={styles.badge}>COMMISSIONER ONLY</span><h2>{view === 'draft' ? 'Your draft edge' : 'Keeper Suggestions'}</h2><p>{view === 'draft' ? 'Live rosters, category win probabilities, and two ways to find your next pick.' : 'Compare every projection source at once. Find value in your roster and a legal way to pay for it.'}</p></div><span className={styles.badge}>PRIVATE STRATEGY</span></div>
     {account.connection !== 'live' && <p className={styles.error} role="alert">Restore the league connection to import projections or record draft picks. Showing the last loaded data.</p>}
     <details className={styles.panel} aria-label="Private projection library">
-      <summary>Projection library · import and refresh</summary><p className={styles.subtle}>ESPN and Yahoo projections load automatically when their imports are missing. Saved imports are shared by Draft Tool and Keeper Suggestions for your account and season in this browser session. Upload Basketball Monster once here to use it in both tools. Estimates and recommendations stay private to Commissioner Tools.</p>
+      <summary>Projection library · import and refresh</summary><p className={styles.subtle}>ESPN and Yahoo load automatically when missing and refresh older imports that lack player ranks. Projection statistics are shared by both tools in this browser session. Supplied BBM player ranks are saved privately to your account and season and restored on future visits. Upload Basketball Monster once here to use its projections in both tools.</p>
       {DIRECT_PROJECTION_SOURCES.map(item => {
         const loading = directLoading?.source === item.id ? directLoading.mode : null;
         const failure = directErrors[item.id];
@@ -164,7 +208,7 @@ function StrategyWorkspace({ account, view }: { account: LeagueAccount; view: 'd
       {error && <p className={styles.error} role="alert">{error}</p>}{notice && <p className={styles.subtle} role="status">{notice}</p>}
       {Object.entries(library).some(([, data]) => data.warnings.length > 0) && <details className={styles.methodology}><summary>Import coverage and source notes</summary>{Object.entries(library).map(([key, data]) => data.warnings.length > 0 && <div key={key}><strong>{data.sourceLabel}</strong><ul>{data.warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul></div>)}</details>}
     </details>
-    {view === 'draft' ? <DraftAdvisorView account={account} projections={projections} library={library}/> : <KeeperComparison account={account} library={library}/>}
+    {view === 'draft' ? <DraftAdvisorView account={account} projections={projections} library={library} rankSnapshots={rankSnapshots} rankStatus={rankStatus}/> : <KeeperComparison account={account} library={library}/>}
   </div>;
 }
 
@@ -231,7 +275,7 @@ function AllTeamCategoryValues({ teams, franchiseId }: { teams: DraftAdvisorTeam
   </section>;
 }
 
-function DraftAdvisorView({ account, projections, library }: { account: LeagueAccount; projections: DraftProjectionDataset | null; library: ProjectionLibrary }) {
+function DraftAdvisorView({ account, projections, library, rankSnapshots, rankStatus }: { account: LeagueAccount; projections: DraftProjectionDataset | null; library: ProjectionLibrary; rankSnapshots: DraftCandidateRankSnapshots; rankStatus: string }) {
   const live = useAdvisorBoard(account.seasonId, account.connection === 'live');
   const [choice, setChoice] = useState('');
   const [schedule, setSchedule] = useState<DraftAdvisorSchedule | null>(null);
@@ -290,7 +334,7 @@ function DraftAdvisorView({ account, projections, library }: { account: LeagueAc
       <Recommendation candidate={seasonLoaded ? report?.scheduleRecommendation ?? null : null}/>
       <Recommendation candidate={seasonLoaded ? report?.fitRecommendation ?? null : null} fit/>
     </div></DraftSection>
-    <DraftSection title="Available players · source ranks and BBM value"><DraftCandidateTable catalog={catalog} library={library} report={report} seasonLoaded={seasonLoaded}/></DraftSection>
+    <DraftSection title="Available players · source ranks and BBM value"><DraftCandidateTable catalog={catalog} library={library} report={report} seasonLoaded={seasonLoaded} rankSnapshots={rankSnapshots} rankStatus={rankStatus}/></DraftSection>
     {live.board && <DraftTradeEditor account={account} board={live.board} stale={Boolean(live.error)} accept={live.accept} refresh={live.refresh}/>}
     {live.board && <RecordDraftPick account={account} board={live.board} stale={Boolean(live.error)} accept={live.accept} refresh={live.refresh}/>}
     {live.board && <DraftSection title="Draft rosters · every team"><DraftRosters board={live.board} preferredFranchiseId={ownFranchiseId}/></DraftSection>}

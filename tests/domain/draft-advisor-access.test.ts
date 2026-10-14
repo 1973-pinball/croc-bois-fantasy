@@ -5,6 +5,8 @@ import test from 'node:test';
 import ts from 'typescript';
 import identities from '../../data/identities.json';
 import { validateDraftScheduleWindow } from '../../src/lib/draft-advisor-schedule';
+import * as projectionRanks from '../../src/lib/draft-projection-ranks';
+import type { DraftProjectionDataset } from '../../src/lib/draft-projections';
 
 const require = createRequire(import.meta.url);
 type Handler = (request: Request) => Promise<Response>;
@@ -20,9 +22,13 @@ function moduleWithDependencies(path: string, dependencies: Record<string, unkno
   return exports;
 }
 
-type FixtureOptions = { role?: string | null; userId?: string | null; active?: boolean; authError?: boolean; membershipError?: boolean; seasonError?: boolean; configured?: boolean; serviceError?: string };
+type FixtureOptions = {
+  role?: string | null; userId?: string | null; active?: boolean; authError?: boolean; membershipError?: boolean; seasonError?: boolean; configured?: boolean; serviceError?: string;
+  projectionDataset?: DraftProjectionDataset; rankSnapshot?: unknown; rpcError?: { code?: string; message: string }; rpcThrow?: boolean;
+};
 function fixture(options: FixtureOptions = {}) {
   const calls: string[] = [], filters: { table: string; values: Record<string, unknown> }[] = [];
+  const rpcCalls: { name: string; args: Record<string, unknown> }[] = [];
   const db = {
     auth: { getUser: async () => { calls.push('auth'); return { data: { user: options.userId === null ? null : { id: options.userId ?? 'fixture-commissioner' } }, error: options.authError ? { message: 'Invalid auth' } : null }; } },
     from: (table: string) => {
@@ -42,21 +48,36 @@ function fixture(options: FixtureOptions = {}) {
       };
       return query;
     },
+    rpc: async (name: string, args: Record<string, unknown>) => {
+      assert.ok(['get_draft_provider_ranks', 'save_draft_provider_ranks'].includes(name));
+      calls.push(name); rpcCalls.push({ name, args });
+      assert.equal(args.p_season, identities.seasonId);
+      assert.deepEqual(Object.keys(args).sort(), name === 'get_draft_provider_ranks' ? ['p_season', 'p_source'] : ['p_season', 'p_snapshot']);
+      if (options.rpcThrow) throw new Error('Private database connection failed; internal detail');
+      if (options.rpcError) return { data: null, error: options.rpcError };
+      if (options.active === false || options.role === null || (options.role !== undefined && options.role !== 'commissioner')) return { data: null, error: { code: '42501', message: 'Commissioner access required' } };
+      return { data: options.rankSnapshot !== undefined ? options.rankSnapshot : name === 'save_draft_provider_ranks' ? args.p_snapshot : null, error: null };
+    },
   };
   const http = moduleWithDependencies('../../src/lib/supabase/http.ts', {
     'next/server': require('next/server'), './server': { createClient: async () => options.configured === false ? null : db }, './config': { SETUP_MESSAGE: 'Fixture setup is unavailable.' },
   });
-  const service = (kind: string, output: unknown) => (args: unknown, serviceOptions?: unknown) => { calls.push(kind); if (options.serviceError) throw new Error(options.serviceError); return { ...output as object, args, ...(serviceOptions ? { serviceOptions } : {}) }; };
+  const service = (kind: string, output: unknown) => (args: unknown, serviceOptions?: unknown) => { calls.push(kind); if (options.serviceError) throw new Error(options.serviceError); return kind !== 'schedule' && options.projectionDataset ? options.projectionDataset : { ...output as object, args, ...(serviceOptions ? { serviceOptions } : {}) }; };
   const projections = moduleWithDependencies('../../src/app/api/draft-projections/route.ts', {
     zod: require('zod'), '../../../../data/identities.json': identities, '@/lib/supabase/http': http,
+    '@/lib/draft-projection-ranks': projectionRanks,
     '@/lib/draft-projection-service': { importEspnDraftProjections: service('espn', { marker: 'projection-result' }), importYahooDraftProjections: service('yahoo', { marker: 'projection-result' }), importDraftProjectionText: service('text', { marker: 'projection-result' }) },
+  });
+  const ranks = moduleWithDependencies('../../src/app/api/draft-projection-ranks/route.ts', {
+    zod: require('zod'), '../../../../data/identities.json': identities, '@/lib/supabase/http': http,
+    '@/lib/draft-projection-ranks': projectionRanks,
   });
   const schedule = moduleWithDependencies('../../src/app/api/draft-schedule/route.ts', {
     '../../../../data/identities.json': identities, '@/lib/supabase/http': http,
     '@/lib/draft-advisor-schedule-server': { fetchDraftAdvisorSchedule: service('schedule', { marker: 'schedule-result' }) },
     '@/lib/draft-advisor-schedule': { validateDraftScheduleWindow },
   });
-  return { post: projections.POST as Handler, get: schedule.GET as Handler, calls, filters };
+  return { post: projections.POST as Handler, get: schedule.GET as Handler, getRanks: ranks.GET as Handler, calls, filters, rpcCalls };
 }
 const origin = 'https://league.example.invalid';
 const body = { action: 'espn', seasonId: identities.seasonId };
@@ -64,6 +85,14 @@ function request(payload: unknown = body, suppliedOrigin: string | null = origin
   return new Request(`${origin}/api/draft-projections`, { method: 'POST', headers: { ...(suppliedOrigin ? { origin: suppliedOrigin } : {}), 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
 }
 function scheduleRequest(query = 'seasonId=2027&startDate=2026-10-20') { return new Request(`${origin}/api/draft-schedule?${query}`); }
+function rankRequest(query = `seasonId=${identities.seasonId}`) { return new Request(`${origin}/api/draft-projection-ranks?${query}`); }
+function rankedDataset(source: DraftProjectionDataset['source'] = 'basketball-monster'): DraftProjectionDataset {
+  return { source, sourceLabel: 'Private fixture import', seasonId: 2027, importedAt: '2026-10-14T12:00:00.000Z', warnings: [],
+    players: [1, 2, 3].map(id => ({ id, name: `Fixture player ${id}`, games: 70, ...(id < 3 ? { providerRank: id + 2 } : {}),
+      stats: { pts: 20, reb: 5, ast: 5, stl: 1, blk: 1, tov: 2, three: 2, fgm: 7, fga: 14, ftm: 4, fta: 5 } })) };
+}
+const rankedImport = { action: 'import', seasonId: identities.seasonId, source: 'basketball-monster', basis: 'per-game', text: 'fixture-csv' };
+const rankSnapshot = () => ({ source: 'basketball-monster', seasonId: 2027, importedAt: '2026-10-14T12:00:00.000Z', ranks: [{ id: 1, providerRank: 3 }, { id: 2, providerRank: 4 }] });
 
 test('anonymous and invalid sessions cannot import or load schedule; source access never begins', async () => {
   for (const options of [{ userId: null }, { authError: true }]) {
@@ -171,6 +200,78 @@ test('Yahoo automatic imports use the same commissioner gate and verified season
   const failure = fixture({ serviceError: 'Yahoo is limiting projection requests.' });
   const rejected = await failure.post(request(yahoo)); assert.equal(rejected.status, 503);
   assert.equal((await rejected.json()).error, 'PROJECTION_IMPORT_FAILED');
+});
+
+test('private rank restoration requires a valid session and active commissioner authorization on every request', async () => {
+  for (const [options, status] of [[{ userId: null }, 401], [{ authError: true }, 401], [{ role: 'manager' }, 403], [{ role: null }, 403], [{ active: false }, 403], [{ configured: false }, 503]] as const) {
+    const app = fixture(options), response = await app.getRanks(rankRequest());
+    assert.equal(response.status, status); assert.equal(response.headers.get('Cache-Control'), 'private, no-store');
+    assert.ok(!('snapshot' in await response.json()));
+  }
+  const options: FixtureOptions = { role: 'commissioner', rankSnapshot: rankSnapshot() }, app = fixture(options);
+  assert.equal((await app.getRanks(rankRequest())).status, 200);
+  options.role = 'manager'; assert.equal((await app.getRanks(rankRequest())).status, 403);
+});
+
+test('rank restoration uses the verified season and fixed BBM source, never a caller-selected account or paid public cache', async () => {
+  const saved = rankSnapshot(), app = fixture({ rankSnapshot: saved });
+  const response = await app.getRanks(rankRequest(`seasonId=${identities.seasonId}&source=yahoo&userId=another-account`));
+  assert.equal(response.status, 200); assert.equal(response.headers.get('Cache-Control'), 'private, no-store');
+  assert.deepEqual(await response.json(), { snapshot: saved });
+  assert.deepEqual(app.rpcCalls, [{ name: 'get_draft_provider_ranks', args: { p_season: identities.seasonId, p_source: 'basketball-monster' } }]);
+  assert.ok(!app.calls.some(call => ['espn', 'yahoo', 'text', 'schedule'].includes(call)));
+  assert.deepEqual(await (await fixture().getRanks(rankRequest())).json(), { snapshot: null });
+  for (const query of ['', 'seasonId=invalid', 'seasonId=00000000-0000-4000-8000-000000000000']) {
+    const invalid = fixture(); assert.equal((await invalid.getRanks(rankRequest(query))).status, 400); assert.equal(invalid.rpcCalls.length, 0);
+  }
+  const unavailable = fixture({ seasonError: true }); assert.equal((await unavailable.getRanks(rankRequest())).status, 503); assert.equal(unavailable.rpcCalls.length, 0);
+});
+
+test('invalid or mismatched saved ranks fail closed without returning the payload or internal database error', async () => {
+  for (const saved of [{}, { ...rankSnapshot(), source: 'yahoo' }, { ...rankSnapshot(), seasonId: 2028 }, { ...rankSnapshot(), ranks: [{ id: 1, providerRank: 0 }] }]) {
+    const response = await fixture({ rankSnapshot: saved }).getRanks(rankRequest());
+    assert.equal(response.status, 503); assert.equal(response.headers.get('Cache-Control'), 'private, no-store');
+    assert.equal((await response.json()).error, 'RANKS_UNAVAILABLE');
+  }
+  const response = await fixture({ rpcError: { message: 'Private internal rank storage detail' } }).getRanks(rankRequest());
+  assert.equal(response.status, 500); assert.ok(!(await response.text()).includes('Private internal'));
+});
+
+test('BBM imports save only supplied rank fields to the authenticated account while preserving every projection statistic', async () => {
+  const dataset = rankedDataset(), before = structuredClone(dataset), app = fixture({ projectionDataset: dataset });
+  const response = await app.post(request(rankedImport));
+  assert.equal(response.status, 200); assert.equal(response.headers.get('Cache-Control'), 'private, no-store');
+  assert.deepEqual(await response.json(), { dataset, rankSnapshot: rankSnapshot() });
+  assert.deepEqual(app.rpcCalls, [{ name: 'save_draft_provider_ranks', args: { p_season: identities.seasonId, p_snapshot: rankSnapshot() } }]);
+  assert.deepEqual(dataset, before);
+  const stored = JSON.stringify(app.rpcCalls[0].args.p_snapshot);
+  for (const privateField of ['name', 'stats', 'games', 'text', 'warnings', 'sourceLabel', 'userId']) assert.ok(!stored.includes(`"${privateField}"`));
+});
+
+test('unranked BBM imports and other providers never invent or persist BBM ranks', async () => {
+  const unranked = rankedDataset(); unranked.players.forEach(player => { delete player.providerRank; });
+  for (const dataset of [unranked, rankedDataset('espn'), rankedDataset('yahoo')]) {
+    const app = fixture({ projectionDataset: dataset });
+    const response = await app.post(request({ ...rankedImport, source: dataset.source }));
+    assert.equal(response.status, 200); assert.deepEqual(await response.json(), { dataset }); assert.equal(app.rpcCalls.length, 0);
+  }
+});
+
+test('private rank persistence failures preserve the usable import and never return internal errors', async () => {
+  const dataset = rankedDataset();
+  for (const options of [{ rpcError: { message: 'Private storage detail' } }, { rpcThrow: true }, { rankSnapshot: {} }, { rankSnapshot: { ...rankSnapshot(), source: 'yahoo' } }, { rankSnapshot: { ...rankSnapshot(), seasonId: 2028 } }]) {
+    const response = await fixture({ ...options, projectionDataset: dataset }).post(request(rankedImport));
+    assert.equal(response.status, 200); assert.equal(response.headers.get('Cache-Control'), 'private, no-store');
+    const result = await response.json(); assert.deepEqual(result.dataset, dataset); assert.match(result.rankSaveError, /could not be saved/);
+    assert.equal(result.rankSnapshot, undefined); assert.ok(!JSON.stringify(result).includes('Private storage detail'));
+  }
+});
+
+test('a retained newer private snapshot is returned without changing the imported projection statistics', async () => {
+  const dataset = rankedDataset(), saved = { ...rankSnapshot(), importedAt: '2026-10-15T12:00:00.000Z' };
+  saved.ranks[0].providerRank = 6;
+  const response = await fixture({ projectionDataset: dataset, rankSnapshot: saved }).post(request(rankedImport));
+  assert.equal(response.status, 200); assert.deepEqual(await response.json(), { dataset, rankSnapshot: saved });
 });
 
 test('Yahoo caches successful reads by season with their source timestamp, while manual refresh deduplicates and preserves cache on failure', async () => {

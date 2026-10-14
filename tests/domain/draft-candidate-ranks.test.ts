@@ -4,6 +4,7 @@ import { buildDraftAdvisor, type DraftAdvisorCandidate, type DraftAdvisorInput }
 import { buildDraftCandidateRanks, sortDraftCandidates, type DraftCandidateRankLibrary } from '../../src/lib/draft-candidate-ranks';
 import type { DraftCatalogPlayer, DraftPlayerCatalog } from '../../src/lib/draft-player-catalog';
 import type { DraftPlayerProjection, DraftProjectionDataset, DraftProjectionSource, DraftProjectionStats } from '../../src/lib/draft-projections';
+import type { DraftProjectionRankSnapshot } from '../../src/lib/draft-projection-ranks';
 
 const source = { sha256: 'a'.repeat(64), url: 'https://example.com/fixture', capturedAt: '2026-10-13T00:00:00.000Z' };
 const stats = (pts = 10): DraftProjectionStats => ({ pts, reb: 5, ast: 3, stl: 1, blk: 1, tov: 2, three: 1, fgm: 5, fga: 10, ftm: 2, fta: 3 });
@@ -37,6 +38,18 @@ test('source ranks preserve imported provider ranks and BBM value is ESPN rank m
   imports['basketball-monster']!.players[0].stats.pts = 100;
   imports.yahoo!.players[24].stats.pts = 100;
   assert.deepEqual(buildDraftCandidateRanks(pool, imports), result);
+});
+
+test('current ESPN imported ranks override catalog ranks, with catalog fallback only for missing supplied values', () => {
+  const pool = catalog(3), imports = library(3); pool.players[2].rank = null;
+  imports.espn = dataset('espn', [{ ...projection(1), providerRank: 20 }, projection(2), { ...projection(3), providerRank: 1 }]);
+  const ranks = buildDraftCandidateRanks(pool, imports);
+  assert.equal(ranks.byPlayerId.get(1)!.espnRank, 20); assert.equal(ranks.byPlayerId.get(1)!.bbmValue, 17);
+  assert.equal(ranks.byPlayerId.get(2)!.espnRank, 2); assert.equal(ranks.byPlayerId.get(3)!.espnRank, 1);
+  assert.equal(ranks.coverage.espn, 3);
+  assert.deepEqual(sortDraftCandidates(pool.players.map(row => candidate(row)), ranks, 'espn').map(row => row.player.id), [3, 2, 1]);
+  imports.espn.seasonId = 2026;
+  assert.deepEqual([...buildDraftCandidateRanks(pool, imports).byPlayerId.values()].map(row => row.espnRank), [1, 2, null]);
 });
 
 test('sorts the full candidate pool before the 15-row cutoff and preserves inputs', () => {
@@ -97,6 +110,47 @@ test('legacy projection datasets without provider ranks remain missing rather th
   const result = buildDraftCandidateRanks(catalog(3), { 'basketball-monster': dataset('basketball-monster', [projection(1), projection(2)]), yahoo: dataset('yahoo', [projection(3)]) });
   assert.deepEqual(result.coverage, { selectable: 3, espn: 3, bbm: 0, yahoo: 0 });
   assert.ok([...result.byPlayerId.values()].every(row => row.bbmRank === null && row.yahooRank === null && row.bbmValue === null));
+});
+
+const rankSnapshot = (source: DraftProjectionRankSnapshot['source'] = 'basketball-monster'): DraftProjectionRankSnapshot => ({
+  source, seasonId: 2027, importedAt: '2026-10-14T00:00:00.000Z', ranks: [{ id: 3, providerRank: 1 }, { id: 1, providerRank: 7 }],
+});
+
+test('private supplied ranks work without forecasts and cannot manufacture team estimates', () => {
+  const input = advisorFixture(); input.projections = null;
+  const snapshots = { 'basketball-monster': rankSnapshot(), yahoo: rankSnapshot('yahoo') }, before = structuredClone(snapshots);
+  const ranks = buildDraftCandidateRanks(input.catalog, {}, snapshots), report = buildDraftAdvisor(input);
+  assert.deepEqual(ranks.byPlayerId.get(3), { espnRank: 3, bbmRank: 1, yahooRank: 1, bbmValue: 2 });
+  assert.equal(ranks.coverage.bbm, 2); assert.equal(ranks.coverage.yahoo, 2);
+  assert.equal(sortDraftCandidates(report.candidates, ranks, 'bbm')[0].player.id, 3);
+  assert.ok(report.candidates.every(row => !row.hasProjection && row.categoryWinRate === null && row.scheduleWinRate === null));
+  assert.deepEqual(report.fitRanking, []); assert.deepEqual(snapshots, before);
+});
+
+test('rank snapshots fill missing ranks, preserve gaps and omit unknown or nonselectable catalog identities', () => {
+  const pool = catalog(4); pool.players[3].selectable = false;
+  const imports = { 'basketball-monster': dataset('basketball-monster', [{ ...projection(1), providerRank: 7 }, projection(2)]) };
+  const supplied = { ...rankSnapshot(), ranks: [...rankSnapshot().ranks, { id: 2, providerRank: 11 }, { id: 4, providerRank: 2 }, { id: 99, providerRank: 3 }] };
+  const before = structuredClone({ imports, supplied });
+  const ranks = buildDraftCandidateRanks(pool, imports, { 'basketball-monster': supplied });
+  assert.equal(ranks.coverage.bbm, 3);
+  assert.deepEqual([...ranks.byPlayerId.values()].map(row => row.bbmRank), [7, 11, 1]);
+  assert.equal(ranks.byPlayerId.has(4), false); assert.equal(ranks.byPlayerId.has(99), false);
+  assert.deepEqual({ imports, supplied }, before);
+});
+
+test('a conflicting rank snapshot is wholly ignored and cannot overwrite imported ranks or fill its gaps', () => {
+  const imports = { 'basketball-monster': dataset('basketball-monster', [{ ...projection(1), providerRank: 5 }, projection(2)]) };
+  const ranks = buildDraftCandidateRanks(catalog(3), imports, { 'basketball-monster': rankSnapshot() });
+  assert.equal(ranks.coverage.bbm, 1); assert.equal(ranks.byPlayerId.get(1)!.bbmRank, 5); assert.equal(ranks.byPlayerId.get(3)!.bbmRank, null);
+});
+
+test('invalid, wrong-source and wrong-season rank snapshots cannot bypass dataset validation', () => {
+  for (const supplied of [{ ...rankSnapshot(), source: 'yahoo' as const }, { ...rankSnapshot(), seasonId: 2026 },
+    { ...rankSnapshot(), ranks: [{ id: 3, providerRank: 0 }] }, { ...rankSnapshot(), ranks: [{ id: 3, providerRank: 1 }, { id: 3, providerRank: 9 }] }]) {
+    const result = buildDraftCandidateRanks(catalog(3), {}, { 'basketball-monster': supplied });
+    assert.equal(result.coverage.bbm, 0);
+  }
 });
 
 function advisorFixture(): DraftAdvisorInput {

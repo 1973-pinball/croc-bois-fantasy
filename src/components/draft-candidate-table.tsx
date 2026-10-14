@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import type { DraftAdvisorReport } from '@/lib/draft-advisor';
 import type { DraftPlayerCatalog } from '@/lib/draft-player-catalog';
-import { buildDraftCandidateRanks, sortDraftCandidates, type DraftCandidateOrder, type DraftCandidateRankLibrary } from '@/lib/draft-candidate-ranks';
+import { buildDraftCandidateRanks, sortDraftCandidates, type DraftCandidateOrder, type DraftCandidateRankLibrary, type DraftCandidateRankSnapshots } from '@/lib/draft-candidate-ranks';
 import styles from './commissioner-strategy.module.css';
 
 const titles: Record<DraftCandidateOrder, string> = {
@@ -18,11 +18,11 @@ const gain = (value: number | null) => value === null ? '—' : `${value >= 0 ? 
 const rankLabel = (value: number | null | undefined) => value == null ? '—' : `#${value}`;
 const valueLabel = (value: number | null | undefined) => value == null ? '—' : `${value > 0 ? '+' : ''}${value}`;
 
-export function DraftCandidateTable({ catalog, library, report, seasonLoaded }: {
-  catalog: DraftPlayerCatalog; library: DraftCandidateRankLibrary; report: DraftAdvisorReport | null; seasonLoaded: boolean;
+export function DraftCandidateTable({ catalog, library, report, seasonLoaded, rankSnapshots, rankStatus }: {
+  catalog: DraftPlayerCatalog; library: DraftCandidateRankLibrary; report: DraftAdvisorReport | null; seasonLoaded: boolean; rankSnapshots?: DraftCandidateRankSnapshots; rankStatus?: string;
 }) {
   const [order, setOrder] = useState<DraftCandidateOrder>('espn');
-  const ranks = useMemo(() => buildDraftCandidateRanks(catalog, library), [catalog, library]);
+  const ranks = useMemo(() => buildDraftCandidateRanks(catalog, library, rankSnapshots), [catalog, library, rankSnapshots]);
   const candidates = useMemo(() => sortDraftCandidates(order === 'fit' && !seasonLoaded ? [] : report?.candidates ?? [], ranks, order), [report, ranks, order, seasonLoaded]);
   const missingSource = (order === 'bbm' || order === 'bbm-value') && !ranks.coverage.bbm ? 'Basketball Monster' : order === 'yahoo' && !ranks.coverage.yahoo ? 'Yahoo' : null;
   return <section className={styles.panel} aria-labelledby="draft-candidates-title">
@@ -35,7 +35,9 @@ export function DraftCandidateTable({ catalog, library, report, seasonLoaded }: 
       <option value="fit">Schedule + roster fit</option>
     </select></label></div>
     <p className={styles.subtle}>ESPN − BBM measures the rank gap: ESPN #80 and BBM #45 is <strong>+35</strong>. Bigger positive numbers mean better BBM value relative to ESPN. Sorting searches all available players before showing 15; missing ranks appear last.</p>
-    <p className={styles.subtle}>ESPN uses its supplied draft rank. BBM uses the supplied Rank column from its ranked table. Yahoo uses its published preseason rank. Ranks include drafted players and stay fixed as picks are made. BBM: {ranks.coverage.bbm || 'no'} ranked players · Yahoo: {ranks.coverage.yahoo || 'no'} ranked players.</p>
+    <p className={styles.subtle}>Player ranks are available before the draft and do not need team rosters. ESPN uses its imported ROTO draft rank, with the captured catalog as a fallback. BBM uses its supplied Rank column or your privately saved ranked list. Yahoo uses its published preseason rank. Ranks include drafted players and do not change when a player is picked. ESPN: {ranks.coverage.espn || 'no'} · BBM: {ranks.coverage.bbm || 'no'} · Yahoo: {ranks.coverage.yahoo || 'no'} ranked players.</p>
+    {rankStatus && <p className={styles.subtle} role="status">{rankStatus}</p>}
+    {rankSnapshots?.['basketball-monster'] && <p className={styles.subtle}>Saved BBM ranked list: {new Date(rankSnapshots['basketball-monster'].importedAt).toLocaleDateString()}.</p>}
     {library['basketball-monster'] && !ranks.coverage.bbm && <p className={styles.notice} role="status">Upload a Basketball Monster projection file with its Rank column to enable BBM rank and value comparisons. Your saved projections still work for win-rate estimates.</p>}
     {library.yahoo && !ranks.coverage.yahoo && <p className={styles.notice} role="status">Refresh Yahoo projections above to load its published preseason ranks.</p>}
     {missingSource && <p className={styles.notice} role="status">Import {missingSource} projections above to use this ranking. Until then, players remain in ESPN order and missing ranks show —.</p>}

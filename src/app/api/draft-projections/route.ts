@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import identities from '../../../../data/identities.json';
 import { importDraftProjectionText, importEspnDraftProjections, importYahooDraftProjections } from '@/lib/draft-projection-service';
+import { draftProjectionRankSnapshotSchema } from '@/lib/draft-projection-ranks';
 import { authenticatedClient, json, sameOrigin } from '@/lib/supabase/http';
 
 export const runtime = 'nodejs';
@@ -57,7 +58,19 @@ export async function POST(request: Request) {
         : body.action === 'yahoo'
           ? await importYahooDraftProjections(espnSeasonId, { refresh: body.refresh })
           : importDraftProjectionText({ seasonId: espnSeasonId, source: body.source, text: body.text, basis: body.basis });
-      // No shared database, board, queue, analytics feed, or public cache receives these projections.
+      if (dataset.source === 'basketball-monster') {
+        const ranks = dataset.players.flatMap(player => player.providerRank === undefined ? [] : [{ id: player.id, providerRank: player.providerRank }]);
+        if (ranks.length) {
+          const snapshot = draftProjectionRankSnapshotSchema.parse({ source: dataset.source, seasonId: dataset.seasonId, importedAt: dataset.importedAt, ranks });
+          try {
+            const saved = await auth.client.rpc('save_draft_provider_ranks', { p_season: body.seasonId, p_snapshot: snapshot });
+            const checked = draftProjectionRankSnapshotSchema.safeParse(saved.data);
+            if (!saved.error && checked.success && checked.data.source === snapshot.source && checked.data.seasonId === snapshot.seasonId) return json({ dataset, rankSnapshot: checked.data });
+          } catch { /* A failed private save must not discard a successfully parsed import. */ }
+          return json({ dataset, rankSaveError: 'Projections imported, but BBM ranks could not be saved to your private account. Retry the import to save them for future visits.' });
+        }
+      }
+      // Projection statistics remain browser-session data; only supplied BBM ranks are saved privately per account.
       return json({ dataset });
     } catch (error) {
       return json({ error: 'PROJECTION_IMPORT_FAILED', message: error instanceof Error ? error.message : 'The projection import could not finish.' }, body.action === 'import' ? 400 : 503);

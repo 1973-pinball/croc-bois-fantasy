@@ -257,7 +257,10 @@ export function extractEspnDraftProjections(payload: unknown, seasonId: number, 
     const rawGames = totals?.['42'];
     if (rawGames !== undefined && rawGames !== null && (typeof rawGames !== 'number' || !Number.isFinite(rawGames) || rawGames < 0 || rawGames > 82)) { excluded++; continue; }
     const games = typeof rawGames === 'number' && Number.isFinite(rawGames) && rawGames >= 0 && rawGames <= 82 ? rawGames : null;
-    players.push({ id, name: knownPlayer.name, games, stats: checked.data });
+    const suppliedRank = object(object(player?.draftRanksByRankType)?.ROTO);
+    const providerRank = suppliedRank?.rankType === 'ROTO' && suppliedRank.slotId === 0
+      && typeof suppliedRank.rank === 'number' && Number.isSafeInteger(suppliedRank.rank) && suppliedRank.rank > 0 ? suppliedRank.rank : undefined;
+    players.push({ id, name: knownPlayer.name, games, stats: checked.data, ...(providerRank === undefined ? {} : { providerRank }) });
   }
   if (!players.length) throw new Error('ESPN did not return complete projections for this season. Import a current projection export instead.');
   const warnings = excluded ? [`${excluded} ESPN players have no complete current-season projection or matching catalog identity and were excluded. Actual statistics were not substituted.`] : [];

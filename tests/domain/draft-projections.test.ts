@@ -263,6 +263,28 @@ test('ESPN excludes incomplete projections and rejects duplicated identities or 
   assert.throws(() => extractEspnDraftProjections({ players: [entry(1, [record(), record()])] }, 2027, catalog), /conflicting full-season/);
 });
 
+test('ESPN projections preserve current overall ROTO ranks independently of catalog ranks and statistics', () => {
+  const ranked = (id: number, rank: number, published: boolean) => ({ ...entry(id, [record()]), player: { ...entry(id, [record()]).player, draftRanksByRankType: { STANDARD: { rank: 1 }, ROTO: { rank, rankType: 'ROTO', slotId: 0, published } } } });
+  const result = extractEspnDraftProjections({ players: [ranked(1, 27, true), ranked(2, 9, false)] }, 2027, catalog, importedAt);
+  assert.deepEqual(result.players.map(({ id, providerRank }) => [id, providerRank]), [[1, 27], [2, 9]]);
+  assert.deepEqual(result.players[0].stats, { pts: 28, reb: 12, ast: 10, stl: 1.5, blk: .8, tov: 3, three: 2, fgm: 10, fga: 18, ftm: 6, fta: 8 });
+  assert.equal(result.players[0].games, 70);
+  assert.equal(catalog.players[0].rank, 1);
+});
+
+test('missing, positional, non-ROTO and malformed ESPN ranks leave valid projections unranked', () => {
+  const validRank = { rank: 27, rankType: 'ROTO', slotId: 0 };
+  const unsupportedRanks: unknown[] = [undefined, null, [], '27', {}, { ...validRank, rankType: 'STANDARD' }, { ...validRank, slotId: 1 }, { ...validRank, slotId: '0' },
+    ...[0, -1, 1.5, Number.MAX_SAFE_INTEGER + 1, Infinity, NaN, '27', null].map(rank => ({ ...validRank, rank }))];
+  const original = entry(1, [record()]);
+  for (const ROTO of unsupportedRanks) {
+    const result = extractEspnDraftProjections({ players: [{ ...original, player: { ...original.player, draftRanksByRankType: { STANDARD: validRank, ROTO } } }] }, 2027, catalog);
+    assert.equal(result.players.length, 1);
+    assert.equal(result.players[0].providerRank, undefined);
+    assert.equal(result.players[0].stats.pts, 28);
+  }
+});
+
 test('saved browser datasets are revalidated for finite complete stats and unique player identity', () => {
   const dataset = importDraftProjections(options(`${titles}\n${line}`));
   assert.equal(draftProjectionDatasetSchema.safeParse(dataset).success, true);
