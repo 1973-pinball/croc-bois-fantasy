@@ -3,8 +3,8 @@ import test from 'node:test';
 import type { DraftPlayerCatalog } from '../../src/lib/draft-player-catalog';
 import { fetchYahooDraftProjections, parseYahooProjectionPage, YAHOO_PROJECTION_URL } from '../../src/lib/yahoo-draft-projections';
 
-const columns = ['Players', 'Roster Status', 'Games Played', 'Field Goals Made', 'Field Goals Attempted', 'Free Throws Made', 'Free Throws Attempted', '3-point Shots Made', 'Points Scored', 'Total Rebounds', 'Assists', 'Steals', 'Blocked Shots', 'Turnovers'];
-type Player = { id: number; name: string; label?: string; values?: Partial<Record<string, string>> };
+const columns = ['Pre-Season', 'Players', 'Roster Status', 'Games Played', 'Field Goals Made', 'Field Goals Attempted', 'Free Throws Made', 'Free Throws Attempted', '3-point Shots Made', 'Points Scored', 'Total Rebounds', 'Assists', 'Steals', 'Blocked Shots', 'Turnovers'];
+type Player = { id: number; name: string; rank?: number; label?: string; values?: Partial<Record<string, string>> };
 const escape = (value: string) => value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 function page(players: Player[], options: { next?: number; headings?: string[]; mode?: string; season?: number; status?: string; nextUrl?: string } = {}) {
   const headings = options.headings ?? columns;
@@ -12,8 +12,8 @@ function page(players: Player[], options: { next?: number; headings?: string[]; 
   const values: Record<string, string> = { 'Roster Status': 'Unrelated league owner', 'Games Played': '70', 'Field Goals Made': '700', 'Field Goals Attempted': '1,400', 'Free Throws Made': '350', 'Free Throws Attempted': '420', '3-point Shots Made': '140', 'Points Scored': '1890', 'Total Rebounds': '560', Assists: '420', Steals: '70', 'Blocked Shots': '35', Turnovers: '210' };
   return `<html><body><select name="status"><option value="${options.status ?? 'ALL'}" selected>All Players</option></select>
     <select name="stat1"><optgroup label="Projected Stats"><option selected value="${options.mode ?? 'S_PSR'}">Remaining Games (proj)</option></optgroup><option value="S_S_${options.season ?? 2026}">Season (total)</option><option value="S_S_2025">2025-26 Season (total)</option></select>
-    <table><tr><th colspan="${headings.length}">Public projections</th></tr><tr>${headings.map(title => `<th class="heading" title="${title}">${title}</th>`).join('')}</tr>
-      ${players.map(player => `<tr>${headings.map(title => `<td>${title === 'Players' ? `<a title="${escape(player.name)}" data-ys-playerid="${player.id}" href="https://sports.yahoo.com/nba/players/${player.id}" class="Nowrap name playernote">${escape(player.label ?? player.name)}</a>` : player.values?.[title] ?? values[title] ?? '0'}</td>`).join('')}</tr>`).join('')}
+    <table><tr><th colspan="${headings.length}">Public projections</th></tr><tr>${headings.map(title => title === 'Pre-Season' ? `<th><a href="/nba/842/players?sort=OR">Pre-Season</a></th>` : `<th class="heading" title="${title}">${title}</th>`).join('')}</tr>
+      ${players.map(player => `<tr>${headings.map(title => `<td>${title === 'Pre-Season' ? String(player.rank ?? player.id) : title === 'Players' ? `<a title="${escape(player.name)}" data-ys-playerid="${player.id}" href="https://sports.yahoo.com/nba/players/${player.id}" class="Nowrap name playernote">${escape(player.label ?? player.name)}</a>` : player.values?.[title] ?? values[title] ?? '0'}</td>`).join('')}</tr>`).join('')}
     </table>${next ? `<a href="${escape(next)}">Next 25</a>` : ''}</body></html><!-- Yahoo footer -->`;
 }
 const players = Array.from({ length: 27 }, (_, index) => ({ id: 9000 + index, name: `Player ${index}` }));
@@ -26,7 +26,7 @@ test('reads full names, not abbreviations, Yahoo IDs or unrelated public owners;
   assert.equal(result.rowCount, 1); assert.equal(result.nextOffset, null);
   assert.equal(result.players[0].name, input.name);
   assert.deepEqual(result.players[0].totals, { fgm: 700, fga: 1400, ftm: 350, fta: 420, three: 140, pts: 1890, reb: 560, ast: 420, stl: 70, blk: 35, tov: 210 });
-  assert.equal(result.players[0].games, 70);
+  assert.equal(result.players[0].games, 70); assert.equal(result.players[0].providerRank, 1);
   assert.ok(!JSON.stringify(result).includes('Unrelated league owner'));
 });
 
@@ -80,6 +80,7 @@ test('fetches every page from the fixed public context, converts totals, preserv
   }
   assert.equal(dataset.players.length, 27); assert.equal(dataset.source, 'yahoo'); assert.equal(dataset.seasonId, 2027);
   assert.equal(dataset.sourceLabel, 'Yahoo remaining-season projections');
+  assert.equal(dataset.players[0].providerRank, 9000); assert.equal(dataset.players[25].providerRank, 9025);
   assert.equal(dataset.players[0].id, 1000); assert.equal(dataset.players[0].stats.pts, 27); assert.equal(dataset.players[0].stats.fga, 20);
   assert.ok(dataset.players.every(player => player.games === null));
   assert.ok(dataset.warnings.some(warning => warning.includes('not scaled by remaining games / 82')));
@@ -115,4 +116,19 @@ test('wrong season and oversized or non-HTML responses fail before usable data c
   assert.equal(calls, 0);
   await assert.rejects(fetchYahooDraftProjections(2027, catalog, async () => new Response('{}', { headers: { 'Content-Type': 'application/json' } })), /unexpected projection format/);
   await assert.rejects(fetchYahooDraftProjections(2027, catalog, async () => new Response('large', { headers: { 'Content-Type': 'text/html', 'Content-Length': '5000000' } })), /unexpectedly large/);
+});
+
+test('preseason ranks come from the verified OR column and retain gaps after excluded rows', async () => {
+  const rows = [
+    { ...players[0], rank: 20 },
+    { ...players[1], rank: 5, values: { 'Games Played': '0' } },
+    { ...players[2], rank: 80 },
+  ];
+  const parsed = parseYahooProjectionPage(page(rows), 2027);
+  assert.deepEqual(parsed.players.map(player => player.providerRank), [20, 80]);
+  const imported = await fetchYahooDraftProjections(2027, catalog, async () => response(page(rows)));
+  assert.deepEqual(imported.players.map(player => player.providerRank), [20, 80]);
+  assert.throws(() => parseYahooProjectionPage(page(rows).replace('sort=OR', 'sort=AR'), 2027), /rank column/);
+  assert.throws(() => parseYahooProjectionPage(page(rows, { headings: columns.filter(column => column !== 'Pre-Season') }), 2027), /rank column/);
+  assert.throws(() => parseYahooProjectionPage(page([{ ...players[0], rank: 0 }]), 2027), /invalid preseason rank/);
 });

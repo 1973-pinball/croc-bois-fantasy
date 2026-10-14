@@ -3,7 +3,7 @@ import { compareDraftCatalogPlayers, type DraftCatalogPlayer, type DraftPlayerCa
 import { buildDraftRosters, type DraftRosterPlayer, type DraftTeamRoster } from './draft-roster';
 import type { DraftRosterEligibility, DraftRosterSettings } from './espn-roster-settings';
 import type { DraftPlayerProjection, DraftProjectionDataset, DraftProjectionStats } from './draft-projections';
-import type { DraftAdvisorSchedule } from './draft-advisor-schedule';
+import { draftAdvisorScheduleSchema, type DraftAdvisorSchedule } from './draft-advisor-schedule';
 
 export type DraftAdvisorCategory = {
   id: number; label: string; lowerIsBetter: boolean; projectedValue: number | null;
@@ -13,6 +13,7 @@ export type DraftAdvisorTeam = {
   franchiseId: string; displayName: string; roster: DraftTeamRoster;
   coverage: { projected: number; total: number; missing: { id: number; name: string }[] };
   totals: DraftProjectionStats | null; categories: DraftAdvisorCategory[];
+  scheduleTotals: DraftProjectionStats | null; scheduleCategories: DraftAdvisorCategory[];
   categoryWinRate: number | null; scheduleWinRate: number | null;
 };
 export type DraftAdvisorCandidate = {
@@ -30,9 +31,11 @@ export type DraftAdvisorMatchup = {
 };
 export type DraftAdvisorReport = {
   available: boolean; unavailableReason: string | null; franchiseId: string; revision: number;
-  teams: DraftAdvisorTeam[]; selectedTeam: DraftAdvisorTeam | null; matchups: DraftAdvisorMatchup[];
+  teams: DraftAdvisorTeam[]; selectedTeam: DraftAdvisorTeam | null; matchups: DraftAdvisorMatchup[]; scheduleMatchups: DraftAdvisorMatchup[];
+  /** Every available selectable player, including rows without the selected source's projection. */
+  candidates: DraftAdvisorCandidate[];
   topAvailable: DraftAdvisorCandidate[]; fitRanking: DraftAdvisorCandidate[];
-  categoryRecommendation: DraftAdvisorCandidate | null; fitRecommendation: DraftAdvisorCandidate | null;
+  categoryRecommendation: DraftAdvisorCandidate | null; scheduleRecommendation: DraftAdvisorCandidate | null; fitRecommendation: DraftAdvisorCandidate | null;
   warnings: string[]; methodology: string[]; scheduleMode: 'actual' | 'equal_games'; evaluatedCandidates: number;
 };
 export type DraftAdvisorInput = {
@@ -121,22 +124,48 @@ function activePlayers(players: DraftRosterPlayer[], slotIds: number[], weights:
   return [...occupants.values()].map(player => player.id);
 }
 
-type ScheduleContext = { days: Map<string, Set<string>>; weeklyScale: number; activeSlots: number[]; weights: Map<number, number> };
-type ScheduledTotals = { totals: DraftProjectionStats | null; games: Map<number, number>; usable: Map<number, number> };
+type ScheduleContext = {
+  days: { teams: Set<string>; week: number }[]; weeklyScale: number; weeks: number; season: boolean; allTeams: Set<string>;
+  activeSlots: number[]; weights: Map<number, number>; lineupCache: Map<string, number[]>;
+};
+type ScheduledTotals = { totals: DraftProjectionStats | null; weekly: (DraftProjectionStats | null)[]; games: Map<number, number>; usable: Map<number, number> };
 function scheduledTotals(players: DraftRosterPlayer[], projections: Map<number, DraftPlayerProjection>, catalog: Map<number, DraftCatalogPlayer>, context: ScheduleContext): ScheduledTotals {
-  const result: ScheduledTotals = { totals: null, games: new Map(), usable: new Map() };
-  if (!players.length || players.some(player => !projections.has(player.id) || !player.eligibleSlots?.length || !catalog.get(player.id)?.nbaTeam || ['FA', 'UNKNOWN'].includes(catalog.get(player.id)!.nbaTeam.toUpperCase()))) return result;
+  const result: ScheduledTotals = { totals: null, weekly: Array.from({ length: context.weeks }, () => null), games: new Map(), usable: new Map() };
+  const playerTeams = new Map(players.map(player => [player.id, normalizeTeam(catalog.get(player.id)?.nbaTeam ?? '')]));
+  if (!players.length || players.some(player => !projections.has(player.id) || !player.eligibleSlots?.length || !playerTeams.get(player.id)
+    || ['FA', 'UNKNOWN'].includes(playerTeams.get(player.id)!) || (context.season && !context.allTeams.has(playerTeams.get(player.id)!)))) return result;
   result.totals = zero();
-  for (const scheduledTeams of context.days.values()) {
-    const playing = players.filter(player => scheduledTeams.has(normalizeTeam(catalog.get(player.id)!.nbaTeam)));
+  result.weekly = Array.from({ length: context.weeks }, zero);
+  for (const day of context.days) {
+    const playing = players.filter(player => day.teams.has(playerTeams.get(player.id)!));
     for (const player of playing) result.games.set(player.id, (result.games.get(player.id) ?? 0) + 1);
-    for (const id of activePlayers(playing, context.activeSlots, context.weights)) {
+    // Repeated daily combinations, including days when a hypothetical pick is
+    // idle, share one slot assignment across the entire candidate pool.
+    const key = playing.map(player => player.id).join(',');
+    let active = context.lineupCache.get(key);
+    if (!active) { active = activePlayers(playing, context.activeSlots, context.weights); context.lineupCache.set(key, active); }
+    for (const id of active) {
       result.usable.set(id, (result.usable.get(id) ?? 0) + 1);
       const projection = projections.get(id)!;
-      add(result.totals, projection.stats, availability(projection) * context.weeklyScale);
+      add(result.weekly[day.week]!, projection.stats, availability(projection) * context.weeklyScale);
     }
   }
+  for (const weekly of result.weekly) add(result.totals, weekly!, 1 / context.weeks);
   return result;
+}
+
+/** Average weekly probabilities, never a probability computed from pooled season totals. */
+function compareScheduled(a: ScheduledTotals, opponents: ScheduledTotals[], categories: DraftPlayerCatalog['categories']) {
+  const weeks = a.weekly.map((total, index) => compareTeams(total, opponents.map(opponent => opponent.weekly[index] ?? null), categories));
+  const complete = weeks.filter(week => week.winRate !== null);
+  return {
+    winRate: average(complete.map(week => week.winRate!)),
+    categories: categories.map((category, index) => ({ ...category, lowerIsBetter: category.id === 11,
+      projectedValue: categoryValue(a.totals, category.id),
+      winProbability: average(complete.map(week => week.categories[index].winProbability!)),
+      opponentsCompared: complete.length ? Math.min(...complete.map(week => week.categories[index].opponentsCompared)) : 0,
+    })),
+  };
 }
 
 const methodology = [
@@ -144,7 +173,8 @@ const methodology = [
   'Each estimate uses the players selected so far. Undrafted roster slots are left unfilled. Teams with missing player projections are excluded from comparisons; percentage categories require positive shot attempts.',
   'The category-only recommendation tests every available projected player using 3.5 games per week. Source projected games, when supplied, scale expected availability by projected games / 82. FG% and FT% use total makes / total attempts; lower turnovers are better.',
   'Weekly probability approximation: normal count differences with variance 1.5 × expected counts plus a 12% team projection uncertainty floor; shooting uses binomial variance plus a 1.5 percentage point floor per team. Ties in expected totals receive 50%. These assumptions are heuristic and are not fitted to player histories.',
-  'With an imported schedule, daily starting assignments maximize summed per-game nine-category value using the league’s configured active slots. Bench and IR games do not score. Totals are normalized to seven days. This is a daily lineup heuristic, not an exact optimization of season-long wins.',
+  'With a full-season schedule, each Monday–Sunday week is evaluated separately against the other current rosters, including partial opening and closing weeks. Schedule winrate averages those weekly nine-category probabilities; it does not pool season totals into one matchup. Weeks without published NBA games are omitted; weekly comparisons needing unavailable shooting probabilities are excluded. Displayed production is average weekly production.',
+  'Daily starting assignments maximize summed per-game nine-category value using the league’s configured active slots. Bench and IR games do not score. Scheduled and usable game counts cover the entire loaded schedule, before availability scaling. This is a daily lineup heuristic, not an exact optimization of season-long wins. Legacy seven-day imports evaluate just their loaded week.',
   'The separate fit score adds an explicit roster-balance adjustment to the schedule category winrate. A fourth C-eligible player is penalized 1.5 percentage points; a fifth or later is penalized 3 points or more (half for multi-position centers). Covering an uncovered specific starting position adds 0.6 points, up to 1.2. Fit score is a ranking score, not a probability.',
   'Snapshot injury labels are shown by the draft roster but are not used to assume a player misses the full schedule horizon. Injury risk enters only through source projected games. The model does not simulate future picks, streaming, trades, games-played caps, or weekly lineup locks.',
 ];
@@ -153,8 +183,8 @@ const methodology = [
 export function buildDraftAdvisor(input: DraftAdvisorInput): DraftAdvisorReport {
   const { board, catalog, settings, eligibility, projections: dataset, franchiseId } = input;
   const report: DraftAdvisorReport = {
-    available: false, unavailableReason: null, franchiseId, revision: board.revision, teams: [], selectedTeam: null, matchups: [],
-    topAvailable: [], fitRanking: [], categoryRecommendation: null, fitRecommendation: null,
+    available: false, unavailableReason: null, franchiseId, revision: board.revision, teams: [], selectedTeam: null, matchups: [], scheduleMatchups: [],
+    candidates: [], topAvailable: [], fitRanking: [], categoryRecommendation: null, scheduleRecommendation: null, fitRecommendation: null,
     warnings: [], methodology: [...methodology], scheduleMode: 'equal_games', evaluatedCandidates: 0,
   };
   const unavailable = (reason: string) => { report.unavailableReason = reason; return report; };
@@ -190,8 +220,8 @@ export function buildDraftAdvisor(input: DraftAdvisorInput): DraftAdvisorReport 
   if (schedule) {
     const start = Date.parse(`${schedule.startDate}T00:00:00Z`), end = Date.parse(`${schedule.endDate}T00:00:00Z`);
     const days = Math.round((end - start) / 86_400_000) + 1;
-    if (schedule.seasonId !== board.draftYear + 1 || !Number.isFinite(days) || days < 1 || days > 31 || !schedule.games.length) {
-      report.warnings.push('The schedule is empty, outside the supported 1–31 day horizon, or for another season; using equal games.');
+    if (schedule.seasonId !== board.draftYear + 1 || !draftAdvisorScheduleSchema.safeParse(schedule).success) {
+      report.warnings.push('The schedule is empty, has an invalid season/window, or is for another season; using equal games.');
     } else {
       const dates = new Map<string, Set<string>>();
       for (const game of schedule.games) {
@@ -201,7 +231,17 @@ export function buildDraftAdvisor(input: DraftAdvisorInput): DraftAdvisorReport 
       if (dates.size) {
         const activeSlots = settings.slots.filter(slot => slot.kind === 'normal' && !settings.slotDefinitions.find(definition => definition.slotId === slot.slotId)?.bench && slot.slotId !== 12)
           .flatMap(slot => Array.from({ length: slot.count }, () => slot.slotId));
-        scheduleContext = { days: dates, weeklyScale: 7 / days, activeSlots, weights: lineupValues(projections) };
+        const season = schedule.scope === 'season';
+        const weeks = new Map<string, number>();
+        const scheduleDays = [...dates].sort(([a], [b]) => a.localeCompare(b)).map(([date, teams]) => {
+          const timestamp = Date.parse(`${date}T12:00:00Z`), weekday = new Date(timestamp).getUTCDay();
+          const monday = new Date(timestamp - ((weekday + 6) % 7) * 86_400_000).toISOString().slice(0, 10);
+          const weekKey = season ? monday : schedule.startDate;
+          if (!weeks.has(weekKey)) weeks.set(weekKey, weeks.size);
+          return { teams, week: weeks.get(weekKey)! };
+        });
+        scheduleContext = { days: scheduleDays, weeklyScale: season ? 1 : 7 / days, weeks: weeks.size, season,
+          allTeams: new Set(schedule.games.map(game => normalizeTeam(game.team))), activeSlots, weights: lineupValues(projections), lineupCache: new Map() };
         report.scheduleMode = 'actual';
         report.warnings.push(...schedule.warnings);
       }
@@ -214,9 +254,10 @@ export function buildDraftAdvisor(input: DraftAdvisorInput): DraftAdvisorReport 
     const missing = roster.players.filter(player => !projections.has(player.id)).map(({ id, name }) => ({ id, name }));
     const totals = totalFor(roster.players);
     if (scheduleContext) scheduledByTeam.set(roster.franchiseId, scheduledTotals(roster.players, projections, catalogById, scheduleContext));
-    else scheduledByTeam.set(roster.franchiseId, { totals, games: new Map(), usable: new Map() });
+    else scheduledByTeam.set(roster.franchiseId, { totals, weekly: [totals], games: new Map(), usable: new Map() });
     report.teams.push({ franchiseId: roster.franchiseId, displayName: roster.displayName, roster,
-      coverage: { projected: roster.totalPlayers - missing.length, total: roster.totalPlayers, missing }, totals, categories: [], categoryWinRate: null, scheduleWinRate: null });
+      coverage: { projected: roster.totalPlayers - missing.length, total: roster.totalPlayers, missing }, totals, categories: [],
+      scheduleTotals: scheduledByTeam.get(roster.franchiseId)!.totals, scheduleCategories: [], categoryWinRate: null, scheduleWinRate: null });
     report.warnings.push(...roster.issues);
     if (roster.players.some(player => !player.eligibleSlots?.length)) report.warnings.push(`${roster.displayName}: ESPN position eligibility is missing for a drafted player; roster-fit recommendations for this team are unavailable.`);
     if (missing.length) report.warnings.push(`${roster.displayName}: ${missing.length} of ${roster.totalPlayers} drafted players lack projections; this team's winrates are unavailable and it is excluded from opponent averages.`);
@@ -227,7 +268,8 @@ export function buildDraftAdvisor(input: DraftAdvisorInput): DraftAdvisorReport 
     const opponents = report.teams.filter(other => other.franchiseId !== team.franchiseId);
     const comparison = compareTeams(team.totals, opponents.map(opponent => opponent.totals), catalog.categories);
     team.categories = comparison.categories; team.categoryWinRate = comparison.winRate;
-    team.scheduleWinRate = compareTeams(scheduledByTeam.get(team.franchiseId)!.totals, opponents.map(opponent => scheduledByTeam.get(opponent.franchiseId)!.totals), catalog.categories).winRate;
+    const scheduled = compareScheduled(scheduledByTeam.get(team.franchiseId)!, opponents.map(opponent => scheduledByTeam.get(opponent.franchiseId)!), catalog.categories);
+    team.scheduleWinRate = scheduled.winRate; team.scheduleCategories = scheduled.categories;
   }
   const selected = report.teams.find(team => team.franchiseId === franchiseId)!;
   const selectedEligibilityComplete = selected.roster.players.every(player => player.eligibleSlots?.length);
@@ -237,8 +279,12 @@ export function buildDraftAdvisor(input: DraftAdvisorInput): DraftAdvisorReport 
     const result = compareTeams(selected.totals, [opponent.totals], catalog.categories);
     return { franchiseId: opponent.franchiseId, displayName: opponent.displayName, categories: result.categories.map(({ id, label, winProbability }) => ({ id, label, winProbability })), categoryWinRate: result.winRate };
   });
+  report.scheduleMatchups = opponents.map(opponent => {
+    const result = compareScheduled(scheduledByTeam.get(franchiseId)!, [scheduledByTeam.get(opponent.franchiseId)!], catalog.categories);
+    return { franchiseId: opponent.franchiseId, displayName: opponent.displayName, categories: result.categories.map(({ id, label, winProbability }) => ({ id, label, winProbability })), categoryWinRate: result.winRate };
+  });
   const selectedOpponents = opponents.map(opponent => opponent.totals);
-  const scheduledOpponents = opponents.map(opponent => scheduledByTeam.get(opponent.franchiseId)!.totals);
+  const scheduledOpponents = opponents.map(opponent => scheduledByTeam.get(opponent.franchiseId)!);
   const taken = new Set(board.picks.filter(pick => pick.status === 'selected' || (pick.status === 'keeper' && board.keepersRevealedAt)).flatMap(pick => pick.playerId === null ? [] : [pick.playerId]));
   const available = catalog.players.filter(player => player.selectable && !taken.has(player.id)).sort(compareDraftCatalogPlayers);
   const centers = selected.roster.players.filter(player => player.eligibleSlots?.includes(4)).length;
@@ -265,7 +311,7 @@ export function buildDraftAdvisor(input: DraftAdvisorInput): DraftAdvisorReport 
     row.categoryGain = row.categoryWinRate !== null && selected.categoryWinRate !== null ? row.categoryWinRate - selected.categoryWinRate : null;
     if (scheduleContext) {
       const scheduled = scheduledTotals(players, projections, catalogById, scheduleContext);
-      row.scheduleWinRate = compareTeams(scheduled.totals, scheduledOpponents, catalog.categories).winRate;
+      row.scheduleWinRate = compareScheduled(scheduled, scheduledOpponents, catalog.categories).winRate;
       if (scheduled.totals) { row.scheduledGames = scheduled.games.get(player.id) ?? 0; row.usableGames = scheduled.usable.get(player.id) ?? 0; }
       row.reasons.push(row.usableGames !== null ? `${row.usableGames} of ${row.scheduledGames} scheduled games fit the daily active lineup in this horizon.` : 'NBA team or lineup eligibility is missing, so schedule fit cannot be estimated.');
     } else row.scheduleWinRate = row.categoryWinRate;
@@ -292,8 +338,11 @@ export function buildDraftAdvisor(input: DraftAdvisorInput): DraftAdvisorReport 
   });
   const pure = allCandidates.filter(row => !row.blocked && row.categoryWinRate !== null).sort((a, b) => b.categoryWinRate! - a.categoryWinRate! || compareDraftCatalogPlayers(a.player, b.player));
   const fit = allCandidates.filter(row => !row.blocked && row.fitScore !== null).sort((a, b) => b.fitScore! - a.fitScore! || compareDraftCatalogPlayers(a.player, b.player));
+  report.candidates = allCandidates;
   report.topAvailable = allCandidates.slice(0, 15); report.fitRanking = fit.slice(0, 15);
   report.categoryRecommendation = pure[0] ?? null; report.fitRecommendation = fit[0] ?? null;
+  report.scheduleRecommendation = allCandidates.filter(row => !row.blocked && row.scheduleWinRate !== null)
+    .sort((a, b) => b.scheduleWinRate! - a.scheduleWinRate! || compareDraftCatalogPlayers(a.player, b.player))[0] ?? null;
   if (!selectedOpponents.some(opponent => opponent !== null)) report.warnings.push('At least one non-empty opponent roster with complete projections is needed for winrate recommendations.');
   if (selected.roster.remainingCapacity === 0) report.warnings.push('The selected team has no normal roster capacity remaining; no further pick is recommended.');
   report.warnings = [...new Set(report.warnings)];

@@ -15,7 +15,7 @@ function team(franchiseId: string, overrides: Partial<DraftProjectionStats> = {}
       normalCapacity: 13, reserveCapacity: 2, remainingCapacity: 12, overflow: 0,
       players: [], slots: [], reserveSlots: [], slotCounts: [], eligiblePositionCounts: [], unplaced: [], issues: [],
     },
-    coverage: { projected: 1, total: 1, missing: [] }, totals: stats(overrides), categories: [], categoryWinRate: null, scheduleWinRate: null,
+    coverage: { projected: 1, total: 1, missing: [] }, totals: stats(overrides), categories: [], scheduleTotals: stats(overrides), scheduleCategories: [], categoryWinRate: null, scheduleWinRate: null,
   };
 }
 const category = (team: DraftTeamValue, id: number) => team.categories.find(value => value.id === id)!.zValue;

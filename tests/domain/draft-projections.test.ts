@@ -18,6 +18,7 @@ test('CSV resolves exact normalized names, preserves shooting volumes, and keeps
   assert.equal(result.players[0].games, 70);
   assert.equal(result.source, 'yahoo');
   assert.equal('rank' in result.players[0], false);
+  assert.equal(result.players[0].providerRank, undefined);
 });
 
 test('quoted CSV fields, BOM, CRLF and repeated headers are accepted', () => {
@@ -47,6 +48,7 @@ test('Basketball Monster published per-game headers import stats and ignore prov
   const text = 'Round,Rank,Value,Name,Team,Pos,Inj,g,m/g,p/g,3/g,r/g,a/g,s/g,b/g,fg%,fga/g,ft%,fta/g,to/g,USG,pV,3V,rV,aV,sV,bV,fg%V,ft%V,toV,ID\n1,99,9.5,Nikola Jokic,DEN,C,,70,34,28,2,12,10,1.5,.8,.5,18,.75,8,3,30,5,4,3,2,1,0,-1,-2,-3,3';
   const result = importDraftProjections({ ...options(text), source: 'basketball-monster' });
   assert.equal(result.players[0].id, 1);
+  assert.equal(result.players[0].providerRank, 99);
   assert.deepEqual(result.players[0].stats, { pts: 28, reb: 12, ast: 10, stl: 1.5, blk: .8, tov: 3, three: 2, fgm: 9, fga: 18, ftm: 6, fta: 8 });
   assert.throws(() => importDraftProjections({ ...options(text), source: 'basketball-monster', basis: 'totals' }), /labeled \/g are per-game/);
   assert.throws(() => importDraftProjections({ ...options(text.replace(',to/g,', ',unused,')), source: 'basketball-monster' }), /Missing projection columns: TOV/);
@@ -64,6 +66,43 @@ test('Basketball Monster short totals headers convert once and remain restricted
 const nativeTitles = 'player_id,last_name,first_name,games,minutes,field_goals_attempted,field_goals,free_throws_attempted,free_throws,threes,threes_attempted,offensive_rebounds,defensive_rebounds,assists,blocks,steals,turnovers,comments';
 // Entirely synthetic totals; provider ID intentionally belongs to another ESPN player.
 const nativeLine = '3,Jokic,Nikola,10,300,180,100,80,60,20,50,30,90,100,8,15,30,';
+
+test('Basketball Monster imports supplied ranks independently of row order and preserves gaps across excluded players', () => {
+  const rankedCatalog = { ...catalog, players: [...catalog.players, player(4, 'Victor Wembanyama')] };
+  const wembanyama = nativeLine.replace('Jokic,Nikola', 'Wembanyama,Victor');
+  const unmatched = nativeLine.replace('Jokic,Nikola', 'Unknown,Player');
+  const incomplete = nativeLine.replace('Jokic,Nikola', 'Player,Other').replace(',10,300,', ',0,300,');
+  const result = importDraftProjections({ ...options(`${nativeTitles},ProviderRank\n${nativeLine},2\n${unmatched},3\n${nativeTitles},ProviderRank\n${incomplete},4\n${wembanyama},1`), source: 'basketball-monster', catalog: rankedCatalog });
+  assert.deepEqual(result.players.map(({ name, providerRank }) => [name, providerRank]), [['Nikola Jokić', 2], ['Victor Wembanyama', 1]]);
+  assert.match(result.warnings.join(' '), /2 rows excluded/);
+  for (const rankHeader of ['ProviderRank', 'BBMRank', 'Rank', 'Rk']) {
+    const pasted = importDraftProjections({ ...options(`${titles},${rankHeader},ADP,Adv ADP\n${line},42,1,3\n${line.replace('Nikola Jokic', 'Victor Wembanyama')},1,99,55`), source: 'basketball-monster', catalog: rankedCatalog });
+    assert.deepEqual(pasted.players.map(({ providerRank }) => providerRank), [42, 1]);
+  }
+  assert.throws(() => importDraftProjections({ ...options(`${titles},Rank,ProviderRank\n${line},1,2`), source: 'basketball-monster' }), /More than one providerRank column/);
+});
+
+test('native or copied Basketball Monster projections without an explicit rank remain unranked', () => {
+  for (const text of [`${nativeTitles}\n${nativeLine}`, `${nativeTitles},ProviderRank\n${nativeLine},`, `${titles},ADP,Adv ADP\n${line},1,2`, `${titles},Rank\n${line},`]) {
+    const result = importDraftProjections({ ...options(text), source: 'basketball-monster' });
+    assert.equal(result.players[0].providerRank, undefined);
+  }
+  for (const rank of ['0', '1.5', '9007199254740992']) assert.throws(() => importDraftProjections({ ...options(`${nativeTitles},BBMRank\n${nativeLine},${rank}`), source: 'basketball-monster' }), /positive safe integer/);
+});
+
+test('explicit ProviderRank imports unchanged for Yahoo while absent or invalid values are handled strictly', () => {
+  const ranked = importDraftProjections(options(`${titles},ProviderRank\n${line},37`));
+  assert.equal(ranked.players[0].providerRank, 37);
+  assert.equal(importDraftProjections(options(`${titles},ProviderRank\n${line},`)).players[0].providerRank, undefined);
+  for (const rank of ['0', '1.5', '9007199254740992']) assert.throws(() => importDraftProjections(options(`${titles},ProviderRank\n${line},${rank}`)), /positive safe integer/);
+  assert.throws(() => importDraftProjections(options(`${titles},ProviderRank,Provider Rank\n${line},1,2`)), /More than one providerRank column/);
+  const legacy = structuredClone(ranked); delete legacy.players[0].providerRank;
+  assert.equal(draftProjectionDatasetSchema.safeParse(legacy).success, true);
+  for (const rank of [0, -1, 1.5, Infinity, NaN]) {
+    const invalid = structuredClone(ranked); invalid.players[0].providerRank = rank;
+    assert.equal(draftProjectionDatasetSchema.safeParse(invalid).success, false);
+  }
+});
 
 test('native Basketball Monster CSV combines names, derives categories and automatically normalizes season totals', () => {
   const nativeOptions = { ...options(`${nativeTitles}\n${nativeLine}`), source: 'basketball-monster' as const };

@@ -138,7 +138,10 @@ test('schedule validates season/window after authorization and sends no private 
   const app = fixture(); const response = await app.get(scheduleRequest());
   assert.equal(response.status, 200); assert.equal(response.headers.get('Cache-Control'), 'private, no-store');
   assert.deepEqual((await response.json()).schedule.args, { seasonId: 2027, startDate: '2026-10-20' });
-  for (const query of ['seasonId=https://attacker.invalid', 'seasonId=2027&startDate=2025-10-20', 'seasonId=2027&startDate=2026-02-30']) {
+  const fullSeason = await app.get(scheduleRequest('seasonId=2027&scope=season'));
+  assert.equal(fullSeason.status, 200);
+  assert.deepEqual((await fullSeason.json()).schedule.args, { seasonId: 2027, scope: 'season' });
+  for (const query of ['seasonId=https://attacker.invalid', 'seasonId=2027&startDate=2025-10-20', 'seasonId=2027&startDate=2026-02-30', 'seasonId=2027&scope=season&startDate=2026-10-20', 'seasonId=2027&scope=invalid']) {
     const invalid = fixture(); assert.equal((await invalid.get(scheduleRequest(query))).status, 400); assert.ok(!invalid.calls.includes('schedule'));
   }
 });

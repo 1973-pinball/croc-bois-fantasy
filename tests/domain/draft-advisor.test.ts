@@ -231,3 +231,53 @@ test('zero projected games stay visible but cannot beat eligible players by addi
   assert.equal(report.fitRecommendation?.player.id, 4);
   assert.ok(report.fitRanking.every(row => row.player.id !== 3));
 });
+
+test('season odds average nonlinear weekly probabilities and expose matching weekly production and matchup categories', () => {
+  const input = fixture(3);
+  input.schedule = { scope: 'season', seasonId: 2027, fetchedAt: source.capturedAt, sourceLabel: 'Full-season fixture', startDate: '2026-10-20', endDate: '2026-10-28', warnings: [], games: [
+    ...['2026-10-20', '2026-10-21', '2026-10-22', '2026-10-23', '2026-10-27'].map(date => ({ date, team: 'ATL' as const })),
+    ...['2026-10-20', '2026-10-27', '2026-10-28'].map(date => ({ date, team: 'BOS' as const })),
+  ] };
+  const full = buildDraftAdvisor(input);
+  const weekly = [['2026-10-19', '2026-10-25'], ['2026-10-26', '2026-11-01']].map(([startDate, endDate]) => buildDraftAdvisor({ ...input,
+    schedule: { ...input.schedule!, scope: 'week', startDate, endDate, games: input.schedule!.games.filter(game => game.date >= startDate && game.date <= endDate) },
+  }));
+  const expected = weekly.reduce((sum, report) => sum + report.selectedTeam!.scheduleWinRate!, 0) / 2;
+  assert.ok(Math.abs(full.selectedTeam!.scheduleWinRate! - expected) < 1e-12);
+  assert.equal(full.selectedTeam!.scheduleTotals!.pts, 15 * 5 / 2);
+  assert.equal(full.selectedTeam!.totals!.pts, 15 * 3.5, 'equal-game category model is unchanged');
+  for (const category of full.selectedTeam!.scheduleCategories) {
+    const mean = weekly.reduce((sum, report) => sum + report.selectedTeam!.scheduleCategories.find(row => row.id === category.id)!.winProbability!, 0) / 2;
+    assert.ok(Math.abs(category.winProbability! - mean) < 1e-12);
+  }
+  assert.equal(full.scheduleMatchups[0].categoryWinRate, expected);
+  // Pooling 5 versus 3 season games into one comparison gives a different probability.
+  const pooled = buildDraftAdvisor({ ...input, schedule: null,
+    projections: { ...input.projections!, players: input.projections!.players.map(row => ({ ...row, stats: Object.fromEntries(Object.entries(row.stats).map(([key, value]) => [key, value * (row.id === 2 ? 3 : 5) / 3.5])) as DraftProjectionStats })) },
+  });
+  assert.ok(Math.abs(pooled.selectedTeam!.categoryWinRate! - expected) > 0.001);
+  assert.equal(full.candidates[0].scheduledGames, 5); assert.equal(full.candidates[0].usableGames, 5);
+});
+
+test('later-season schedule changes the best pick beyond the opening week and missing NBA teams stay unavailable', () => {
+  const input = fixture(4); input.catalog.players[2].nbaTeam = 'CHI'; input.catalog.players[3].nbaTeam = 'DEN';
+  const games: NonNullable<DraftAdvisorInput['schedule']>['games'] = [];
+  for (let week = 0; week < 3; week++) {
+    for (const team of ['ATL', 'BOS', 'CHI', 'DEN'] as const) {
+      const count = team === 'CHI' ? (week === 0 ? 4 : 1) : team === 'DEN' ? (week === 0 ? 1 : 4) : 2;
+      for (let day = 0; day < count; day++) games.push({ team, date: new Date(Date.parse('2026-10-20T12:00:00Z') + (week * 7 + day) * 86_400_000).toISOString().slice(0, 10) });
+    }
+  }
+  input.schedule = { scope: 'season', seasonId: 2027, fetchedAt: source.capturedAt, sourceLabel: 'Fixture', startDate: '2026-10-20', endDate: '2026-11-06', warnings: [], games };
+  const full = buildDraftAdvisor(input);
+  const opening = buildDraftAdvisor({ ...input, schedule: { ...input.schedule, scope: 'week', startDate: '2026-10-19', endDate: '2026-10-25', games: games.filter(game => game.date <= '2026-10-25') } });
+  assert.equal(opening.scheduleRecommendation?.player.id, 3);
+  assert.equal(full.scheduleRecommendation?.player.id, 4);
+  assert.equal(full.categoryRecommendation?.player.id, 3);
+  assert.equal(full.candidates.find(row => row.player.id === 4)!.scheduledGames, 9);
+  assert.equal(full.candidates.find(row => row.player.id === 4)!.usableGames, 9);
+  const missing = buildDraftAdvisor({ ...input, schedule: { ...input.schedule, games: games.filter(game => game.team !== 'DEN') } });
+  assert.equal(missing.candidates.find(row => row.player.id === 4)!.scheduleWinRate, null);
+  assert.equal(missing.candidates.find(row => row.player.id === 4)!.scheduledGames, null);
+  assert.equal(missing.scheduleRecommendation?.player.id, 3);
+});

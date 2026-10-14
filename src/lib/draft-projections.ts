@@ -4,7 +4,7 @@ import type { DraftCatalogPlayer, DraftPlayerCatalog } from './draft-player-cata
 export type DraftProjectionSource = 'espn' | 'yahoo' | 'basketball-monster';
 export type DraftProjectionStats = { pts: number; reb: number; ast: number; stl: number; blk: number; tov: number; three: number; fgm: number; fga: number; ftm: number; fta: number };
 /** Stats are per NBA game; games is expected full-season appearances, when supplied. */
-export type DraftPlayerProjection = { id: number; name: string; games: number | null; stats: DraftProjectionStats };
+export type DraftPlayerProjection = { id: number; name: string; games: number | null; stats: DraftProjectionStats; /** Original provider rank, when imported; never recalculated from projections. */ providerRank?: number };
 export type DraftProjectionDataset = { source: DraftProjectionSource; sourceLabel: string; seasonId: number; importedAt: string; players: DraftPlayerProjection[]; warnings: string[] };
 
 export const PROJECTION_SOURCES: { id: DraftProjectionSource; label: string; url: string; help: string }[] = [
@@ -18,7 +18,7 @@ export const draftProjectionStatsSchema = z.object({ pts: stat, reb: stat, ast: 
 export const draftProjectionDatasetSchema = z.object({
   source: z.enum(['espn', 'yahoo', 'basketball-monster']), sourceLabel: z.string().min(1).max(100),
   seasonId: z.number().int().min(2000).max(2100), importedAt: z.string().datetime(),
-  players: z.array(z.object({ id: z.number().int().positive().max(Number.MAX_SAFE_INTEGER), name: z.string().min(1).max(150), games: z.number().finite().min(0).max(82).nullable(), stats: draftProjectionStatsSchema })).min(1).max(2000),
+  players: z.array(z.object({ id: z.number().int().positive().max(Number.MAX_SAFE_INTEGER), name: z.string().min(1).max(150), games: z.number().finite().min(0).max(82).nullable(), stats: draftProjectionStatsSchema, providerRank: z.number().int().positive().max(Number.MAX_SAFE_INTEGER).optional() })).min(1).max(2000),
   warnings: z.array(z.string().max(500)).max(110),
 }).refine(value => new Set(value.players.map(player => player.id)).size === value.players.length, 'Duplicate ESPN player identities.');
 
@@ -58,7 +58,7 @@ const basketballMonsterNameAliases: Record<string, string> = {
 };
 const header = (value: string) => value.trim().toLowerCase().replace(/%/g, 'pct').replace(/[^a-z0-9]/g, '');
 const aliases: Record<string, string[]> = {
-  name: ['player', 'name', 'playername', 'fullname'], id: ['espnid', 'espnplayerid', 'playerespnid'], games: ['gp', 'g', 'games', 'gamesplayed', 'projectedgames'],
+  name: ['player', 'name', 'playername', 'fullname'], id: ['espnid', 'espnplayerid', 'playerespnid'], providerRank: ['providerrank'], games: ['gp', 'g', 'games', 'gamesplayed', 'projectedgames'],
   pts: ['pts', 'points', 'ppg'], reb: ['reb', 'treb', 'trb', 'rebounds', 'rpg'], ast: ['ast', 'assists', 'apg'], stl: ['stl', 'steals', 'spg'], blk: ['blk', 'blocks', 'bpg'],
   tov: ['to', 'tov', 'turnovers', 'topg'], three: ['3pm', '3ptm', '3pt', '3p', '3', 'three', 'threes', 'threepointersmade', '3pointersmade'],
   fgm: ['fgm', 'fieldgoalsmade'], fga: ['fga', 'fieldgoalsattempted', 'fieldgoalattempts'], ftm: ['ftm', 'freethrowsmade'], fta: ['fta', 'freethrowsattempted', 'freethrowattempts'],
@@ -67,6 +67,7 @@ const aliases: Record<string, string[]> = {
 // Basketball Monster's published table uses p/g, 3/g, r/g, a/g, s/g, b/g,
 // fga/g, fta/g and to/g. Its value/z-score columns (pV, rV, etc.) are not stats.
 const monsterAliases: Record<string, string[]> = {
+  providerRank: ['bbmrank', 'rank', 'rk'],
   pts: ['p', 'pg'], reb: ['r', 'rg'], ast: ['a', 'ag'], stl: ['s', 'sg'], blk: ['b', 'bg'],
   three: ['3g'], tov: ['tog'], fgm: ['fgmg'], fga: ['fgag'], ftm: ['ftmg'], fta: ['ftag'],
 };
@@ -168,11 +169,12 @@ export function importDraftProjections(options: { source: DraftProjectionSource;
   const players: DraftPlayerProjection[] = [], warnings: string[] = nativeMonster ? ['Detected Basketball Monster native season-total export. Statistics are converted to per-game averages using Games automatically, regardless of the format selector. Split names are combined; provider player_id values are not ESPN IDs.'] : [], seen = new Set<number>(); let skipped = 0, suffixMatched = 0, providerAliasMatched = 0;
   if (derivePoints || deriveRebounds) warnings.push(`Native export categories derived from season totals: ${[derivePoints ? 'PTS = 2 × field goals + threes + free throws' : '', deriveRebounds ? 'REB = offensive rebounds + defensive rebounds' : ''].filter(Boolean).join('; ')}.`);
   for (const [offset, row] of rows.entries()) {
+    // Copied source tables can repeat headers between groups. Native export
+    // row order is not a provider ranking; only explicit rank cells count.
+    if (row.length === titles.length && row.every((cell, i) => header(cell) === headers[i])) continue;
     const value = (key: string) => index[key] < 0 ? '' : row[index[key]] ?? '';
     try {
       if (row.length !== titles.length) throw new Error('The number of cells does not match the header.');
-      // Some copied source tables repeat their column header between groups.
-      if (row.every((cell, i) => header(cell) === headers[i])) continue;
       const suppliedId = numeric(value('id'), 'ESPN ID');
       if (nativeMonster && (!value('firstName') || !value('lastName'))) throw new Error('Native Basketball Monster rows need both first_name and last_name.');
       const name = nativeMonster ? `${value('firstName')} ${value('lastName')}` : value('name');
@@ -185,6 +187,8 @@ export function importDraftProjections(options: { source: DraftProjectionSource;
       if (!player) throw new Error('Player did not match a unique ESPN ID or full name.');
       if (suppliedId !== null && name && normalizeDraftProjectionName(name) !== normalizeDraftProjectionName(player.name)) throw new Error('Player name does not match the supplied ESPN ID.');
       if (seen.has(player.id)) throw new DuplicateDraftProjectionError('Duplicate player projection. Remove the duplicate and import again.');
+      const providerRank = numeric(value('providerRank'), 'Provider rank');
+      if (providerRank !== null && (!Number.isSafeInteger(providerRank) || providerRank < 1)) throw new Error('Provider rank must be a positive safe integer.');
       const games = numeric(value('games'), 'Games');
       if (games !== null && games > 82) throw new Error('Projected games must be between 0 and 82.');
       if (basis === 'totals' && (games === null || games <= 0)) throw new Error('Season totals need a positive GP/Games value.');
@@ -213,7 +217,7 @@ export function importDraftProjections(options: { source: DraftProjectionSource;
       if (!checked.success) throw new Error(checked.error.issues[0]?.message || 'Projection statistics are invalid.');
       if (suffixMatches.length === 1) suffixMatched++;
       if (providerMatches.length === 1) providerAliasMatched++;
-      seen.add(player.id); players.push({ id: player.id, name: player.name, games, stats: checked.data });
+      seen.add(player.id); players.push({ id: player.id, name: player.name, games, stats: checked.data, ...(providerRank !== null ? { providerRank } : {}) });
     } catch (error) {
       if (error instanceof DuplicateDraftProjectionError) throw error;
       skipped++;

@@ -1,13 +1,25 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { draftAdvisorScheduleSchema, draftScheduleEndDate, normalizeNbaTeam, parseDraftScheduleText } from '../../src/lib/draft-advisor-schedule';
-import { fetchDraftAdvisorSchedule, parseEspnDraftSchedule } from '../../src/lib/draft-advisor-schedule-server';
+import { fetchDraftAdvisorSchedule, parseEspnDraftSchedule, parseEspnRegularSeason } from '../../src/lib/draft-advisor-schedule-server';
 
 const options = { seasonId: 2027, startDate: '2026-10-20', fetchedAt: '2026-10-13T15:00:00.000Z' };
 const abbreviations = ['ATL', 'BOS', 'NO', 'CHI', 'CLE', 'DAL', 'DEN', 'DET', 'GS', 'HOU', 'IND', 'LAC', 'LAL', 'MIA', 'MIL', 'MIN', 'BKN', 'NY', 'ORL', 'PHI', 'PHX', 'POR', 'SAC', 'SA', 'OKC', 'UTAH', 'WSH', 'TOR', 'MEM', 'CHA'];
 function espnSchedule() {
   const games = Array.from({ length: 14 }, (_, index) => ({ id: index + 100, date: Date.parse('2026-10-21T01:00:00Z') + index * 86_400_000, homeProTeamId: 1, awayProTeamId: 18, scoringPeriodId: index + 1 }));
   return { settings: { proTeams: abbreviations.map((abbrev, index) => ({ id: index + 1, abbrev, proGamesByScoringPeriod: Object.fromEntries(games.filter(game => game.homeProTeamId === index + 1 || game.awayProTeamId === index + 1).map(game => [game.scoringPeriodId, [game]])) })) } };
+}
+function fullEspnSchedule() {
+  const teams = abbreviations.map((abbrev, index) => ({ id: index + 1, abbrev, proGamesByScoringPeriod: {} as Record<string, unknown[]> }));
+  for (const [index, date] of ['2026-10-21T01:00:00Z', '2027-01-21T01:00:00Z', '2027-04-12T01:00:00Z'].entries()) {
+    for (let id = 1; id <= 30; id += 2) {
+      const scoringPeriodId = Math.round((Date.parse(date) - Date.parse('2026-10-21T01:00:00Z')) / 86_400_000) + 1;
+      const game = { id: 1000 + index * 30 + id, date: Date.parse(date), homeProTeamId: id, awayProTeamId: id + 1, scoringPeriodId };
+      teams[id - 1].proGamesByScoringPeriod[String(scoringPeriodId)] = [game];
+      teams[id].proGamesByScoringPeriod[String(scoringPeriodId)] = [game];
+    }
+  }
+  return { settings: { proTeams: teams } };
 }
 
 test('schedule CSV validates actual dates, normalizes source abbreviations and selects only the chosen week', () => {
@@ -96,4 +108,49 @@ test('NBA fetch uses only the fixed public endpoint without cookies and rejects 
     globalThis.fetch = async () => new Response('', { status: 302, headers: { Location: 'https://example.com' } });
     await assert.rejects(() => fetchDraftAdvisorSchedule(options), /could not provide/);
   } finally { globalThis.fetch = originalFetch; }
+});
+
+test('full-season CSV includes every date and infers bounds, with explicit coverage warnings', () => {
+  const result = parseDraftScheduleText('date,team\n2027-04-11,BOS\n2026-10-20,ATL\n2027-01-20,BOS', { seasonId: 2027, scope: 'season' });
+  assert.equal(result.scope, 'season'); assert.equal(result.startDate, '2026-10-20'); assert.equal(result.endDate, '2027-04-11');
+  assert.equal(result.games.length, 3);
+  assert.ok(result.warnings.some(warning => warning.includes('82 games')));
+  assert.ok(result.warnings.some(warning => warning.includes('No games were supplied')));
+  assert.equal(draftAdvisorScheduleSchema.safeParse(result).success, true);
+  assert.equal(draftAdvisorScheduleSchema.safeParse({ ...result, scope: 'week' }).success, false);
+  assert.throws(() => parseDraftScheduleText('date,team\n2025-10-20,BOS', { seasonId: 2027, scope: 'season' }), /another NBA season/);
+});
+
+test('full ESPN season includes October, January and April regardless of today and rejects absent teams', () => {
+  const result = parseEspnDraftSchedule(fullEspnSchedule(), { seasonId: 2027, scope: 'season', today: '2027-01-01' });
+  assert.equal(result.scope, 'season'); assert.equal(result.startDate, '2026-10-20'); assert.equal(result.endDate, '2027-04-11');
+  assert.equal(result.games.length, 90); assert.equal(new Set(result.games.map(game => game.team)).size, 30);
+  assert.ok(result.warnings.some(warning => warning.includes('Monday–Sunday')));
+  assert.ok(result.warnings.some(warning => warning.includes('not published 82 games')));
+  assert.throws(() => parseEspnDraftSchedule(espnSchedule(), { seasonId: 2027, scope: 'season' }), /missing teams/);
+});
+
+test('full-season fetching verifies official regular-season boundaries and trims preseason/postseason fixtures', async () => {
+  const bounds = { id: '2', type: 2, year: 2027, startDate: '2026-10-20T07:00Z', endDate: '2027-04-12T06:59Z' };
+  const payload = fullEspnSchedule();
+  for (const [index, date] of ['2026-10-10T01:00:00Z', '2027-04-20T01:00:00Z'].entries()) {
+    const game = { id: 5000 + index, date: Date.parse(date), homeProTeamId: 1, awayProTeamId: 2, scoringPeriodId: 200 + index };
+    payload.settings.proTeams[0].proGamesByScoringPeriod[String(game.scoringPeriodId)] = [game];
+    payload.settings.proTeams[1].proGamesByScoringPeriod[String(game.scoringPeriodId)] = [game];
+  }
+  const original = globalThis.fetch; const calls: string[] = [];
+  try {
+    globalThis.fetch = async (url, init) => {
+      calls.push(String(url)); assert.equal(init?.credentials, 'omit'); assert.equal(init?.redirect, 'manual');
+      return new Response(JSON.stringify(String(url).startsWith('https://sports.core.api.espn.com/') ? bounds : payload));
+    };
+    const result = await fetchDraftAdvisorSchedule({ seasonId: 2027, scope: 'season' });
+    assert.equal(calls.length, 2); assert.equal(result.games.length, 90);
+    assert.equal(result.startDate, '2026-10-20'); assert.equal(result.endDate, '2027-04-11');
+    assert.ok(calls.includes('https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/seasons/2027/types/2'));
+    globalThis.fetch = async url => new Response(JSON.stringify(String(url).startsWith('https://sports.core.api.espn.com/') ? { ...bounds, type: 3 } : payload));
+    await assert.rejects(fetchDraftAdvisorSchedule({ seasonId: 2027, scope: 'season' }), /regular-season dates/);
+  } finally { globalThis.fetch = original; }
+  assert.throws(() => parseEspnRegularSeason({ ...bounds, year: 2026 }, 2027), /regular-season dates/);
+  assert.throws(() => parseEspnRegularSeason({ ...bounds, endDate: 'invalid' }, 2027), /regular-season dates/);
 });

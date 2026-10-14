@@ -13,7 +13,7 @@ const REQUEST_TIMEOUT = 12_000;
 const TOTAL_TIMEOUT = 90_000;
 const FIELDS = ['fgm', 'fga', 'ftm', 'fta', 'three', 'pts', 'reb', 'ast', 'stl', 'blk', 'tov'] as const;
 type YahooStats = Record<typeof FIELDS[number], number>;
-type YahooProjection = { yahooId: string; name: string; games: number; totals: YahooStats };
+type YahooProjection = { yahooId: string; name: string; providerRank: number; games: number; totals: YahooStats };
 export type YahooProjectionPage = { players: YahooProjection[]; yahooIds: string[]; rowCount: number; excluded: number; nextOffset: number | null };
 
 const TITLES: Record<string, typeof FIELDS[number] | 'games'> = {
@@ -86,6 +86,18 @@ export function parseYahooProjectionPage(html: string, seasonId: number, offset 
     }
   });
   if (['games', ...FIELDS].some(field => !columns.has(field))) throw new Error('Yahoo is missing required projection categories or shooting attempts.');
+  const rankColumns = headings.flatMap((heading, index) => {
+    const links = [...heading[2].matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)];
+    const preSeason = links.some(link => {
+      if (text(link[2]) !== 'Pre-Season') return false;
+      try {
+        const url = new URL(attributes(link[1]).href, YAHOO_PROJECTION_URL);
+        return url.origin === new URL(YAHOO_PROJECTION_URL).origin && url.searchParams.get('sort') === 'OR';
+      } catch { return false; }
+    });
+    return preSeason ? [index] : [];
+  });
+  if (rankColumns.length !== 1) throw new Error('Yahoo’s published preseason rank column could not be verified.');
   const result: YahooProjectionPage = { players: [], yahooIds: [], rowCount: 0, excluded: 0, nextOffset: null };
   for (const row of rows) {
     if (/<th\b/i.test(row)) continue;
@@ -105,13 +117,15 @@ export function parseYahooProjectionPage(html: string, seasonId: number, offset 
     result.yahooIds.push(yahooId); result.rowCount++;
     const cells = [...row.matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)].map(match => text(match[1]));
     if (cells.length !== headings.length) throw new Error('Yahoo returned an incomplete player row.');
+    const providerRank = number(cells[rankColumns[0]]);
+    if (providerRank === null || !Number.isSafeInteger(providerRank) || providerRank < 1) throw new Error('Yahoo returned an invalid preseason rank.');
     const games = number(cells[columns.get('games')!]);
     const values = FIELDS.map(field => number(cells[columns.get(field)!]));
     if (games !== null && (!Number.isInteger(games) || games > 82)) throw new Error('Yahoo returned invalid projected games.');
     if (games === null || games === 0 || values.some(value => value === null)) { result.excluded++; continue; }
     const totals = Object.fromEntries(FIELDS.map((field, index) => [field, values[index]!])) as YahooStats;
     if (totals.fgm > totals.fga || totals.ftm > totals.fta || totals.three > totals.fgm) throw new Error('Yahoo returned inconsistent shooting projections.');
-    result.players.push({ yahooId, name, games, totals });
+    result.players.push({ yahooId, name, providerRank, games, totals });
   }
   if (!result.rowCount || result.rowCount > PAGE_SIZE) throw new Error('Yahoo’s player page is empty or unexpectedly sized.');
   const nextLinks = [...clean.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].filter(match => /^Next\s+25$/i.test(text(match[2])));
@@ -179,8 +193,8 @@ export async function fetchYahooDraftProjections(seasonId: number, catalog: Pick
   }
   if (!players.length) throw new Error('Yahoo has no complete remaining-season player projections.');
   const csv = [
-    'Player,GP,FGM,FGA,FTM,FTA,3PM,PTS,REB,AST,STL,BLK,TO',
-    ...players.map(player => [`"${player.name.replace(/"/g, '""')}"`, player.games, ...FIELDS.map(field => player.totals[field])].join(',')),
+    'Player,ProviderRank,GP,FGM,FGA,FTM,FTA,3PM,PTS,REB,AST,STL,BLK,TO',
+    ...players.map(player => [`"${player.name.replace(/"/g, '""')}"`, player.providerRank, player.games, ...FIELDS.map(field => player.totals[field])].join(',')),
   ].join('\n');
   const dataset = importDraftProjections({ source: 'yahoo', seasonId, text: csv, basis: 'totals', catalog });
   dataset.sourceLabel = 'Yahoo remaining-season projections';
@@ -192,7 +206,8 @@ export async function fetchYahooDraftProjections(seasonId: number, catalog: Pick
     `Read all ${ids.size} Yahoo player rows across ${offset / PAGE_SIZE + 1} pages${excluded ? `; ${excluded} rows with missing statistics or zero/missing projected games were excluded` : ''}.`,
     'Yahoo supplies remaining-season totals. These are divided by remaining projected games to obtain per-game rates. Before opening day this covers the upcoming season; after opening day it covers only the remaining season.',
     'Yahoo remaining-game counts are not full-season availability estimates. Availability is not scaled by remaining games / 82; compare this source’s per-game rates with that limitation in mind.',
-    'Only public Yahoo player projections are imported. The public league is a display context; its rosters, owners, scoring settings and rankings are not used. ESPN player names and IDs remain authoritative.',
+    'Yahoo rank is its published Pre-Season (OR) rank, not a rank calculated from the remaining-season totals. Original ranks are preserved across unmatched or excluded players.',
+    'Only public Yahoo player projections and preseason ranks are imported. The public league is a display context; its rosters, owners and scoring settings are not used. ESPN player names and IDs remain authoritative.',
   ];
   return dataset;
 }

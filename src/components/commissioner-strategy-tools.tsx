@@ -16,6 +16,7 @@ import type { LeagueAccount } from './league-account';
 import { useAdvisorBoard } from './use-advisor-board';
 import { KeeperComparison } from './keeper-comparison';
 import { DraftRosters } from './draft-rosters';
+import { DraftCandidateTable } from './draft-candidate-table';
 import styles from './commissioner-strategy.module.css';
 import teamTableStyles from './draft-team-projections.module.css';
 
@@ -153,18 +154,18 @@ function StrategyWorkspace({ account, view }: { account: LeagueAccount; view: 'd
         <h4>{provider.label}</h4><p className={styles.subtle}>{provider.help} <a href={provider.url} target="_blank" rel="noreferrer">Open source ↗</a></p>
         <div className={styles.toolbar}><label>CSV / TSV file<input type="file" accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values" disabled={busy} onChange={async event => { try { const value = await readFile(event.target.files?.[0]); if (active.current && value !== null) setText(value); } catch (failure) { setError((failure as Error).message); } }}/></label><label>Projection basis<select value={basis} disabled={busy} onChange={event => setBasis(event.target.value as typeof basis)}><option value="per-game">Per game averages</option><option value="totals">Season totals (GP required)</option></select></label></div>
         <label className={styles.field}>Or paste the projection table<textarea rows={5} value={text} disabled={busy} maxLength={2_000_000} onChange={event => setText(event.target.value)} placeholder="Player,GP,PTS,REB,AST,STL,BLK,TO,3PM,FGM,FGA,FTM,FTA"/></label>
-        <p className={styles.subtle}>Include full player names or ESPN IDs, all nine categories, and shooting attempts. Player identity and missing columns are checked before use. Source ranks do not replace ESPN’s draft display order.</p>
+        <p className={styles.subtle}>Include full player names or ESPN IDs, all nine categories, and shooting attempts. Player identity and missing columns are checked before use. Include the BBM table’s Rank column to compare source ranks. Source rank comparisons and sorting are available in the draft player table.</p>
         <div className={styles.actions}><button className="button button-green" disabled={busy || !text.trim() || account.connection !== 'live'} onClick={() => void importData(importSource, false)}>{busy ? 'Importing…' : 'Import table'}</button><button className="text-button" disabled={busy} onClick={() => { setImportSource(null); setText(''); }}>Close importer</button></div>
       </div>}
       {error && <p className={styles.error} role="alert">{error}</p>}{notice && <p className={styles.subtle} role="status">{notice}</p>}
       {Object.entries(library).some(([, data]) => data.warnings.length > 0) && <details className={styles.methodology}><summary>Import coverage and source notes</summary>{Object.entries(library).map(([key, data]) => data.warnings.length > 0 && <div key={key}><strong>{data.sourceLabel}</strong><ul>{data.warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul></div>)}</details>}
     </section>
-    {view === 'draft' ? <DraftAdvisorView account={account} projections={projections}/> : <KeeperComparison account={account} library={library}/>}
+    {view === 'draft' ? <DraftAdvisorView account={account} projections={projections} library={library}/> : <KeeperComparison account={account} library={library}/>}
   </div>;
 }
 
-function Recommendation({ candidate, fit, schedule }: { candidate: DraftAdvisorCandidate | null; fit?: boolean; schedule: boolean }) {
-  return <section className={`${styles.panel} ${styles.recommendation}`}><span className={styles.eyebrow}>{fit ? 'Schedule + roster fit' : 'Maximum category win rate'}</span><h3>{candidate?.player.name ?? 'No recommendation yet'}</h3>{candidate ? <><p className={styles.subtle}>ESPN #{candidate.player.rank ?? '—'} · {candidate.player.eligiblePositions.join(' / ')} · {candidate.player.nbaTeam}</p><p className={styles.subtle}>{fit ? `${pct(candidate.scheduleWinRate)} ${schedule ? 'scheduled' : 'equal-game'} category win rate` : `${pct(candidate.categoryWinRate)} projected category win rate`} · <strong className={styles.gain}>{gain(fit ? candidate.scheduleGain : candidate.categoryGain)}</strong></p>{fit && <p className={styles.subtle}>Fit score {pct(candidate.fitScore)} · roster adjustment {gain(candidate.fitAdjustment)}. Fit score includes a roster preference and is not a win probability.</p>}<ul>{candidate.reasons.map((reason, index) => <li key={index}>{reason}</li>)}</ul></> : <p className={styles.subtle}>A recommendation needs imported projections, comparable opponent rosters, and an open roster slot. Check coverage and draft assumptions above.</p>}</section>;
+function Recommendation({ candidate, fit }: { candidate: DraftAdvisorCandidate | null; fit?: boolean }) {
+  return <section className={`${styles.panel} ${styles.recommendation}`}><span className={styles.eyebrow}>{fit ? 'Full-season schedule + roster fit' : 'Maximum season category win rate'}</span><h3>{candidate?.player.name ?? 'No recommendation yet'}</h3>{candidate ? <><p className={styles.subtle}>ESPN #{candidate.player.rank ?? '—'} · {candidate.player.eligiblePositions.join(' / ')} · {candidate.player.nbaTeam}</p><p className={styles.subtle}>{pct(candidate.scheduleWinRate)} projected season category win rate · <strong className={styles.gain}>{gain(candidate.scheduleGain)}</strong></p>{fit && <p className={styles.subtle}>Fit score {pct(candidate.fitScore)} · roster adjustment {gain(candidate.fitAdjustment)}. Fit score includes a roster preference and is not a win probability.</p>}<ul>{candidate.reasons.map((reason, index) => <li key={index}>{reason}</li>)}</ul></> : <p className={styles.subtle}>A recommendation needs imported projections, a full-season schedule, comparable opponent rosters, and an open roster slot. Check coverage and draft assumptions above.</p>}</section>;
 }
 
 function AllTeamProjections({ teams, franchiseId }: { teams: DraftAdvisorTeam[]; franchiseId: string }) {
@@ -172,10 +173,10 @@ function AllTeamProjections({ teams, franchiseId }: { teams: DraftAdvisorTeam[];
   return <section className={styles.panel} aria-labelledby="all-team-projections-title">
     <h3 id="all-team-projections-title">All-team projections</h3>
     <p className={styles.subtle}>Every live roster, ranked by overall category win rate against the rest of the league. Overall is the expected share of the nine categories won, not the chance of winning a matchup. Your selected team is highlighted.</p>
-    <p className={styles.subtle}>Equal games: 3.5 games per player per week, adjusted for projected availability. FG% and FT% use total makes / attempts. Lower TO is better. These estimates compare drafted players so far; uneven roster sizes affect the results.</p>
+    <p className={styles.subtle}>Full season: daily active-slot production and category win rates are averaged across the season’s weeks, adjusted for projected availability. FG% and FT% use total makes / attempts. Lower TO is better. These estimates compare drafted players so far; uneven roster sizes affect the results.</p>
     <div className={styles.tableWrap} tabIndex={0} role="region" aria-label="All-team projections, scroll horizontally to compare all categories">
       <table className={teamTableStyles.table}>
-        <caption>Category cells show <strong>win chance</strong> above weekly production. — means projections, shooting attempts, or comparable opponents are unavailable.</caption>
+        <caption>Category cells show <strong>win chance</strong> above average weekly production across the full season. — means projections, shooting attempts, or comparable opponents are unavailable.</caption>
         <thead><tr><th scope="col">Team / projection coverage</th><th scope="col">Overall win rate<small>Share of categories won</small></th>{catalog.categories.map(category => <th key={category.id} scope="col">{category.label}{category.lowerIsBetter ? ' ↓' : ''}<small>Win chance / production</small></th>)}</tr></thead>
         <tbody>{rankedTeams.map(team => {
           const selected = team.franchiseId === franchiseId;
@@ -213,7 +214,7 @@ function AllTeamCategoryValues({ teams, franchiseId }: { teams: DraftAdvisorTeam
     <p className={styles.subtle}>Compare strengths and weaknesses across current rosters in standard deviations. Each category centers on 0; positive values are stronger and negative values are weaker. Value is the sum of all nine category scores, calculated from the selected projection source and current league rosters.</p>
     <div className={styles.tableWrap} tabIndex={0} role="region" aria-label="All-team category values, scroll horizontally to compare all categories">
       <table className={`${teamTableStyles.table} ${teamTableStyles.valuesTable}`}>
-        <caption>Equal-game weekly projections · higher is better, including toV · — means a category cannot be compared.</caption>
+        <caption>Full-season average weekly projections · higher is better, including toV · — means a category cannot be compared.</caption>
         <thead><tr><th scope="col">Team</th><th scope="col">Value<small>Sum of 9 scores</small></th>{columns.map(category => <th key={category.id} scope="col"><abbr title={`${category.label} category value`}>{category.valueLabel}</abbr></th>)}</tr></thead>
         <tbody>{rankedTeams.map(team => <tr key={team.franchiseId} className={team.franchiseId === franchiseId ? teamTableStyles.selected : undefined}>
           <th scope="row"><strong>{names.get(team.franchiseId) ?? team.franchiseId}</strong>{team.franchiseId === franchiseId && <span className={teamTableStyles.selectedBadge}>Selected team</span>}</th>
@@ -222,18 +223,16 @@ function AllTeamCategoryValues({ teams, franchiseId }: { teams: DraftAdvisorTeam
         </tr>)}{!rankedTeams.length && <tr><td colSpan={columns.length + 2}>Category values appear when a compatible draft board is loaded.</td></tr>}</tbody>
       </table>
     </div>
-    <details className={styles.methodology}><summary>How category values are calculated</summary><ul>{report.methodology.map((item, index) => <li key={index}>{item}</li>)}</ul></details>
+    <details className={styles.methodology}><summary>How category values are calculated</summary><ul>{report.methodology.filter(item => !item.startsWith('Values use the same source')).map((item, index) => <li key={index}>{item}</li>)}<li>Values use average weekly production across the full season after daily active-slot assignments. Current partial rosters are compared; future picks are not assumed.</li></ul></details>
   </section>;
 }
 
-function DraftAdvisorView({ account, projections }: { account: LeagueAccount; projections: DraftProjectionDataset | null }) {
+function DraftAdvisorView({ account, projections, library }: { account: LeagueAccount; projections: DraftProjectionDataset | null; library: ProjectionLibrary }) {
   const live = useAdvisorBoard(account.seasonId, account.connection === 'live');
   const [choice, setChoice] = useState('');
   const [schedule, setSchedule] = useState<DraftAdvisorSchedule | null>(null);
-  const [startDate, setStartDate] = useState('');
   const [scheduleBusy, setScheduleBusy] = useState(false);
   const [scheduleError, setScheduleError] = useState('');
-  const [ranking, setRanking] = useState<'espn' | 'fit'>('espn');
   const request = useRef<AbortController | null>(null);
   const autoScheduleAttempted = useRef(false);
   const { connection, reloadSession } = account;
@@ -241,17 +240,17 @@ function DraftAdvisorView({ account, projections }: { account: LeagueAccount; pr
   const ownFranchiseId = live.board?.teams.find(team => team.espnTeamId !== null && account.ownTeamIds.includes(team.espnTeamId))?.franchiseId;
   const franchiseId = live.board?.teams.find(team => team.franchiseId === choice)?.franchiseId ?? ownFranchiseId ?? live.board?.teams[0]?.franchiseId ?? '';
   const report = useMemo(() => live.board ? buildDraftAdvisor({ board: live.board, catalog, settings, eligibility, projections, franchiseId, schedule }) : null, [live.board, projections, franchiseId, schedule]);
-  const loadSchedule = useCallback(async (date = '') => {
+  const loadSchedule = useCallback(async () => {
     if (request.current || connection !== 'live') return;
     setScheduleBusy(true); setScheduleError('');
     const controller = new AbortController(); request.current = controller;
     try {
-      const response = await fetch(`/api/draft-schedule?seasonId=${catalog.espnSeasonId}${date ? `&startDate=${encodeURIComponent(date)}` : ''}`, { cache: 'no-store', credentials: 'same-origin', signal: controller.signal });
+      const response = await fetch(`/api/draft-schedule?seasonId=${catalog.espnSeasonId}&scope=season`, { cache: 'no-store', credentials: 'same-origin', signal: controller.signal });
       const body = await response.json();
       if (!response.ok) { if ([401, 403].includes(response.status)) void reloadSession(); throw new Error(body.message || 'The schedule could not be loaded.'); }
       const next = draftAdvisorScheduleSchema.parse(body.schedule);
-      if (next.seasonId !== catalog.espnSeasonId) throw new Error('The NBA schedule belongs to another season.');
-      if (!controller.signal.aborted) { setSchedule(next); setStartDate(next.startDate); }
+      if (next.seasonId !== catalog.espnSeasonId || next.scope !== 'season') throw new Error('A complete season schedule is required for draft analysis.');
+      if (!controller.signal.aborted) setSchedule(next);
     } catch (failure) { if (!controller.signal.aborted) setScheduleError(failure instanceof Error ? failure.message : 'The schedule could not be loaded.'); }
     finally { if (request.current === controller) request.current = null; if (!controller.signal.aborted) setScheduleBusy(false); }
   }, [connection, reloadSession]);
@@ -261,28 +260,33 @@ function DraftAdvisorView({ account, projections }: { account: LeagueAccount; pr
     const timer = window.setTimeout(() => { autoScheduleAttempted.current = true; void loadSchedule(); }, 0);
     return () => window.clearTimeout(timer);
   }, [connection, loadSchedule]);
-  const selected = report?.selectedTeam;
-  const candidates = ranking === 'fit' ? report?.fitRanking : report?.topAvailable;
+  const seasonLoaded = schedule?.scope === 'season' && report?.scheduleMode === 'actual';
+  const displayedTeams = useMemo(() => report?.teams.map(team => ({ ...team,
+    totals: seasonLoaded ? team.scheduleTotals : null,
+    categories: seasonLoaded ? team.scheduleCategories : team.categories.map(category => ({ ...category, projectedValue: null, winProbability: null })),
+    categoryWinRate: seasonLoaded ? team.scheduleWinRate : null,
+  })) ?? [], [report, seasonLoaded]);
+  const selected = displayedTeams.find(team => team.franchiseId === franchiseId);
   return <>
     <section className={styles.panel} aria-label="Draft analysis controls"><div className={styles.status}><strong>Live draft connection</strong><span>{live.checkedAt ? `Checked ${new Date(live.checkedAt).toLocaleTimeString()} · revision ${live.board?.revision} · refreshes every 2 seconds` : 'Loading draft board…'}</span><button type="button" className="text-button" disabled={live.refreshing || account.connection !== 'live'} onClick={() => void live.refresh()}>Refresh now</button></div>
       {live.error && <p className={styles.error} role="alert">{live.error} Recommendations below use the last successful refresh.</p>}
-      <div className={styles.toolbar}><label>My draft team<select value={franchiseId} onChange={event => setChoice(event.target.value)}>{live.board?.teams.map(team => <option key={team.franchiseId} value={team.franchiseId}>{team.displayName}</option>)}</select></label><label>Schedule week starts<input type="date" value={startDate} onChange={event => setStartDate(event.target.value)}/></label><button type="button" className="button button-subtle" disabled={scheduleBusy || account.connection !== 'live'} onClick={() => void loadSchedule(startDate)}>{scheduleBusy ? 'Loading ESPN…' : schedule ? 'Refresh ESPN schedule' : 'Load ESPN schedule'}</button></div>
-      <p className={styles.subtle}>The NBA schedule loads automatically from ESPN when you open Draft Tool. It helps compare scheduled games and crowded lineup days for the schedule-and-roster-fit recommendation.</p>
-      <p className={styles.subtle} aria-live="polite">{schedule ? `${schedule.startDate} through ${schedule.endDate} · ${schedule.sourceLabel} · daily active-slot congestion included.` : scheduleBusy ? 'Loading the next published seven-day schedule from ESPN…' : 'No schedule loaded. Roster-fit recommendations currently use equal games for every NBA team. Use Load ESPN schedule to include scheduled games.'}</p>
-      {scheduleError && <p className={styles.error} role="alert">{scheduleError}{schedule ? ` The loaded window remains ${schedule.startDate}–${schedule.endDate}.` : ''}</p>}
-      <details className={styles.methodology}><summary>Other schedule options</summary><p>No upload is needed for ESPN. To use a custom schedule, import CSV/TSV with headers date,team and one row per NBA team playing each day in the selected seven-day window.</p><label className={styles.field}>Schedule CSV / TSV<input type="file" accept=".csv,.tsv,.txt" disabled={scheduleBusy} onChange={async event => { try { const text = await readFile(event.target.files?.[0]); if (text !== null) { setSchedule(parseDraftScheduleText(text, { seasonId: catalog.espnSeasonId, startDate })); setScheduleError(''); } } catch (failure) { setScheduleError((failure as Error).message); } }}/></label>{schedule && <button className="text-button" type="button" disabled={scheduleBusy} onClick={() => { setSchedule(null); setScheduleError(''); }}>Use equal games instead</button>}</details>
+      <div className={styles.toolbar}><label>My draft team<select value={franchiseId} onChange={event => setChoice(event.target.value)}>{live.board?.teams.map(team => <option key={team.franchiseId} value={team.franchiseId}>{team.displayName}</option>)}</select></label><button type="button" className="button button-subtle" disabled={scheduleBusy || account.connection !== 'live'} onClick={() => void loadSchedule()}>{scheduleBusy ? 'Loading full season…' : schedule ? 'Refresh full-season schedule' : 'Load full-season schedule'}</button></div>
+      <p className={styles.subtle}>Draft analysis uses the entire published NBA regular season. It assigns active lineup slots each day, estimates category win rates for each Monday–Sunday week, then averages them across the season against the current league rosters.</p>
+      <p className={styles.subtle} aria-live="polite">{schedule ? `${schedule.startDate} through ${schedule.endDate} · ${schedule.sourceLabel} · full-season lineup congestion included.` : scheduleBusy ? 'Loading the full published season from ESPN…' : 'Full-season estimates need the NBA schedule. Load it from ESPN or upload a complete season below.'}</p>
+      {scheduleError && <p className={styles.error} role="alert">{scheduleError}{schedule ? ` The loaded season remains ${schedule.startDate}–${schedule.endDate}.` : ''}</p>}
+      <details className={styles.methodology}><summary>Upload a full-season schedule</summary><p>ESPN loads automatically. A custom CSV/TSV must contain the entire season with headers date,team and one row per NBA team playing each day.</p><label className={styles.field}>Season schedule CSV / TSV<input type="file" accept=".csv,.tsv,.txt" disabled={scheduleBusy} onChange={async event => { try { const text = await readFile(event.target.files?.[0]); if (text !== null) { setSchedule(parseDraftScheduleText(text, { seasonId: catalog.espnSeasonId, scope: 'season' })); setScheduleError(''); } } catch (failure) { setScheduleError((failure as Error).message); } }}/></label></details>
     </section>
     {report?.warnings.length ? <details className={styles.notice} open={!report.available}><summary>Projection coverage and draft assumptions ({report.warnings.length})</summary><ul>{report.warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul></details> : null}
     {report && !report.available && <p className={styles.notice}>{report.unavailableReason}</p>}
-    {selected && <section className={styles.panel}><h3>{selected.displayName} · projected category win rate</h3><p className={styles.subtle}>Current drafted roster against every other team. Each category is equally weighted; these are model estimates for the players selected so far.</p><div className={styles.metrics}><div className={styles.metric}><strong>{pct(selected.categoryWinRate)}</strong><span>Expected share of categories won · equal games</span></div><div className={styles.metric}><strong>{pct(selected.scheduleWinRate)}</strong><span>{schedule ? 'Expected share with the loaded schedule' : 'Equal-game estimate · no schedule loaded'}</span></div><div className={styles.metric}><strong>{selected.roster.totalPlayers} / {selected.roster.normalCapacity}</strong><span>Roster slots · {selected.coverage.projected}/{selected.coverage.total} players have projections</span></div></div><div className={styles.categories}>{selected.categories.map(category => <div key={category.id} className={styles.category}><span>{category.label}{category.lowerIsBetter ? ' ↓' : ''}</span><strong>{pct(category.winProbability)}</strong><progress aria-label={`${category.label} estimated category win probability`} value={category.winProbability ?? 0} max={1}/><small>{category.projectedValue === null ? 'No projection' : [19, 20].includes(category.id) ? pct(category.projectedValue) : `${category.projectedValue.toFixed(1)} / week`}</small></div>)}</div></section>}
-    {report && <AllTeamProjections teams={report.teams} franchiseId={franchiseId}/>}
-    {report && <AllTeamCategoryValues teams={report.teams} franchiseId={franchiseId}/>}
-    <div className={styles.recommendations}><Recommendation candidate={report?.categoryRecommendation ?? null} schedule={Boolean(schedule)}/><Recommendation candidate={report?.fitRecommendation ?? null} fit schedule={Boolean(schedule)}/></div>
-    <section className={styles.panel}><h3>{ranking === 'espn' ? 'Next 15 available · ESPN order' : 'Top 15 · schedule and roster fit'}</h3><div className={styles.toolbar}><label>Player ranking<select value={ranking} onChange={event => setRanking(event.target.value as typeof ranking)}><option value="espn">ESPN rankings</option><option value="fit">Schedule + roster fit</option></select></label></div><p className={styles.subtle}>Recommendations consider all {report?.evaluatedCandidates ?? 0} evaluated players and may fall outside ESPN’s next 15. Gains are percentage points (pp); lower turnovers are better.</p><div className={styles.tableWrap}><table className={[styles.table, styles.candidateTable].join(" ")}><thead><tr><th>Player / ESPN rank</th><th>Position</th><th>Category win rate</th><th>Gain</th><th>Usable / scheduled games</th><th>Fit score</th></tr></thead><tbody>{candidates?.map(candidate => <tr key={candidate.player.id}><td><strong>#{candidate.player.rank ?? '—'} {candidate.player.name}</strong><small>{candidate.player.nbaTeam}{candidate.hasProjection ? '' : ' · missing projection'}{candidate.blocked ? ' · not recommended' : ''}</small></td><td>{candidate.player.eligiblePositions.join(' / ')}</td><td>{pct(candidate.categoryWinRate)}</td><td className={(candidate.categoryGain ?? 0) < 0 ? styles.negative : styles.gain}>{gain(candidate.categoryGain)}</td><td>{candidate.usableGames ?? '—'} / {candidate.scheduledGames ?? '—'}</td><td>{pct(candidate.fitScore)}<small>{candidate.reasons.join(' ')}</small></td></tr>)}{!candidates?.length && <tr><td colSpan={6}>Available candidates appear after the draft board loads.</td></tr>}</tbody></table></div></section>
+    {selected && <section className={styles.panel}><h3>{selected.displayName} · projected category win rate</h3><p className={styles.subtle}>Current drafted roster against every other team, averaged across the full season’s weeks. Each category is equally weighted; future draft picks are not assumed.</p><div className={styles.metrics}><div className={styles.metric}><strong>{pct(selected.categoryWinRate)}</strong><span>Expected share of categories won · full season</span></div><div className={styles.metric}><strong>{seasonLoaded ? 'Full season' : 'Pending'}</strong><span>{schedule ? `${schedule.startDate} – ${schedule.endDate}` : 'NBA schedule required'}</span></div><div className={styles.metric}><strong>{selected.roster.totalPlayers} / {selected.roster.normalCapacity}</strong><span>Roster slots · {selected.coverage.projected}/{selected.coverage.total} players have projections</span></div></div><div className={styles.categories}>{selected.categories.map(category => <div key={category.id} className={styles.category}><span>{category.label}{category.lowerIsBetter ? ' ↓' : ''}</span><strong>{pct(category.winProbability)}</strong><progress aria-label={`${category.label} estimated category win probability`} value={category.winProbability ?? 0} max={1}/><small>{category.projectedValue === null ? 'No projection' : [19, 20].includes(category.id) ? pct(category.projectedValue) : `${category.projectedValue.toFixed(1)} / week`}</small></div>)}</div></section>}
+    {report && <AllTeamProjections teams={displayedTeams} franchiseId={franchiseId}/>}
+    {report && <AllTeamCategoryValues teams={displayedTeams} franchiseId={franchiseId}/>}
+    <div className={styles.recommendations}><Recommendation candidate={seasonLoaded ? report?.scheduleRecommendation ?? null : null}/><Recommendation candidate={seasonLoaded ? report?.fitRecommendation ?? null : null} fit/></div>
+    <DraftCandidateTable catalog={catalog} library={library} report={report} seasonLoaded={seasonLoaded}/>
     {live.board && <RecordDraftPick account={account} board={live.board} stale={Boolean(live.error)} accept={live.accept} refresh={live.refresh}/>}
     {live.board && <DraftRosters board={live.board} preferredFranchiseId={ownFranchiseId}/>}
-    {report && <section className={styles.panel}><h3>Category matchups</h3><p className={styles.subtle}>{selected?.displayName ?? 'Your team'} against each opponent, using equal games. Blank values mean projections or shot attempts are missing.</p><div className={styles.tableWrap}><table className={styles.table}><thead><tr><th>Opponent</th>{catalog.categories.map(category => <th key={category.id}>{category.label}</th>)}<th>Category win rate</th></tr></thead><tbody>{report.matchups.map(matchup => <tr key={matchup.franchiseId}><td>{matchup.displayName}</td>{matchup.categories.map(category => <td key={category.id}>{pct(category.winProbability)}</td>)}<td><strong>{pct(matchup.categoryWinRate)}</strong></td></tr>)}</tbody></table></div></section>}
-    {report && <details className={`${styles.panel} ${styles.methodology}`}><summary>How these estimates work</summary><ul>{report.methodology.map((item, index) => <li key={index}>{item}</li>)}</ul><p>NBA teams, ESPN ranks, and position eligibility use the player catalog captured {new Date(catalog.fetchedAt).toLocaleDateString()}. Schedule recommendations cover the selected week, not the whole fantasy season.</p></details>}
+    {report && <section className={styles.panel}><h3>Category matchups</h3><p className={styles.subtle}>{selected?.displayName ?? 'Your team'} against each opponent, averaged across the full season. Blank values mean projections or shot attempts are missing.</p><div className={styles.tableWrap}><table className={styles.table}><thead><tr><th>Opponent</th>{catalog.categories.map(category => <th key={category.id}>{category.label}</th>)}<th>Category win rate</th></tr></thead><tbody>{(seasonLoaded ? report.scheduleMatchups : []).map(matchup => <tr key={matchup.franchiseId}><td>{matchup.displayName}</td>{matchup.categories.map(category => <td key={category.id}>{pct(category.winProbability)}</td>)}<td><strong>{pct(matchup.categoryWinRate)}</strong></td></tr>)}</tbody></table></div></section>}
+    {report && <details className={`${styles.panel} ${styles.methodology}`}><summary>How these estimates work</summary><ul>{report.methodology.map((item, index) => <li key={index}>{item}</li>)}</ul><p>NBA teams, ESPN ranks, and position eligibility use the player catalog captured {new Date(catalog.fetchedAt).toLocaleDateString()}. Schedule recommendations cover the full published NBA regular season. League-specific playoff dates and future roster changes are not modeled.</p></details>}
   </>;
 }
 

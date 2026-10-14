@@ -16,10 +16,12 @@ export async function GET(request: Request) {
     const query = new URL(request.url).searchParams;
     const rawSeason = query.get('seasonId') ?? '';
     const seasonId = Number(rawSeason), startDate = query.get('startDate') ?? undefined;
+    const scope = query.get('scope') ?? undefined;
     if (!/^\d{4}$/.test(rawSeason) || seasonId < 2001 || seasonId > 2100) return json({ error: 'INVALID_SEASON', message: 'Choose the NBA season ending year.' }, 400);
+    if ((scope !== undefined && scope !== 'week' && scope !== 'season') || (scope === 'season' && startDate !== undefined)) return json({ error: 'INVALID_WINDOW', message: 'Choose the complete season without a single-week start date.' }, 400);
     try { if (startDate !== undefined) validateDraftScheduleWindow(seasonId, startDate); }
     catch (error) { return json({ error: 'INVALID_WINDOW', message: error instanceof Error ? error.message : 'Choose a valid seven-day schedule window.' }, 400); }
-    try { return json({ schedule: await fetchDraftAdvisorSchedule({ seasonId, startDate }) }); }
+    try { return json({ schedule: await fetchDraftAdvisorSchedule({ seasonId, startDate, ...(scope ? { scope } : {}) }) }); }
     catch (error) { return json({ error: 'SCHEDULE_UNAVAILABLE', message: error instanceof Error ? error.message : 'The NBA schedule is unavailable. Try again or upload a schedule file.' }, 503); }
   } catch { return json({ error: 'SCHEDULE_UNAVAILABLE', message: 'The private draft schedule could not be loaded. Try again.' }, 503); }
 }

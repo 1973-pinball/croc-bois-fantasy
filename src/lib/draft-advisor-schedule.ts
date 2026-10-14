@@ -29,24 +29,36 @@ export function validateDraftScheduleWindow(seasonId: number, startDate: string,
   return { seasonId, startDate, endDate };
 }
 
+export function validateDraftScheduleSeason(seasonId: number, startDate: string, endDate: string) {
+  if (!Number.isInteger(seasonId) || seasonId < 2001 || seasonId > 2100) throw new Error('The NBA season must be its ending year.');
+  const days = (Date.parse(`${endDate}T12:00:00Z`) - Date.parse(`${startDate}T12:00:00Z`)) / 86_400_000 + 1;
+  if (!isDraftScheduleDate(startDate) || !isDraftScheduleDate(endDate) || days < 1 || days > 366
+    || startDate < `${seasonId - 1}-07-01` || endDate > `${seasonId}-06-30`) throw new Error('The full schedule must stay inside the selected NBA season.');
+  return { seasonId, startDate, endDate, scope: 'season' as const };
+}
+
 const dateSchema = z.string().refine(isDraftScheduleDate, 'Use a valid calendar date.');
 export const draftAdvisorScheduleSchema = z.object({
   seasonId: z.number().int().min(2001).max(2100),
+  scope: z.enum(['week', 'season']).optional(),
   fetchedAt: z.iso.datetime(),
   startDate: dateSchema,
   endDate: dateSchema,
-  games: z.array(z.object({ date: dateSchema, team: z.enum(NBA_TEAMS) })).min(1).max(210),
+  games: z.array(z.object({ date: dateSchema, team: z.enum(NBA_TEAMS) })).min(1).max(5000),
   sourceLabel: z.string().min(1).max(150),
   warnings: z.array(z.string().max(500)).max(20),
 }).superRefine((schedule, context) => {
-  try { validateDraftScheduleWindow(schedule.seasonId, schedule.startDate, schedule.endDate); }
+  try {
+    if (schedule.scope === 'season') validateDraftScheduleSeason(schedule.seasonId, schedule.startDate, schedule.endDate);
+    else validateDraftScheduleWindow(schedule.seasonId, schedule.startDate, schedule.endDate);
+  }
   catch { context.addIssue({ code: 'custom', message: 'The schedule window is invalid.' }); }
   if (schedule.games.some(game => game.date < schedule.startDate || game.date > schedule.endDate)) context.addIssue({ code: 'custom', message: 'The schedule contains games outside its selected window.' });
   if (new Set(schedule.games.map(game => `${game.date}:${game.team}`)).size !== schedule.games.length) context.addIssue({ code: 'custom', message: 'The schedule repeats a team on the same date.' });
 });
 
 export type DraftAdvisorSchedule = z.infer<typeof draftAdvisorScheduleSchema>;
-export type DraftScheduleImportOptions = { seasonId: number; startDate: string; endDate?: string; fetchedAt?: string };
+export type DraftScheduleImportOptions = { seasonId: number; scope?: 'week' | 'season'; startDate?: string; endDate?: string; fetchedAt?: string };
 
 function readTable(text: string): string[][] {
   if (text.length > 2_000_000) throw new Error('Schedule files must be smaller than 2 MB.');
@@ -84,7 +96,7 @@ function readTable(text: string): string[][] {
 
 /** One date/team row per scheduled team-game; a game therefore has two rows. */
 export function parseDraftScheduleText(text: string, options: DraftScheduleImportOptions): DraftAdvisorSchedule {
-  const window = validateDraftScheduleWindow(options.seasonId, options.startDate, options.endDate);
+  let window = options.scope === 'season' ? null : validateDraftScheduleWindow(options.seasonId, options.startDate ?? '', options.endDate);
   const [rawHeaders, ...rows] = readTable(text);
   const headers = rawHeaders.map(value => value.toLowerCase().replace(/[\s_-]/g, ''));
   const dateIndexes = headers.flatMap((header, index) => ['date', 'gamedate'].includes(header) ? [index] : []);
@@ -101,13 +113,22 @@ export function parseDraftScheduleText(text: string, options: DraftScheduleImpor
     const key = `${date}:${team}`;
     if (seen.has(key)) throw new Error(`Schedule row ${index + 2} repeats ${team} on ${date}.`);
     seen.add(key);
-    if (date >= window.startDate && date <= window.endDate) games.push({ date, team: team as DraftAdvisorSchedule['games'][number]['team'] });
+    if (!window || (date >= window.startDate && date <= window.endDate)) games.push({ date, team: team as DraftAdvisorSchedule['games'][number]['team'] });
   }
-  if (!games.length) throw new Error('The file has no games in the selected seven-day window. Choose another window or schedule file.');
+  if (!games.length) throw new Error('The file has no games in the selected schedule. Choose another schedule file.');
+  games.sort((a, b) => a.date.localeCompare(b.date) || a.team.localeCompare(b.team));
+  if (!window) window = validateDraftScheduleSeason(options.seasonId, games[0].date, games.at(-1)!.date);
+  const warnings = ['Upload a complete NBA schedule for this window: omitted teams and dates are treated as having no games. Uploaded fixtures are not independently verified.'];
+  if (options.scope === 'season') {
+    warnings[0] = 'Upload the complete NBA regular-season schedule. All file dates are included; preseason, playoffs, and the NBA Cup final must be excluded. Uploaded fixtures are not independently verified.';
+    const counts = new Map<string, number>(); games.forEach(game => counts.set(game.team, (counts.get(game.team) ?? 0) + 1));
+    const missing = NBA_TEAMS.filter(team => !counts.has(team));
+    if (missing.length) warnings.push(`No games were supplied for ${missing.join(', ')}. Schedule estimates for players on those teams are unavailable.`);
+    if (NBA_TEAMS.some(team => (counts.get(team) ?? 0) !== 82)) warnings.push('The file does not contain exactly 82 games for every NBA team. Missing NBA Cup or makeup fixtures are not invented; verify full-season coverage.');
+  }
   return draftAdvisorScheduleSchema.parse({
-    ...window, fetchedAt: options.fetchedAt ?? new Date().toISOString(),
-    games: games.sort((a, b) => a.date.localeCompare(b.date) || a.team.localeCompare(b.team)),
+    ...window, ...(options.scope ? { scope: options.scope } : {}), fetchedAt: options.fetchedAt ?? new Date().toISOString(), games,
     sourceLabel: 'Uploaded NBA schedule (CSV/TSV)',
-    warnings: ['Upload a complete NBA schedule for this window: omitted teams and dates are treated as having no games. Uploaded fixtures are not independently verified.'],
+    warnings,
   });
 }
