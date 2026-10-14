@@ -178,7 +178,7 @@ function TradeFinalization({ account, trade, disabled, deadlineReached, busy, on
   const teamId = (franchise: string) => account.data.teams.find(team => account.franchiseId(team.id) === franchise)?.id;
   const currentTransfers = trade.trade_pick_transfers.filter(leg => account.data.picks.some(pick => pick.id === leg.pick_id && pick.season === account.data.season));
   const affected = new Set(currentTransfers.flatMap(leg => [leg.from_franchise_id, leg.to_franchise_id]));
-  const submissions = account.submissions.filter(submission => affected.has(submission.franchise_id) && paymentStatusEligible(submission) && submission.keeper_assignments.length);
+  const submissions = account.keeperDeadlinePassed ? account.submissions.filter(submission => affected.has(submission.franchise_id) && paymentStatusEligible(submission) && submission.keeper_assignments.length) : [];
   const reusable = submissions.flatMap(submission => submission.keeper_assignments.map(assignment => assignment.pick_id));
   const prospectivePicks = account.data.picks.map(pick => {
     const transfer = currentTransfers.find(leg => leg.pick_id === pick.id);
@@ -194,7 +194,7 @@ function TradeFinalization({ account, trade, disabled, deadlineReached, busy, on
   const stale = Boolean(edits && (groups.some(group => group.edit?.expectedRevision !== group.submission.revision) || Object.keys(edits).some(key => !groups.some(group => group.submission.id === key))));
   const changes = groups.filter(group => group.changed).map(group => group.edit!);
   const valid = groups.every(group => group.valid);
-  const paymentsAvailable = account.live?.draftStarted === false && ['keeper_selection', 'draft_ready'].includes(account.live?.phase || '') && account.submissionsLoaded && !account.loadingSubmissions && !account.reloadRequired;
+  const paymentsAvailable = Boolean(account.live?.keeperPaymentInventory) && account.live?.draftStarted === false && ['keeper_selection', 'draft_ready'].includes(account.live?.phase || '') && account.submissionsLoaded && !account.loadingSubmissions && !account.reloadRequired;
   const blocked = disabled || stale || !valid || (currentTransfers.length > 0 && (!account.submissionsLoaded || account.loadingSubmissions)) || (changes.length > 0 && !paymentsAvailable);
   const reasonValid = note.trim().length >= 5 && note.trim().length <= 2000;
   function beginPayments() {
@@ -214,7 +214,7 @@ function TradeFinalization({ account, trade, disabled, deadlineReached, busy, on
   return <div className={styles.stack}>
     {groups.length > 0 && <details className={styles.history} open={Boolean(edits) || !valid}>
       <summary>Keeper payment picks for this trade</summary>
-      <p className={styles.help}>The selected players stay fixed. Review payments using each team’s picks after the swap. Any changed payments are saved together with this trade.</p>
+      <p className={styles.help}>The selected players stay fixed. Replacement payments must have belonged to the team at the keeper deadline and remain with it after this swap. Later-acquired picks cannot pay keeper costs. Changes are saved atomically with this trade.</p>
       {!valid && <p className="workflow-message workflow-error" role="alert">This swap needs valid replacement payment picks before it can be finalized.</p>}
       {stale && <p className="workflow-message workflow-error" role="alert">A keeper submission changed while you were editing. Your choices are preserved. Reload the payment plan from current records before finalizing.</p>}
       {!edits ? <button type="button" className="button button-subtle" disabled={disabled || !paymentsAvailable} onClick={beginPayments}>Review replacement payment picks</button> : <>

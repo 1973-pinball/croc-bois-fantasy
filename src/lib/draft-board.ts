@@ -45,6 +45,7 @@ export const draftBoardSchema = z.object({
   picks: z.array(z.object({ id: uuid, round: z.number().int().positive(), overallPick: z.number().int().positive().nullable(),
     originalFranchiseId: uuid.nullable(), currentOwnerId: uuid.nullable(), status: z.enum(['available', 'keeper', 'selected']),
     playerId: playerId.nullable(), playerName: z.string().nullable(), selectionId: uuid.nullable(),
+    rosterOwnerId: uuid.nullable().optional(),
   })),
 });
 export type DraftBoard = z.infer<typeof draftBoardSchema>;

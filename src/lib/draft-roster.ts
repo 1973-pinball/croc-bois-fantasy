@@ -99,12 +99,13 @@ export function buildDraftRosters(board: DraftBoard, settings: DraftRosterSettin
   const picksByPlayer = new Map<number, DraftBoardPick[]>();
   for (const pick of [...board.picks].sort(comparePicks)) {
     if (pick.status === 'available' || (pick.status === 'keeper' && !board.keepersRevealedAt)) continue;
-    if (pick.playerId === null || !pick.currentOwnerId || !teamIds.has(pick.currentOwnerId)) {
+    const ownerId = pick.rosterOwnerId ?? pick.currentOwnerId;
+    if (pick.playerId === null || !ownerId || !teamIds.has(ownerId)) {
       issues.push('A public selection without a recognized player or owner was omitted.');
       continue;
     }
     const prior = picksByPlayer.get(pick.playerId) || [];
-    prior.push(pick); picksByPlayer.set(pick.playerId, prior);
+    prior.push({ ...pick, currentOwnerId: ownerId }); picksByPlayer.set(pick.playerId, prior);
   }
   const teamPlayers = new Map(board.teams.map(team => [team.franchiseId, [] as DraftRosterPlayer[]]));
   for (const [id, picks] of picksByPlayer) {

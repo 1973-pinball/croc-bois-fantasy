@@ -9796,7 +9796,8 @@
         "Each retention advances the underlying cost one round earlier. Paying an earlier pick because another round is unavailable does not accelerate future cost. An undrafted player starts at nominal round 13 and tenure one; retaining them the next season advances tenure to two and the following nominal keeper cost to round 12.",
         "Trades and waiver moves preserve the keeper cycle. Re-entering the draft without being kept resets it. Keeper rights stay with the player.",
         "Owners choose their payment picks. Each pick can fund one keeper. If the required round is unavailable, move to the next available earlier round. Owners cannot voluntarily overpay while a suitable later pick remains.",
-        "Submissions are private until every team is locked. Owners can edit until the commissioner locks them."
+        "10/14/2026 vote passed. Keeper payment costs are incurred only after the keeper deadline has passed and every participating team has submitted its keeper selections, including an empty list for a team keeping no players. Payment picks are determined from the picks each team owns at the deadline. Earlier private drafts and submissions do not reserve or spend picks. Later payment corrections may use only picks owned at the deadline that the team still owns and can legally spend. Picks acquired after the deadline cannot improve the team's keeper budget.",
+        "Submissions are private until every team is locked. Owners may revise their player selections before the keeper deadline while their submission remains unlocked. The deadline freezes the player list; approval, final locking and public reveal remain separate steps."
       ]
     },
     {

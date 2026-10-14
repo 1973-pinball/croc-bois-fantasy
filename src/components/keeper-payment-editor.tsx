@@ -10,11 +10,18 @@ export const paymentStatusEligible = (submission: KeeperSubmission) => ['submitt
 export const paymentAssignments = (submission: KeeperSubmission): PaymentAssignment[] => submission.keeper_assignments.map(item => ({ playerId: Number(item.player_id), pickId: item.pick_id }));
 export const paymentKey = (assignments: PaymentAssignment[]) => JSON.stringify([...assignments].sort((a, b) => a.playerId - b.playerId).map(item => [item.playerId, item.pickId]));
 
+export function paymentDeadlinePicks(account: LeagueAccount): DraftPick[] | null | undefined {
+  if (!account.keeperDeadlinePassed) return undefined;
+  const inventory = account.live?.keeperPaymentInventory;
+  if (!inventory) return null;
+  return inventory.picks.map(pick => ({ ...pick, id: account.data.picks.find(current => account.officialPickId(current.id) === pick.id)?.id ?? pick.id }));
+}
+
 export function paymentInput(account: LeagueAccount, submission: KeeperSubmission, teamId: number, picks: DraftPick[] = account.data.picks, reusablePickIds = submission.keeper_assignments.map(item => item.pick_id)): KeeperPaymentOptionsInput {
   return {
-    season: account.data.season, teamId, picks,
+    season: account.data.season, teamId, picks, deadlinePicks: paymentDeadlinePicks(account),
     keepers: submission.keeper_assignments.map(item => ({ playerId: Number(item.player_id), pickId: item.pick_id, baseRound: item.base_round_at_submission ?? null })),
-    usedPickIds: [...(account.live?.usedPickIds || []), ...account.submissions.filter(item => ['approved', 'locked'].includes(item.status)).flatMap(item => item.keeper_assignments.map(assignment => assignment.pick_id))],
+    usedPickIds: account.live?.usedPickIds || [],
     reusablePickIds,
   };
 }
@@ -44,7 +51,7 @@ export function PaymentAllocationFields({ account, input, assignments, disabled,
         {selected !== keeper.pickId && <span className={styles.change}>Payment changed: {label(selected)}</span>}
       </label>;
     })}
-    {!model.assignments && <p className="workflow-message workflow-error" role="alert">No valid payment allocation is available with these picks. Refresh records or adjust the proposed pick transfers.</p>}
+    {!model.assignments && <p className="workflow-message workflow-error" role="alert">{input.deadlinePicks === null ? 'The deadline pick-ownership snapshot is loading. Refresh records before changing payments.' : 'No valid payment allocation is available with these picks. After the deadline, later-acquired picks cannot replace the deadline budget.'}</p>}
     {model.assignments && !isValidKeeperPaymentAllocation(input, assignments) && <button type="button" className="button button-subtle" disabled={disabled} onClick={() => onChange(model.assignments!)}>Use available valid payments</button>}
   </div>;
 }
@@ -61,8 +68,9 @@ function ScopedKeeperPaymentEditor({ account, teamId, submission }: { account: L
   const [note, setNote] = useState('');
   const [notice, setNotice] = useState('');
   const input = paymentInput(account, submission, teamId);
+  const inventoryPending = input.deadlinePicks === null;
   const stale = Boolean(edit && edit.revision !== submission.revision);
-  const unavailable = account.connection !== 'live' || account.live?.draftStarted !== false || !['keeper_selection', 'draft_ready'].includes(account.live?.phase || '') || !account.submissionsLoaded || account.loadingSubmissions || Boolean(account.actionBusy) || account.reloadRequired;
+  const unavailable = inventoryPending || account.connection !== 'live' || account.live?.draftStarted !== false || !['keeper_selection', 'draft_ready'].includes(account.live?.phase || '') || !account.submissionsLoaded || account.loadingSubmissions || Boolean(account.actionBusy) || account.reloadRequired;
   const dirty = Boolean(edit && paymentKey(edit.assignments) !== paymentKey(paymentAssignments(submission)));
   const valid = Boolean(edit && isValidKeeperPaymentAllocation(input, edit.assignments));
   function begin() { setEdit({ revision: submission.revision, assignments: paymentAssignments(submission) }); setNote(''); setNotice(''); }
@@ -73,7 +81,8 @@ function ScopedKeeperPaymentEditor({ account, teamId, submission }: { account: L
   }
   return <section className={styles.editor} aria-labelledby={`${id}-heading`}>
     <h3 id={`${id}-heading`}>Change payment picks</h3>
-    <p className={styles.help}>Owners, co-managers, and the commissioner can update valid payment picks after the deadline and reveal, until the live draft starts.</p>
+    <p className={styles.help}>{account.keeperDeadlinePassed ? 'Payment corrections can use only picks owned at the deadline and still owned by this team, until the live draft starts. Later acquisitions cannot pay keeper costs.' : 'These are payment previews. Approval does not reserve or spend picks. Costs are applied after the deadline and every team’s submission, using ownership at the deadline.'}</p>
+    {inventoryPending && <p role="status">Waiting for the deadline pick-ownership snapshot. Refresh official records to load it.</p>}
     {account.live?.draftStarted && <p role="status">Payment changes are closed because the live draft has started.</p>}
     {!edit ? <button type="button" className="button button-subtle" disabled={unavailable} onClick={begin}>Change payment picks</button> : <>
       <p className={styles.help}>Editing saved revision {edit.revision} · {submission.status}. Your keeper players cannot be added or removed here.</p>

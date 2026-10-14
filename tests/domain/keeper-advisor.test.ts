@@ -85,6 +85,33 @@ test('an earlier legal payment can erase nominal keeper value', () => {
   assert.equal(row.keep, false);
 });
 
+test('deadline payment inventory prevents a later pick acquisition from improving keeper value', () => {
+  const input = fixture([player(17)]);
+  input.leagueData.picks = [
+    { id: 'retained', season: 2026, round: 2, originalTeamId: 1, ownerTeamId: 1 },
+    { id: 'later-acquired', season: 2026, round: 13, originalTeamId: 2, ownerTeamId: 1 },
+    { id: 'traded-away', season: 2026, round: 12, originalTeamId: 1, ownerTeamId: 2 },
+  ];
+  assert.equal(buildKeeperAdvisor(input).rows[0].keep, true);
+  input.deadlinePicks = input.leagueData.picks.map(pick => ({ ...pick, ownerTeamId: pick.id === 'later-acquired' ? 2 : 1 }));
+  const row = buildKeeperAdvisor(input).rows[0];
+  assert.equal(row.pickId, 'retained');
+  assert.equal(row.paymentRound, 2);
+  assert.equal(row.roundSavings, -1);
+  assert.equal(row.keep, false);
+});
+
+test('pending deadline inventory leaves payment decisions unavailable without hiding projection ranks', () => {
+  const input = fixture([player(17)]);
+  input.deadlinePicks = null;
+  const report = buildKeeperAdvisor(input);
+  assert.equal(report.rows[0].keep, null);
+  assert.equal(report.rows[0].projectedRank, 17);
+  assert.equal(report.rows[0].paymentRound, null);
+  assert.deepEqual(report.assignments, []);
+  assert.match(report.warnings.join(' '), /deadline pick-ownership snapshot/);
+});
+
 test('existing keeper rules reject fresh first-round players and expired tenure; unresolved history stays undecided', () => {
   const input = fixture([player(1, { previousRound: 1 }), player(9, { tenure: 5 }), player(17, { status: 'review', reason: 'Needs ruling' }), player(25, { tenure: null })]);
   const rows = new Map(buildKeeperAdvisor(input).rows.map(row => [row.player.id, row]));

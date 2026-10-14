@@ -8,6 +8,8 @@ export type KeeperPaymentOptionsInput = {
   keepers: FixedKeeperPayment[];
   /** May contain prospective owners when preparing a trade finalization. */
   picks: DraftPick[];
+  /** Undefined before the deadline; null while its ownership snapshot is unavailable. */
+  deadlinePicks?: DraftPick[] | null;
   usedPickIds?: string[];
   /** Only keeper-consumed picks being reconciled by this operation; never live draft picks. */
   reusablePickIds?: string[];
@@ -15,10 +17,13 @@ export type KeeperPaymentOptionsInput = {
   includeOptions?: boolean;
 };
 
-function paymentPool(input: KeeperPaymentOptionsInput) {
+export function keeperPaymentPickPool(input: Pick<KeeperPaymentOptionsInput, 'season' | 'teamId' | 'picks' | 'deadlinePicks' | 'usedPickIds' | 'reusablePickIds'>) {
   const used = new Set(input.usedPickIds);
   const reusable = new Set(input.reusablePickIds);
+  const deadlineOwned = input.deadlinePicks === undefined ? null : new Set((input.deadlinePicks ?? [])
+    .filter(pick => pick.season === input.season && pick.ownerTeamId === input.teamId).map(pick => pick.id));
   return input.picks.filter(pick => pick.season === input.season && pick.ownerTeamId === input.teamId
+    && (deadlineOwned === null || deadlineOwned.has(pick.id))
     && Number.isInteger(pick.round) && pick.round > 0 && (!used.has(pick.id) || reusable.has(pick.id)));
 }
 
@@ -26,7 +31,7 @@ function paymentPool(input: KeeperPaymentOptionsInput) {
 export function isValidKeeperPaymentAllocation(input: KeeperPaymentOptionsInput, assignments: PaymentAssignment[]): boolean {
   if (assignments.length !== input.keepers.length || new Set(input.keepers.map(k => k.playerId)).size !== input.keepers.length
     || new Set(assignments.map(a => a.playerId)).size !== assignments.length || new Set(assignments.map(a => a.pickId)).size !== assignments.length) return false;
-  const pool = paymentPool(input);
+  const pool = keeperPaymentPickPool(input);
   if (new Set(pool.map(p => p.id)).size !== pool.length) return false;
   const selected = new Set(assignments.map(a => a.pickId));
   return input.keepers.every(keeper => {
@@ -44,7 +49,7 @@ export function isValidKeeperPaymentAllocation(input: KeeperPaymentOptionsInput,
  * Nested round eligibility lets constrained keepers claim the nearest picks first.
  */
 export function keeperPaymentOptions(input: KeeperPaymentOptionsInput, current: PaymentAssignment[] = input.keepers) {
-  const pool = paymentPool(input);
+  const pool = keeperPaymentPickPool(input);
   const fixed = input.keepers.map(({ playerId, pickId }) => ({ playerId, pickId }));
   const preferred = new Map(current.map(a => [a.playerId, a.pickId]));
   const complete = (pinned?: PaymentAssignment): PaymentAssignment[] | null => {

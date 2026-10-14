@@ -1,9 +1,9 @@
 import { DEFAULT_KEEPER_RULES, evaluateKeeperEligibility, type KeeperCycle } from '../domain/keepers';
-import { keeperPaymentOptions, type PaymentAssignment } from './keeper-payment-options';
+import { keeperPaymentOptions, keeperPaymentPickPool, type PaymentAssignment } from './keeper-payment-options';
 import { validatePlanner } from './planner';
 import type { DraftPlayerCatalog } from './draft-player-catalog';
 import { draftProjectionDatasetSchema, type DraftPlayerProjection, type DraftProjectionDataset, type DraftProjectionSource } from './draft-projections';
-import type { LeagueData, LeaguePlayer } from './types';
+import type { DraftPick, LeagueData, LeaguePlayer } from './types';
 
 export type KeeperAdvisorRow = {
   player: LeaguePlayer;
@@ -34,6 +34,8 @@ export type KeeperAdvisorInput = {
   usedPickIds?: string[];
   /** Confirmed revealed keeper payments only; never picks consumed by actual draft selections. */
   reusablePickIds?: string[];
+  /** Undefined for previews before the deadline; null means the deadline snapshot is pending. */
+  deadlinePicks?: DraftPick[] | null;
 };
 
 function cycle(player: LeaguePlayer, season: number): KeeperCycle {
@@ -83,7 +85,7 @@ export function buildKeeperAdvisor(input: KeeperAdvisorInput): KeeperAdvisorRepo
     methodology: [
       'Projection ranks sum equally weighted per-game z-scores across nine categories. FG% and FT% use makes minus league-average makes at the player’s attempt volume; fewer turnovers is better.',
       'Projected round is the player’s rank divided by the number of league teams, rounded up. These are model-derived rounds within the imported player pool, not provider ranks or a prediction of draft position.',
-      'Round savings = actual payment round minus projected round. The recommendation maximizes total positive round savings across a jointly legal keeper set using currently owned picks and the existing keeper rules. Confirmed keeper payment reservations can be reconsidered here; picks spent on actual draft selections remain unavailable.',
+      'Round savings = payment round minus projected round. Before the deadline, payments are previews using current ownership. After the deadline, only picks owned at the deadline and still owned by that team can pay. Costs are applied only after the deadline and every team has submitted; the final lock charges and reveals the league together.',
       'A Don’t keep row shows its best individual legal payment; that pick may instead be assigned to another recommended keeper. Equal-round value is not recommended. Per-game value does not include injuries, games missed, category punts or future seasons.',
     ],
   };
@@ -101,12 +103,17 @@ export function buildKeeperAdvisor(input: KeeperAdvisorInput): KeeperAdvisorRepo
   report.warnings.push(`Ranks are calculated within ${pool.length} matched draftable players from this source. Incomplete imports can overstate value; compare coverage across all sources.`);
   if (pool.some(player => player.games === 0)) report.warnings.push('Some projections have zero expected games. Their per-game ranks are shown, but they are not recommended as keepers.');
   const sourcePlayers = new Map(pool.map(player => [player.id, player]));
-  const used = new Set(input.usedPickIds);
-  const reusable = new Set(input.reusablePickIds);
+  if (input.deadlinePicks === null) {
+    for (const row of rows) {
+      const rank = ranking.get(row.player.id);
+      if (rank) { row.projectedRank = rank.rank; row.projectedRound = Math.ceil(rank.rank / data.teams.length); }
+    }
+    return unavailable('The deadline has passed. Payment recommendations are waiting for the deadline pick-ownership snapshot.');
+  }
   // Confirmed keeper reservations may participate in a hypothetical keeper set;
   // actual draft selections remain consumed. Neither path changes the ledger.
-  const availableData = { ...data, picks: data.picks.filter(pick => !used.has(pick.id) || (reusable.has(pick.id) && pick.ownerTeamId === teamId)) };
-  const owned = availableData.picks.filter(pick => pick.ownerTeamId === teamId && pick.season === data.season);
+  const owned = keeperPaymentPickPool({ season: data.season, teamId, picks: data.picks, deadlinePicks: input.deadlinePicks, usedPickIds: input.usedPickIds, reusablePickIds: input.reusablePickIds });
+  const availableData = { ...data, picks: owned };
   const pickById = new Map(owned.map(pick => [pick.id, pick]));
   if (!owned.length) report.warnings.push('This team has no unused payment picks in the upcoming draft.');
   const eligible: KeeperAdvisorRow[] = [];

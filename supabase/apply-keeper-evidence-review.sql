@@ -5,4 +5,10 @@
 begin;
 select private.apply_keeper_evidence_review_20261001();
 select private.apply_undrafted_keeper_rule_20261003();
+-- Apply the later charter version only after historical evidence reconciliations.
+do $$ begin
+  if to_regprocedure('private.apply_keeper_deadline_payment_rule_20261014()') is not null then
+    perform private.apply_keeper_deadline_payment_rule_20261014();
+  end if;
+end $$;
 commit;

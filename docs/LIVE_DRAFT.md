@@ -18,7 +18,7 @@ Owners and visitors can also expand **Manage draft order** to view the slots. Th
 
 Keeper selections remain private until every team's submission is locked. Once keepers are revealed and the order is complete, their payment picks appear purple on the grid. Kept players are greyed out in the player pool, with a purple keeper label, and cannot be selected again. Revealed keeper picks cannot be changed through draft corrections.
 
-The separate [keeper payment editor](KEEPER_READINESS.md#changing-payment-picks-after-the-deadline) lets assigned owners, co-managers and commissioners replace legal payment picks while keeping the retained players fixed, including after the deadline or reveal. It closes when the commissioner starts the draft, including before the first live selection. A saved post-reveal payment change moves the purple keeper cell, releases the former payment pick when no longer committed, updates used-pick inventory, and advances the draft revision. Boards and draft rosters refresh from that corrected state; stale draft-entry choices must be reloaded.
+The separate [keeper payment editor](KEEPER_READINESS.md#changing-payment-picks-after-the-deadline) lets assigned owners, co-managers and commissioners replace legal payment picks while keeping the retained players fixed, including after the deadline or reveal. Under the **10/14/2026 vote passed** rule, costs are incurred only after the deadline and all participating teams' submissions, using each team's pick inventory at the deadline. Payment corrections must use picks from that inventory that remain owned and available; later acquisitions cannot improve the keeper budget. The editor closes when the commissioner starts the draft, including before the first live selection. A saved post-reveal payment change moves the purple keeper cell, releases the former payment pick when no longer committed, updates used-pick inventory, and advances the draft revision. Boards and draft rosters refresh from that corrected state; stale draft-entry choices must be reloaded.
 
 ## Live team rosters
 
@@ -60,7 +60,7 @@ All visible boards refresh regularly and when the page regains focus. A choice r
 
 Trade finalization does not require keeper submissions or a keeper-triggered trading-open timestamp. Migration 00018 removes that prerequisite. The default review period is 24 hours; Commissioner Tools also offers an explicit early-finalization action with a required reason and audit record. Commissioner authorization, ownership checks, keeper commitments and draft protections still apply to either path.
 
-Player trades pause once keepers are revealed, including proposals logged before reveal. The current ownership records still describe the pre-draft player pool; they cannot authorize a former owner to transfer a released or re-drafted player. Player trading can resume only after a future roster-finalization workflow is implemented. Pick-only trades and recorded obligations retain their existing review and ownership controls. A commissioner can include legal payment replacements when finalizing a trade that sends a keeper-committed pick or receives a closer-round payment pick. Ownership transfers and all replacement allocations are validated and committed atomically before the draft starts. Picks already spent on live draft selections remain unavailable for transfer.
+Player trades through the ordinary trade ledger pause once keepers are revealed, including proposals logged before reveal. Those ownership records still describe the pre-draft player pool; they cannot authorize a former owner to transfer a released or re-drafted player. Pick-only trades and recorded obligations retain their existing review and ownership controls. Before the draft starts, a commissioner can include legal payment replacements when finalizing a trade that sends a keeper-committed pick. Each replacement must belong to that team's deadline inventory and remain owned and available after the full trade; receiving a pick outside that inventory cannot make it eligible for keeper payment. Ownership transfers and all replacement allocations are validated and committed atomically. Picks already spent on live draft selections remain unavailable for transfer.
 
 ## Player pool and ranking source
 
@@ -83,7 +83,15 @@ The commissioner can explicitly share a read-only lottery replay and separately 
 
 Open **Commissioner Tools → Draft Tool** or **Keeper Suggestions**. Both workspaces require the existing commissioner account. `/api/draft-projections` and `/api/draft-schedule` independently verify an authenticated user and active commissioner membership; responses are private and never cached. Projection imports and recommendations never enter the public board, queues, League Lab, or a shared database. The browser saves imports in the existing account/season-scoped session draft store, which clears other accounts on account change or sign-out.
 
-The **League administration** workspace groups each tool into an independent disclosure, collapsed initially. Expand only the tools you need; collapsing a section preserves any unfinished form within it.
+Each function in **League administration**, **Draft Tool** and **Keeper Suggestions** has an independent disclosure, collapsed initially. Expand only the tools you need; collapsing a section preserves any unfinished form within it.
+
+### Recording a draft trade
+
+Expand **Draft Tool → Record draft trade · players and picks** after keeper finalization and reveal. Choose the two teams, select the players or unspent picks each sends, and enter a trade note. **Review trade** shows the complete exchange; **Record trade now** applies it immediately and records it in the public trade history. The control supports same-year pick swaps and current/next-year exchanges, including 2026 for 2027, alongside drafted players and revealed keepers. It works before the lottery and while the draft is underway.
+
+Player transfers change the live draft roster. Pick transfers preserve their year, original franchise and draft slot. A transferred keeper retains the original payer's spent pick and historical keeper cost. The entire exchange succeeds or fails together after the server rechecks ownership and the board revision. Refresh and review again if the draft or ownership has changed. A running draft clock pauses with its remaining time preserved; resume it from the draft room when ready. A drafted player transferred away must be traded back before its original selection can be corrected or undone.
+
+Revealed keepers populate team rosters and projection comparisons before the lottery, published draft order or first live pick. The pick grid still leaves unpublished slots and pick owners blank. Unrevealed keeper selections remain private.
 
 ### Projection imports
 

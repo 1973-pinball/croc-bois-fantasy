@@ -88,6 +88,31 @@ test('does not reveal a supplied keeper until the board reveals keepers', () => 
   assert.ok(report.warnings.some(warning => warning.includes('Unrevealed keepers')));
 });
 
+test('keeper-only rosters produce pre-draft forecasts before the lottery, and a keeper trade changes roster ownership without changing its payment slot', () => {
+  const input = fixture();
+  input.board.orderComplete = false; input.board.orderLocked = false;
+  input.board.clock.status = 'waiting'; input.board.clock.startedAt = null;
+  input.board.teams.forEach(team => { team.draftPosition = null; });
+  input.board.picks = [pick(1, teamA, { status: 'keeper', overallPick: null, currentOwnerId: null, rosterOwnerId: teamA }),
+    pick(2, teamB, { status: 'keeper', overallPick: null, currentOwnerId: null, rosterOwnerId: teamB }),
+    pick(3, teamA, { status: 'keeper', overallPick: null, currentOwnerId: null, rosterOwnerId: teamA })];
+  input.schedule = { scope: 'season', seasonId: 2027, startDate: '2026-10-20', endDate: '2027-04-11', fetchedAt: source.capturedAt, sourceLabel: 'Season fixture', warnings: [],
+    games: ['2026-10-20', '2026-10-22', '2027-01-05', '2027-04-11'].flatMap(date => (['ATL', 'BOS'] as const).map(team => ({ date, team }))) };
+  const initial = buildDraftAdvisor(input);
+  assert.equal(initial.selectedTeam!.roster.keptPlayers, 2);
+  assert.equal(initial.selectedTeam!.roster.draftedPlayers, 0);
+  assert.notEqual(initial.selectedTeam!.scheduleWinRate, null);
+  assert.ok(initial.scheduleRecommendation);
+  assert.ok(initial.candidates.every(candidate => ![1, 2, 3].includes(candidate.player.id)));
+  const paidSlot = { ...input.board.picks[2] };
+  input.board.picks[2].rosterOwnerId = teamB; input.board.revision++;
+  const traded = buildDraftAdvisor(input);
+  assert.deepEqual(traded.teams.map(team => team.roster.keptPlayers), [1, 2]);
+  assert.notEqual(traded.selectedTeam!.scheduleWinRate, initial.selectedTeam!.scheduleWinRate);
+  assert.deepEqual({ ...input.board.picks[2], rosterOwnerId: teamA }, paidSlot);
+  assert.ok(traded.candidates.every(candidate => candidate.player.id !== 3));
+});
+
 test('missing projections suppress incomplete team odds instead of silently counting absent stats as zero', () => {
   const input = fixture(); input.projections!.players = input.projections!.players.filter(player => player.id !== 1 && player.id !== 3);
   const report = buildDraftAdvisor(input);

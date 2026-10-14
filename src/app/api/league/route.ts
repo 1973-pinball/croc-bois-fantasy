@@ -3,6 +3,7 @@ import { leagueData } from '@/lib/league-data';
 import type { DraftPick, LeagueData, LeaguePlayer, Team } from '@/lib/types';
 import { getSupabaseConfig } from '@/lib/supabase/config';
 import { json, setupResponse } from '@/lib/supabase/http';
+import { parseKeeperPaymentInventory } from '@/lib/keeper-payment-inventory';
 
 export async function GET() {
   const config = getSupabaseConfig();
@@ -66,7 +67,11 @@ export async function GET() {
       reviewItems: players.filter((p) => p.status === 'review').map((p) => ({ id: String(p.id), player: p.name, detail: p.reason, status: profileMap.get(p.id)?.verification === 'provisional' ? 'provisional' : 'needs-review' })),
     };
     const revealedKeepers = season.keepers_revealed_at ? keeperRecords.data!.map((k) => ({ playerId: k.player_id, teamId: numericIds.get(k.franchise_id), pickId: k.pick_id, baseRound: k.base_round, paymentRound: k.actual_payment_round })) : [];
+    const paymentInventory = await client.rpc('get_keeper_payment_inventory', { p_season: season.id });
+    if (paymentInventory.error) return unavailable();
+    const keeperPaymentInventory = parseKeeperPaymentInventory(paymentInventory.data, season.id, season.draft_year, franchiseIds);
     return json({ configured: true, source: 'supabase', seasonId: season.id, phase: season.phase, participantCount: season.participant_count, keepersRevealedAt: season.keepers_revealed_at, tradingOpenedAt: season.trading_opened_at, franchiseIds,
+      keeperPaymentInventory,
       keeperDeadline: season.keeper_deadline, draftAt: season.draft_at, seasonTimeZone: season.season_time_zone, scheduleRevision: season.schedule_revision,
       draftStarted: draftBoard.data.orderLocked,
       usedPickIds: picks.data!.filter((p) => p.status === 'used').map((p) => p.id),

@@ -36,6 +36,31 @@ test('prospective trade owners produce a complete replacement and do not mutate 
   assert.equal(result.options[101].some(option => option.pickId === 'five'), false);
 });
 
+test('deadline ownership excludes later acquisitions even when they are currently owned or reusable', () => {
+  const input = base({
+    picks: [pick('retained', 4), pick('acquired-after-deadline', 5), pick('traded-away', 5, 2)],
+    deadlinePicks: [pick('retained', 4), pick('acquired-after-deadline', 5, 2), pick('traded-away', 5)],
+    usedPickIds: ['acquired-after-deadline'], reusablePickIds: ['acquired-after-deadline'],
+  });
+  assert.deepEqual(keeperPaymentOptions(input).assignments, [{ playerId: 101, pickId: 'retained' }]);
+  assert.deepEqual(keeperPaymentOptions(input).options[101].map(option => option.pickId), ['retained']);
+  assert.equal(isValidKeeperPaymentAllocation(input, [{ playerId: 101, pickId: 'acquired-after-deadline' }]), false);
+});
+
+test('missing deadline inventory fails closed while previews use current ownership', () => {
+  const pending = base({ deadlinePicks: null });
+  assert.equal(keeperPaymentOptions(pending).assignments, null);
+  assert.deepEqual(keeperPaymentOptions(pending).options[101], []);
+  assert.equal(keeperPaymentOptions(base({ deadlinePicks: [] })).assignments, null);
+  assert.deepEqual(keeperPaymentOptions(base()).assignments, [{ playerId: 101, pickId: 'five' }]);
+});
+
+test('post-deadline trades can replace payments only with retained deadline-owned picks', () => {
+  const input = base({ picks: [pick('five', 5, 2), pick('other-five', 5), pick('incoming-five', 5)], deadlinePicks: [pick('five', 5), pick('other-five', 5), pick('incoming-five', 5, 2)] });
+  assert.deepEqual(keeperPaymentOptions(input).assignments, [{ playerId: 101, pickId: 'other-five' }]);
+  assert.deepEqual(keeperPaymentOptions(input).options[101].map(option => option.pickId), ['other-five']);
+});
+
 test('insufficient picks offer no invalid fallback and fixed players cannot be removed or added', () => {
   const input = base({ keepers: [{ playerId: 101, baseRound: 5, pickId: 'five' }, { playerId: 102, baseRound: 5, pickId: 'four' }], picks: [pick('five', 5)] });
   assert.equal(keeperPaymentOptions(input).assignments, null);

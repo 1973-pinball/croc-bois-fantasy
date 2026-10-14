@@ -64,5 +64,13 @@
  .roster { border: 1px solid var(--line); border-radius: 7px; padding: 14px; }
  .roster h4 { font-size: 13px; }
  .roster ul { font-size: 12px; line-height: 1.9; padding-left: 18px; margin-bottom: 0; }
+ .tradeSides { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 16px 0; }
+ .tradeSide { min-width: 0; border: 1px solid var(--line); border-radius: 7px; padding: 14px; }
+ .tradeSide select { width: 100%; min-width: 0; }
+ .assetList { max-height: 360px; overflow: auto; margin-top: 10px; }
+ .assetList label { display: flex; align-items: flex-start; gap: 9px; padding: 9px 0; font-size: 12px; line-height: 1.6; }
+ .assetList input { flex: 0 0 auto; margin-top: 4px; }
+ .functionBody { margin-top: 14px; }
+ @media(max-width: 650px) { .tradeSides { grid-template-columns: 1fr; } }
  @media(max-width: 900px) { .sourceCards { grid-template-columns: 1fr 1fr; } }
  @media(max-width: 650px) { .header { flex-direction: column; padding: 20px; } .panel { padding: 16px; } .metrics { grid-template-columns: 1fr; } .metric strong { font-size: 29px; } .recommendations { grid-template-columns: 1fr; } .toolbar { align-items: stretch; } .toolbar label { width: 100%; } .sourceCards { grid-template-columns: 1fr; } .table th, .table td { padding: 12px; } }

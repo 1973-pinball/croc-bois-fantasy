@@ -117,10 +117,12 @@ test('missing or mismatched standings, expansion and existing draft decisions fa
 }));
 
 test('historical live selections and closed phases prevent a first draw even if their draft order is blank', () => isolated(async () => {
+  await db.exec('savepoint historical_selection_fixture');
   await db.query(`insert into public.live_draft_selections(season_id,pick_id,franchise_id,player_id,player_name,created_revision,voided_revision,voided_at)
     select $1,p.id,p.current_owner_id,c.player_id,c.full_name,1,2,now() from public.draft_picks p cross join public.draft_player_catalog c where p.season_id=$1 limit 1`, [season]);
   await asUser(commissioner); await rejects(run, /prevents a new lottery/);
-  await db.exec('reset role'); await db.exec('delete from public.live_draft_selections');
+  // Roll back this fixture; production draft history cannot be deleted.
+  await db.exec('rollback to savepoint historical_selection_fixture');
   for (const phase of ['in_season', 'archived']) {
     await db.query('update public.seasons set phase=$2 where id=$1', [season, phase]);
     await asUser(commissioner); await rejects(run, /closed for this season phase/); await db.exec('reset role');
