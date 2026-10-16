@@ -2,11 +2,11 @@
   "version": 1,
   "leagueId": 139935,
   "espnSeasonId": 2027,
-  "fetchedAt": "2026-10-03T15:58:56.638Z",
+  "fetchedAt": "2026-10-16T17:57:49.587Z",
   "source": {
-    "sha256": "526e90471cb7756bc5fad0e10fcf5fb6a080609350f3697ca5666efe0aa57b86",
+    "sha256": "24c87b98012dceb2f16e0df4c00a1db2e91deb36044ab36eb0b6f1fae39c4794",
     "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2027/segments/0/leagues/139935?view=kona_player_info",
-    "capturedAt": "2026-10-03T15:58:56.638Z"
+    "capturedAt": "2026-10-16T17:57:49.587Z"
   },
   "rankingSource": {
     "field": "player.draftRanksByRankType.ROTO.rank",
@@ -67,11 +67,11 @@
     }
   ],
   "coverage": {
-    "players": 1095,
+    "players": 1096,
     "ranked": 410,
-    "unranked": 685,
-    "selectable": 1095,
-    "unsigned": 204
+    "unranked": 686,
+    "selectable": 1096,
+    "unsigned": 200
   },
   "players": [
     {
@@ -141,20 +141,6 @@
       "selectable": true
     },
     {
-      "id": 4431678,
-      "name": "Tyrese Maxey",
-      "nbaTeam": "PHI",
-      "primaryPosition": "PG",
-      "eligiblePositions": [
-        "PG",
-        "SG"
-      ],
-      "rank": 6,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
       "id": 3908809,
       "name": "Donovan Mitchell",
       "nbaTeam": "CLE",
@@ -163,7 +149,7 @@
         "PG",
         "SG"
       ],
-      "rank": 7,
+      "rank": 6,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -176,6 +162,20 @@
       "eligiblePositions": [
         "SF",
         "PF"
+      ],
+      "rank": 7,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4431678,
+      "name": "Tyrese Maxey",
+      "nbaTeam": "PHI",
+      "primaryPosition": "PG",
+      "eligiblePositions": [
+        "PG",
+        "SG"
       ],
       "rank": 8,
       "rankSource": "ROTO",
@@ -196,13 +196,13 @@
       "selectable": true
     },
     {
-      "id": 4433134,
-      "name": "Scottie Barnes",
-      "nbaTeam": "TOR",
+      "id": 5041939,
+      "name": "Cooper Flagg",
+      "nbaTeam": "DAL",
       "primaryPosition": "SF",
       "eligiblePositions": [
-        "SG",
-        "SF"
+        "SF",
+        "PF"
       ],
       "rank": 10,
       "rankSource": "ROTO",
@@ -223,6 +223,33 @@
       "selectable": true
     },
     {
+      "id": 4432816,
+      "name": "LaMelo Ball",
+      "nbaTeam": "MIN",
+      "primaryPosition": "PG",
+      "eligiblePositions": [
+        "PG"
+      ],
+      "rank": 12,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4433134,
+      "name": "Scottie Barnes",
+      "nbaTeam": "TOR",
+      "primaryPosition": "SF",
+      "eligiblePositions": [
+        "SG",
+        "SF"
+      ],
+      "rank": 13,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
       "id": 4396993,
       "name": "Tyrese Haliburton",
       "nbaTeam": "IND",
@@ -231,21 +258,7 @@
         "PG",
         "SG"
       ],
-      "rank": 12,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4684740,
-      "name": "Amen Thompson",
-      "nbaTeam": "HOU",
-      "primaryPosition": "SF",
-      "eligiblePositions": [
-        "SG",
-        "SF"
-      ],
-      "rank": 13,
+      "rank": 14,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -259,7 +272,21 @@
         "PF",
         "C"
       ],
-      "rank": 14,
+      "rank": 15,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4684740,
+      "name": "Amen Thompson",
+      "nbaTeam": "HOU",
+      "primaryPosition": "SF",
+      "eligiblePositions": [
+        "SG",
+        "SF"
+      ],
+      "rank": 16,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -273,21 +300,7 @@
         "PF",
         "C"
       ],
-      "rank": 15,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 5041939,
-      "name": "Cooper Flagg",
-      "nbaTeam": "DAL",
-      "primaryPosition": "SF",
-      "eligiblePositions": [
-        "SF",
-        "PF"
-      ],
-      "rank": 16,
+      "rank": 17,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -301,34 +314,7 @@
         "PG",
         "SG"
       ],
-      "rank": 17,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 6450,
-      "name": "Kawhi Leonard",
-      "nbaTeam": "TOR",
-      "primaryPosition": "SF",
-      "eligiblePositions": [
-        "SF",
-        "PF"
-      ],
       "rank": 18,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 3136195,
-      "name": "Karl-Anthony Towns",
-      "nbaTeam": "NYK",
-      "primaryPosition": "C",
-      "eligiblePositions": [
-        "C"
-      ],
-      "rank": 19,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -342,7 +328,34 @@
         "PF",
         "C"
       ],
+      "rank": 19,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 6450,
+      "name": "Kawhi Leonard",
+      "nbaTeam": "TOR",
+      "primaryPosition": "SF",
+      "eligiblePositions": [
+        "SF",
+        "PF"
+      ],
       "rank": 20,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 3136195,
+      "name": "Karl-Anthony Towns",
+      "nbaTeam": "NYK",
+      "primaryPosition": "C",
+      "eligiblePositions": [
+        "C"
+      ],
+      "rank": 21,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -351,19 +364,6 @@
       "id": 3936299,
       "name": "Jamal Murray",
       "nbaTeam": "DEN",
-      "primaryPosition": "PG",
-      "eligiblePositions": [
-        "PG"
-      ],
-      "rank": 21,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4432816,
-      "name": "LaMelo Ball",
-      "nbaTeam": "MIN",
       "primaryPosition": "PG",
       "eligiblePositions": [
         "PG"
@@ -387,6 +387,20 @@
       "selectable": true
     },
     {
+      "id": 4396971,
+      "name": "Naz Reid",
+      "nbaTeam": "CHA",
+      "primaryPosition": "C",
+      "eligiblePositions": [
+        "PF",
+        "C"
+      ],
+      "rank": 24,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
       "id": 3149673,
       "name": "Pascal Siakam",
       "nbaTeam": "IND",
@@ -394,7 +408,7 @@
       "eligiblePositions": [
         "PF"
       ],
-      "rank": 24,
+      "rank": 25,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -407,20 +421,6 @@
       "eligiblePositions": [
         "PG",
         "SG"
-      ],
-      "rank": 25,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 3147657,
-      "name": "Mikal Bridges",
-      "nbaTeam": "NYK",
-      "primaryPosition": "SF",
-      "eligiblePositions": [
-        "SG",
-        "SF"
       ],
       "rank": 26,
       "rankSource": "ROTO",
@@ -456,6 +456,20 @@
       "selectable": true
     },
     {
+      "id": 3147657,
+      "name": "Mikal Bridges",
+      "nbaTeam": "NYK",
+      "primaryPosition": "SF",
+      "eligiblePositions": [
+        "SG",
+        "SF"
+      ],
+      "rank": 29,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
       "id": 4871144,
       "name": "Alperen Sengun",
       "nbaTeam": "HOU",
@@ -463,7 +477,7 @@
       "eligiblePositions": [
         "C"
       ],
-      "rank": 29,
+      "rank": 30,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -475,20 +489,6 @@
       "primaryPosition": "PG",
       "eligiblePositions": [
         "PG"
-      ],
-      "rank": 30,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4278039,
-      "name": "Nickeil Alexander-Walker",
-      "nbaTeam": "ATL",
-      "primaryPosition": "SG",
-      "eligiblePositions": [
-        "PG",
-        "SG"
       ],
       "rank": 31,
       "rankSource": "ROTO",
@@ -510,12 +510,13 @@
       "selectable": true
     },
     {
-      "id": 3975,
-      "name": "Stephen Curry",
-      "nbaTeam": "GSW",
-      "primaryPosition": "PG",
+      "id": 4278039,
+      "name": "Nickeil Alexander-Walker",
+      "nbaTeam": "ATL",
+      "primaryPosition": "SG",
       "eligiblePositions": [
-        "PG"
+        "PG",
+        "SG"
       ],
       "rank": 33,
       "rankSource": "ROTO",
@@ -523,13 +524,12 @@
       "selectable": true
     },
     {
-      "id": 4066336,
-      "name": "Lauri Markkanen",
-      "nbaTeam": "UTA",
-      "primaryPosition": "PF",
+      "id": 3975,
+      "name": "Stephen Curry",
+      "nbaTeam": "GSW",
+      "primaryPosition": "PG",
       "eligiblePositions": [
-        "SF",
-        "PF"
+        "PG"
       ],
       "rank": 34,
       "rankSource": "ROTO",
@@ -551,13 +551,13 @@
       "selectable": true
     },
     {
-      "id": 4871145,
-      "name": "Josh Giddey",
-      "nbaTeam": "CHI",
-      "primaryPosition": "PG",
+      "id": 4066336,
+      "name": "Lauri Markkanen",
+      "nbaTeam": "UTA",
+      "primaryPosition": "PF",
       "eligiblePositions": [
-        "PG",
-        "SG"
+        "SF",
+        "PF"
       ],
       "rank": 36,
       "rankSource": "ROTO",
@@ -565,13 +565,13 @@
       "selectable": true
     },
     {
-      "id": 4396971,
-      "name": "Naz Reid",
-      "nbaTeam": "CHA",
-      "primaryPosition": "C",
+      "id": 4871145,
+      "name": "Josh Giddey",
+      "nbaTeam": "CHI",
+      "primaryPosition": "PG",
       "eligiblePositions": [
-        "PF",
-        "C"
+        "PG",
+        "SG"
       ],
       "rank": 37,
       "rankSource": "ROTO",
@@ -593,20 +593,6 @@
       "selectable": true
     },
     {
-      "id": 5061575,
-      "name": "Kon Knueppel",
-      "nbaTeam": "CHA",
-      "primaryPosition": "SF",
-      "eligiblePositions": [
-        "SG",
-        "SF"
-      ],
-      "rank": 39,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
       "id": 3136193,
       "name": "Devin Booker",
       "nbaTeam": "PHX",
@@ -614,6 +600,20 @@
       "eligiblePositions": [
         "PG",
         "SG"
+      ],
+      "rank": 39,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 5061575,
+      "name": "Kon Knueppel",
+      "nbaTeam": "CHA",
+      "primaryPosition": "SF",
+      "eligiblePositions": [
+        "SG",
+        "SF"
       ],
       "rank": 40,
       "rankSource": "ROTO",
@@ -635,13 +635,13 @@
       "selectable": true
     },
     {
-      "id": 4278104,
-      "name": "Michael Porter Jr.",
-      "nbaTeam": "BKN",
-      "primaryPosition": "SF",
+      "id": 4066457,
+      "name": "Austin Reaves",
+      "nbaTeam": "LAL",
+      "primaryPosition": "SG",
       "eligiblePositions": [
-        "SF",
-        "PF"
+        "PG",
+        "SG"
       ],
       "rank": 42,
       "rankSource": "ROTO",
@@ -649,12 +649,13 @@
       "selectable": true
     },
     {
-      "id": 5105565,
-      "name": "Donovan Clingan",
-      "nbaTeam": "POR",
-      "primaryPosition": "C",
+      "id": 4278104,
+      "name": "Michael Porter Jr.",
+      "nbaTeam": "BKN",
+      "primaryPosition": "SF",
       "eligiblePositions": [
-        "C"
+        "SF",
+        "PF"
       ],
       "rank": 43,
       "rankSource": "ROTO",
@@ -675,14 +676,27 @@
       "selectable": true
     },
     {
-      "id": 4433136,
-      "name": "Walker Kessler",
-      "nbaTeam": "LAL",
+      "id": 5105565,
+      "name": "Donovan Clingan",
+      "nbaTeam": "POR",
       "primaryPosition": "C",
       "eligiblePositions": [
         "C"
       ],
       "rank": 45,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 5105623,
+      "name": "Kel'el Ware",
+      "nbaTeam": "MIL",
+      "primaryPosition": "C",
+      "eligiblePositions": [
+        "C"
+      ],
+      "rank": 46,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -696,7 +710,20 @@
         "SG",
         "SF"
       ],
-      "rank": 46,
+      "rank": 47,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4433136,
+      "name": "Walker Kessler",
+      "nbaTeam": "LAL",
+      "primaryPosition": "C",
+      "eligiblePositions": [
+        "C"
+      ],
+      "rank": 48,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -709,7 +736,7 @@
       "eligiblePositions": [
         "PG"
       ],
-      "rank": 47,
+      "rank": 49,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -722,7 +749,7 @@
       "eligiblePositions": [
         "PG"
       ],
-      "rank": 48,
+      "rank": 50,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -735,21 +762,7 @@
       "eligiblePositions": [
         "C"
       ],
-      "rank": 49,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4066457,
-      "name": "Austin Reaves",
-      "nbaTeam": "LAL",
-      "primaryPosition": "SG",
-      "eligiblePositions": [
-        "PG",
-        "SG"
-      ],
-      "rank": 50,
+      "rank": 51,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -763,7 +776,7 @@
         "PF",
         "C"
       ],
-      "rank": 51,
+      "rank": 52,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -777,7 +790,7 @@
         "PG",
         "SG"
       ],
-      "rank": 52,
+      "rank": 53,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -790,7 +803,7 @@
       "eligiblePositions": [
         "PG"
       ],
-      "rank": 53,
+      "rank": 54,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -804,7 +817,7 @@
         "SG",
         "SF"
       ],
-      "rank": 54,
+      "rank": 55,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -817,7 +830,7 @@
       "eligiblePositions": [
         "C"
       ],
-      "rank": 55,
+      "rank": 56,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -830,29 +843,15 @@
       "eligiblePositions": [
         "SF"
       ],
-      "rank": 56,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 3907497,
-      "name": "Dejounte Murray",
-      "nbaTeam": "NOP",
-      "primaryPosition": "SG",
-      "eligiblePositions": [
-        "PG",
-        "SG"
-      ],
       "rank": 57,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
     },
     {
-      "id": 4711272,
-      "name": "Reed Sheppard",
-      "nbaTeam": "HOU",
+      "id": 4065733,
+      "name": "Ty Jerome",
+      "nbaTeam": "MEM",
       "primaryPosition": "SG",
       "eligiblePositions": [
         "PG",
@@ -864,13 +863,12 @@
       "selectable": true
     },
     {
-      "id": 4711294,
-      "name": "Matas Buzelis",
-      "nbaTeam": "CHI",
-      "primaryPosition": "SF",
+      "id": 5124612,
+      "name": "VJ Edgecombe",
+      "nbaTeam": "PHI",
+      "primaryPosition": "SG",
       "eligiblePositions": [
-        "SF",
-        "PF"
+        "SG"
       ],
       "rank": 59,
       "rankSource": "ROTO",
@@ -892,15 +890,29 @@
       "selectable": true
     },
     {
-      "id": 5160992,
-      "name": "Alex Sarr",
-      "nbaTeam": "WAS",
-      "primaryPosition": "C",
+      "id": 3907497,
+      "name": "Dejounte Murray",
+      "nbaTeam": "NOP",
+      "primaryPosition": "SG",
       "eligiblePositions": [
-        "PF",
-        "C"
+        "PG",
+        "SG"
       ],
       "rank": 61,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4711272,
+      "name": "Reed Sheppard",
+      "nbaTeam": "HOU",
+      "primaryPosition": "SG",
+      "eligiblePositions": [
+        "PG",
+        "SG"
+      ],
+      "rank": 62,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -914,7 +926,21 @@
         "SG",
         "SF"
       ],
-      "rank": 62,
+      "rank": 63,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4711294,
+      "name": "Matas Buzelis",
+      "nbaTeam": "CHI",
+      "primaryPosition": "SF",
+      "eligiblePositions": [
+        "SF",
+        "PF"
+      ],
+      "rank": 64,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -928,7 +954,21 @@
         "PG",
         "SG"
       ],
-      "rank": 63,
+      "rank": 65,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 5160992,
+      "name": "Alex Sarr",
+      "nbaTeam": "WAS",
+      "primaryPosition": "C",
+      "eligiblePositions": [
+        "PF",
+        "C"
+      ],
+      "rank": 66,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -942,7 +982,7 @@
         "SG",
         "SF"
       ],
-      "rank": 64,
+      "rank": 67,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -956,7 +996,7 @@
         "SF",
         "PF"
       ],
-      "rank": 65,
+      "rank": 68,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -968,46 +1008,6 @@
       "primaryPosition": "SG",
       "eligiblePositions": [
         "PG",
-        "SG"
-      ],
-      "rank": 66,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 5105623,
-      "name": "Kel'el Ware",
-      "nbaTeam": "MIL",
-      "primaryPosition": "C",
-      "eligiblePositions": [
-        "C"
-      ],
-      "rank": 67,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 3934719,
-      "name": "OG Anunoby",
-      "nbaTeam": "NYK",
-      "primaryPosition": "SF",
-      "eligiblePositions": [
-        "SF",
-        "PF"
-      ],
-      "rank": 68,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 5124612,
-      "name": "VJ Edgecombe",
-      "nbaTeam": "PHI",
-      "primaryPosition": "SG",
-      "eligiblePositions": [
         "SG"
       ],
       "rank": 69,
@@ -1029,13 +1029,13 @@
       "selectable": true
     },
     {
-      "id": 4277961,
-      "name": "Jaren Jackson Jr.",
-      "nbaTeam": "UTA",
-      "primaryPosition": "C",
+      "id": 3934719,
+      "name": "OG Anunoby",
+      "nbaTeam": "NYK",
+      "primaryPosition": "SF",
       "eligiblePositions": [
-        "PF",
-        "C"
+        "SF",
+        "PF"
       ],
       "rank": 71,
       "rankSource": "ROTO",
@@ -1043,13 +1043,13 @@
       "selectable": true
     },
     {
-      "id": 4065733,
-      "name": "Ty Jerome",
-      "nbaTeam": "MEM",
-      "primaryPosition": "SG",
+      "id": 4277961,
+      "name": "Jaren Jackson Jr.",
+      "nbaTeam": "UTA",
+      "primaryPosition": "C",
       "eligiblePositions": [
-        "PG",
-        "SG"
+        "PF",
+        "C"
       ],
       "rank": 72,
       "rankSource": "ROTO",
@@ -1085,13 +1085,12 @@
       "selectable": true
     },
     {
-      "id": 4432573,
-      "name": "Paolo Banchero",
-      "nbaTeam": "ORL",
-      "primaryPosition": "PF",
+      "id": 4017837,
+      "name": "Ivica Zubac",
+      "nbaTeam": "IND",
+      "primaryPosition": "C",
       "eligiblePositions": [
-        "SF",
-        "PF"
+        "C"
       ],
       "rank": 75,
       "rankSource": "ROTO",
@@ -1099,10 +1098,10 @@
       "selectable": true
     },
     {
-      "id": 4066383,
-      "name": "Miles Bridges",
-      "nbaTeam": "PHX",
-      "primaryPosition": "SF",
+      "id": 4432573,
+      "name": "Paolo Banchero",
+      "nbaTeam": "ORL",
+      "primaryPosition": "PF",
       "eligiblePositions": [
         "SF",
         "PF"
@@ -1126,9 +1125,9 @@
       "selectable": true
     },
     {
-      "id": 4684742,
-      "name": "Ausar Thompson",
-      "nbaTeam": "DET",
+      "id": 4066383,
+      "name": "Miles Bridges",
+      "nbaTeam": "PHX",
       "primaryPosition": "SF",
       "eligiblePositions": [
         "SF",
@@ -1140,9 +1139,9 @@
       "selectable": true
     },
     {
-      "id": 3913176,
-      "name": "Brandon Ingram",
-      "nbaTeam": "LAC",
+      "id": 4684742,
+      "name": "Ausar Thompson",
+      "nbaTeam": "DET",
       "primaryPosition": "SF",
       "eligiblePositions": [
         "SF",
@@ -1168,12 +1167,13 @@
       "selectable": true
     },
     {
-      "id": 4017837,
-      "name": "Ivica Zubac",
-      "nbaTeam": "IND",
-      "primaryPosition": "C",
+      "id": 4431671,
+      "name": "Jaden McDaniels",
+      "nbaTeam": "MIN",
+      "primaryPosition": "SF",
       "eligiblePositions": [
-        "C"
+        "SF",
+        "PF"
       ],
       "rank": 81,
       "rankSource": "ROTO",
@@ -1209,33 +1209,6 @@
       "selectable": true
     },
     {
-      "id": 4431671,
-      "name": "Jaden McDaniels",
-      "nbaTeam": "MIN",
-      "primaryPosition": "SF",
-      "eligiblePositions": [
-        "SF",
-        "PF"
-      ],
-      "rank": 84,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 5142718,
-      "name": "AJ Dybantsa",
-      "nbaTeam": "WAS",
-      "primaryPosition": "SF",
-      "eligiblePositions": [
-        "SF"
-      ],
-      "rank": 85,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
       "id": 3064514,
       "name": "Julius Randle",
       "nbaTeam": "BKN",
@@ -1243,7 +1216,7 @@
       "eligiblePositions": [
         "PF"
       ],
-      "rank": 86,
+      "rank": 84,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1257,7 +1230,20 @@
         "SF",
         "PF"
       ],
-      "rank": 87,
+      "rank": 85,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 5142718,
+      "name": "AJ Dybantsa",
+      "nbaTeam": "WAS",
+      "primaryPosition": "SF",
+      "eligiblePositions": [
+        "SF"
+      ],
+      "rank": 86,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1270,7 +1256,7 @@
       "eligiblePositions": [
         "C"
       ],
-      "rank": 88,
+      "rank": 87,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1283,6 +1269,20 @@
       "eligiblePositions": [
         "PG",
         "SG"
+      ],
+      "rank": 88,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4869780,
+      "name": "Derik Queen",
+      "nbaTeam": "NOP",
+      "primaryPosition": "C",
+      "eligiblePositions": [
+        "PF",
+        "C"
       ],
       "rank": 89,
       "rankSource": "ROTO",
@@ -1332,19 +1332,6 @@
       "selectable": true
     },
     {
-      "id": 3133628,
-      "name": "Myles Turner",
-      "nbaTeam": "MIL",
-      "primaryPosition": "C",
-      "eligiblePositions": [
-        "C"
-      ],
-      "rank": 93,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
       "id": 6440,
       "name": "Tobias Harris",
       "nbaTeam": "SAS",
@@ -1353,21 +1340,7 @@
         "SF",
         "PF"
       ],
-      "rank": 94,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4869780,
-      "name": "Derik Queen",
-      "nbaTeam": "NOP",
-      "primaryPosition": "C",
-      "eligiblePositions": [
-        "PF",
-        "C"
-      ],
-      "rank": 95,
+      "rank": 93,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1376,6 +1349,33 @@
       "id": 4395628,
       "name": "Zion Williamson",
       "nbaTeam": "NOP",
+      "primaryPosition": "PF",
+      "eligiblePositions": [
+        "PF",
+        "C"
+      ],
+      "rank": 94,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 3133628,
+      "name": "Myles Turner",
+      "nbaTeam": "MIL",
+      "primaryPosition": "C",
+      "eligiblePositions": [
+        "C"
+      ],
+      "rank": 95,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 3908845,
+      "name": "John Collins",
+      "nbaTeam": "DET",
       "primaryPosition": "PF",
       "eligiblePositions": [
         "PF",
@@ -1415,13 +1415,13 @@
       "selectable": true
     },
     {
-      "id": 3908845,
-      "name": "John Collins",
-      "nbaTeam": "DET",
-      "primaryPosition": "PF",
+      "id": 5037871,
+      "name": "Dylan Harper",
+      "nbaTeam": "SAS",
+      "primaryPosition": "PG",
       "eligiblePositions": [
-        "PF",
-        "C"
+        "PG",
+        "SG"
       ],
       "rank": 99,
       "rankSource": "ROTO",
@@ -1442,20 +1442,6 @@
       "selectable": true
     },
     {
-      "id": 5037871,
-      "name": "Dylan Harper",
-      "nbaTeam": "SAS",
-      "primaryPosition": "PG",
-      "eligiblePositions": [
-        "PG",
-        "SG"
-      ],
-      "rank": 101,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
       "id": 3978,
       "name": "DeMar DeRozan",
       "nbaTeam": "DEN",
@@ -1464,7 +1450,7 @@
         "SF",
         "PF"
       ],
-      "rank": 102,
+      "rank": 101,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1477,21 +1463,21 @@
       "eligiblePositions": [
         "C"
       ],
-      "rank": 103,
+      "rank": 102,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
     },
     {
-      "id": 4576087,
-      "name": "Peyton Watson",
-      "nbaTeam": "CLE",
-      "primaryPosition": "SF",
+      "id": 4437244,
+      "name": "Jalen Green",
+      "nbaTeam": "PHX",
+      "primaryPosition": "SG",
       "eligiblePositions": [
-        "SF",
-        "PF"
+        "SG",
+        "SF"
       ],
-      "rank": 104,
+      "rank": 103,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1504,6 +1490,20 @@
       "eligiblePositions": [
         "PG",
         "SG"
+      ],
+      "rank": 104,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4576087,
+      "name": "Peyton Watson",
+      "nbaTeam": "CLE",
+      "primaryPosition": "SF",
+      "eligiblePositions": [
+        "SF",
+        "PF"
       ],
       "rank": 105,
       "rankSource": "ROTO",
@@ -1525,10 +1525,10 @@
       "selectable": true
     },
     {
-      "id": 4397140,
-      "name": "Kevin Porter Jr.",
-      "nbaTeam": "MIL",
-      "primaryPosition": "SG",
+      "id": 5175643,
+      "name": "Egor Demin",
+      "nbaTeam": "BKN",
+      "primaryPosition": "PG",
       "eligiblePositions": [
         "PG",
         "SG"
@@ -1553,9 +1553,9 @@
       "selectable": true
     },
     {
-      "id": 4683692,
-      "name": "Cason Wallace",
-      "nbaTeam": "OKC",
+      "id": 4397140,
+      "name": "Kevin Porter Jr.",
+      "nbaTeam": "MIL",
       "primaryPosition": "SG",
       "eligiblePositions": [
         "PG",
@@ -1567,14 +1567,15 @@
       "selectable": true
     },
     {
-      "id": 3468,
-      "name": "Russell Westbrook",
-      "nbaTeam": "FA",
-      "primaryPosition": "PG",
+      "id": 4683692,
+      "name": "Cason Wallace",
+      "nbaTeam": "OKC",
+      "primaryPosition": "SG",
       "eligiblePositions": [
-        "PG"
+        "PG",
+        "SG"
       ],
-      "rank": 109,
+      "rank": 110,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1588,7 +1589,7 @@
         "PF",
         "C"
       ],
-      "rank": 110,
+      "rank": 111,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1602,7 +1603,7 @@
         "SF",
         "PF"
       ],
-      "rank": 111,
+      "rank": 112,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1615,7 +1616,7 @@
       "eligiblePositions": [
         "C"
       ],
-      "rank": 112,
+      "rank": 113,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1628,7 +1629,7 @@
       "eligiblePositions": [
         "C"
       ],
-      "rank": 113,
+      "rank": 114,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1641,7 +1642,7 @@
       "eligiblePositions": [
         "C"
       ],
-      "rank": 114,
+      "rank": 115,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1654,7 +1655,7 @@
       "eligiblePositions": [
         "C"
       ],
-      "rank": 115,
+      "rank": 116,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1667,7 +1668,7 @@
       "eligiblePositions": [
         "C"
       ],
-      "rank": 116,
+      "rank": 117,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1680,7 +1681,7 @@
       "eligiblePositions": [
         "C"
       ],
-      "rank": 117,
+      "rank": 118,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1694,145 +1695,7 @@
         "SG",
         "SF"
       ],
-      "rank": 118,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4278067,
-      "name": "Nic Claxton",
-      "nbaTeam": "CHI",
-      "primaryPosition": "C",
-      "eligiblePositions": [
-        "C"
-      ],
       "rank": 119,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4592691,
-      "name": "Jake LaRavia",
-      "nbaTeam": "LAL",
-      "primaryPosition": "PF",
-      "eligiblePositions": [
-        "SF",
-        "PF"
-      ],
-      "rank": 120,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 5175643,
-      "name": "Egor Demin",
-      "nbaTeam": "BKN",
-      "primaryPosition": "PG",
-      "eligiblePositions": [
-        "PG",
-        "SG"
-      ],
-      "rank": 121,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4601023,
-      "name": "Oso Ighodaro",
-      "nbaTeam": "PHX",
-      "primaryPosition": "PF",
-      "eligiblePositions": [
-        "PF"
-      ],
-      "rank": 122,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 5041955,
-      "name": "Darryn Peterson",
-      "nbaTeam": "UTA",
-      "primaryPosition": "SG",
-      "eligiblePositions": [
-        "PG",
-        "SG"
-      ],
-      "rank": 123,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4903027,
-      "name": "Cedric Coward",
-      "nbaTeam": "MEM",
-      "primaryPosition": "SF",
-      "eligiblePositions": [
-        "SG",
-        "SF"
-      ],
-      "rank": 124,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4712849,
-      "name": "Anthony Black",
-      "nbaTeam": "ORL",
-      "primaryPosition": "PG",
-      "eligiblePositions": [
-        "PG",
-        "SG"
-      ],
-      "rank": 125,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 5174563,
-      "name": "Kyshawn George",
-      "nbaTeam": "WAS",
-      "primaryPosition": "SG",
-      "eligiblePositions": [
-        "SG",
-        "SF"
-      ],
-      "rank": 126,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4873138,
-      "name": "Ace Bailey",
-      "nbaTeam": "UTA",
-      "primaryPosition": "SF",
-      "eligiblePositions": [
-        "SF",
-        "PF"
-      ],
-      "rank": 127,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4395630,
-      "name": "Devin Vassell",
-      "nbaTeam": "SAS",
-      "primaryPosition": "SG",
-      "eligiblePositions": [
-        "SG",
-        "SF"
-      ],
-      "rank": 128,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1846,35 +1709,144 @@
         "PG",
         "SG"
       ],
+      "rank": 120,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4278067,
+      "name": "Nic Claxton",
+      "nbaTeam": "CHI",
+      "primaryPosition": "C",
+      "eligiblePositions": [
+        "C"
+      ],
+      "rank": 121,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4279888,
+      "name": "Ja Morant",
+      "nbaTeam": "POR",
+      "primaryPosition": "PG",
+      "eligiblePositions": [
+        "PG"
+      ],
+      "rank": 122,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4592691,
+      "name": "Jake LaRavia",
+      "nbaTeam": "LAL",
+      "primaryPosition": "PF",
+      "eligiblePositions": [
+        "SF",
+        "PF"
+      ],
+      "rank": 123,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4873138,
+      "name": "Ace Bailey",
+      "nbaTeam": "UTA",
+      "primaryPosition": "SF",
+      "eligiblePositions": [
+        "SF",
+        "PF"
+      ],
+      "rank": 124,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4601023,
+      "name": "Oso Ighodaro",
+      "nbaTeam": "PHX",
+      "primaryPosition": "PF",
+      "eligiblePositions": [
+        "PF"
+      ],
+      "rank": 125,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 5041955,
+      "name": "Darryn Peterson",
+      "nbaTeam": "UTA",
+      "primaryPosition": "SG",
+      "eligiblePositions": [
+        "PG",
+        "SG"
+      ],
+      "rank": 126,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4903027,
+      "name": "Cedric Coward",
+      "nbaTeam": "MEM",
+      "primaryPosition": "SF",
+      "eligiblePositions": [
+        "SG",
+        "SF"
+      ],
+      "rank": 127,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4712849,
+      "name": "Anthony Black",
+      "nbaTeam": "ORL",
+      "primaryPosition": "PG",
+      "eligiblePositions": [
+        "PG",
+        "SG"
+      ],
+      "rank": 128,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 5174563,
+      "name": "Kyshawn George",
+      "nbaTeam": "WAS",
+      "primaryPosition": "SG",
+      "eligiblePositions": [
+        "SG",
+        "SF"
+      ],
       "rank": 129,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
     },
     {
-      "id": 4437244,
-      "name": "Jalen Green",
-      "nbaTeam": "PHX",
+      "id": 4395630,
+      "name": "Devin Vassell",
+      "nbaTeam": "SAS",
       "primaryPosition": "SG",
       "eligiblePositions": [
         "SG",
         "SF"
       ],
       "rank": 130,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 3995,
-      "name": "Jrue Holiday",
-      "nbaTeam": "POR",
-      "primaryPosition": "PG",
-      "eligiblePositions": [
-        "PG",
-        "SG"
-      ],
-      "rank": 131,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1888,20 +1860,20 @@
         "SF",
         "PF"
       ],
-      "rank": 132,
+      "rank": 131,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
     },
     {
-      "id": 4279888,
-      "name": "Ja Morant",
-      "nbaTeam": "POR",
-      "primaryPosition": "PG",
+      "id": 4222252,
+      "name": "Isaiah Hartenstein",
+      "nbaTeam": "OKC",
+      "primaryPosition": "C",
       "eligiblePositions": [
-        "PG"
+        "C"
       ],
-      "rank": 133,
+      "rank": 132,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1915,20 +1887,21 @@
         "SF",
         "PF"
       ],
-      "rank": 134,
+      "rank": 133,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
     },
     {
-      "id": 4222252,
-      "name": "Isaiah Hartenstein",
-      "nbaTeam": "OKC",
-      "primaryPosition": "C",
+      "id": 4431785,
+      "name": "Scotty Pippen Jr.",
+      "nbaTeam": "MEM",
+      "primaryPosition": "PG",
       "eligiblePositions": [
-        "C"
+        "PG",
+        "SG"
       ],
-      "rank": 135,
+      "rank": 134,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1941,7 +1914,7 @@
       "eligiblePositions": [
         "C"
       ],
-      "rank": 136,
+      "rank": 135,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1955,7 +1928,7 @@
         "PG",
         "SG"
       ],
-      "rank": 137,
+      "rank": 136,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1969,7 +1942,7 @@
         "SG",
         "SF"
       ],
-      "rank": 138,
+      "rank": 137,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1982,7 +1955,7 @@
       "eligiblePositions": [
         "PG"
       ],
-      "rank": 139,
+      "rank": 138,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -1996,7 +1969,7 @@
         "SG",
         "SF"
       ],
-      "rank": 140,
+      "rank": 139,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2010,19 +1983,33 @@
         "SF",
         "PF"
       ],
+      "rank": 140,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 3995,
+      "name": "Jrue Holiday",
+      "nbaTeam": "POR",
+      "primaryPosition": "PG",
+      "eligiblePositions": [
+        "PG",
+        "SG"
+      ],
       "rank": 141,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
     },
     {
-      "id": 4432165,
-      "name": "Jalen Suggs",
-      "nbaTeam": "ORL",
-      "primaryPosition": "PG",
+      "id": 3913176,
+      "name": "Brandon Ingram",
+      "nbaTeam": "LAC",
+      "primaryPosition": "SF",
       "eligiblePositions": [
-        "PG",
-        "SG"
+        "SF",
+        "PF"
       ],
       "rank": 142,
       "rankSource": "ROTO",
@@ -2044,12 +2031,13 @@
       "selectable": true
     },
     {
-      "id": 4683688,
-      "name": "Dereck Lively II",
-      "nbaTeam": "DAL",
-      "primaryPosition": "C",
+      "id": 4432165,
+      "name": "Jalen Suggs",
+      "nbaTeam": "ORL",
+      "primaryPosition": "PG",
       "eligiblePositions": [
-        "C"
+        "PG",
+        "SG"
       ],
       "rank": 143,
       "rankSource": "ROTO",
@@ -2057,13 +2045,12 @@
       "selectable": true
     },
     {
-      "id": 4431785,
-      "name": "Scotty Pippen Jr.",
-      "nbaTeam": "MEM",
-      "primaryPosition": "PG",
+      "id": 4683688,
+      "name": "Dereck Lively II",
+      "nbaTeam": "DAL",
+      "primaryPosition": "C",
       "eligiblePositions": [
-        "PG",
-        "SG"
+        "C"
       ],
       "rank": 144,
       "rankSource": "ROTO",
@@ -2085,13 +2072,12 @@
       "selectable": true
     },
     {
-      "id": 4432810,
-      "name": "Isaiah Stewart",
+      "id": 2991070,
+      "name": "Jerami Grant",
       "nbaTeam": "MEM",
-      "primaryPosition": "C",
+      "primaryPosition": "PF",
       "eligiblePositions": [
-        "PF",
-        "C"
+        "PF"
       ],
       "rank": 146,
       "rankSource": "ROTO",
@@ -2099,12 +2085,13 @@
       "selectable": true
     },
     {
-      "id": 2991070,
-      "name": "Jerami Grant",
+      "id": 4432810,
+      "name": "Isaiah Stewart",
       "nbaTeam": "MEM",
-      "primaryPosition": "PF",
+      "primaryPosition": "C",
       "eligiblePositions": [
-        "PF"
+        "PF",
+        "C"
       ],
       "rank": 147,
       "rankSource": "ROTO",
@@ -2126,13 +2113,13 @@
       "selectable": true
     },
     {
-      "id": 4395712,
-      "name": "Andrew Nembhard",
-      "nbaTeam": "IND",
-      "primaryPosition": "PG",
+      "id": 4278078,
+      "name": "P.J. Washington",
+      "nbaTeam": "DAL",
+      "primaryPosition": "PF",
       "eligiblePositions": [
-        "PG",
-        "SG"
+        "SF",
+        "PF"
       ],
       "rank": 149,
       "rankSource": "ROTO",
@@ -2154,13 +2141,13 @@
       "selectable": true
     },
     {
-      "id": 4278078,
-      "name": "P.J. Washington",
-      "nbaTeam": "DAL",
-      "primaryPosition": "PF",
+      "id": 4395712,
+      "name": "Andrew Nembhard",
+      "nbaTeam": "IND",
+      "primaryPosition": "PG",
       "eligiblePositions": [
-        "SF",
-        "PF"
+        "PG",
+        "SG"
       ],
       "rank": 151,
       "rankSource": "ROTO",
@@ -2196,28 +2183,15 @@
       "selectable": true
     },
     {
-      "id": 3064290,
-      "name": "Aaron Gordon",
-      "nbaTeam": "DEN",
+      "id": 4066648,
+      "name": "Rui Hachimura",
+      "nbaTeam": "LAC",
       "primaryPosition": "PF",
-      "eligiblePositions": [
-        "PF"
-      ],
-      "rank": 154,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 2583632,
-      "name": "Royce O'Neale",
-      "nbaTeam": "CHA",
-      "primaryPosition": "SF",
       "eligiblePositions": [
         "SF",
         "PF"
       ],
-      "rank": 155,
+      "rank": 154,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2231,7 +2205,34 @@
         "SG",
         "SF"
       ],
+      "rank": 155,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 3064290,
+      "name": "Aaron Gordon",
+      "nbaTeam": "DEN",
+      "primaryPosition": "PF",
+      "eligiblePositions": [
+        "PF"
+      ],
       "rank": 156,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 2583632,
+      "name": "Royce O'Neale",
+      "nbaTeam": "CHA",
+      "primaryPosition": "SF",
+      "eligiblePositions": [
+        "SF",
+        "PF"
+      ],
+      "rank": 157,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2245,7 +2246,7 @@
         "PG",
         "SG"
       ],
-      "rank": 157,
+      "rank": 158,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2258,20 +2259,6 @@
       "eligiblePositions": [
         "SG",
         "SF"
-      ],
-      "rank": 158,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4066262,
-      "name": "Malik Monk",
-      "nbaTeam": "SAC",
-      "primaryPosition": "SG",
-      "eligiblePositions": [
-        "PG",
-        "SG"
       ],
       "rank": 159,
       "rankSource": "ROTO",
@@ -2293,13 +2280,13 @@
       "selectable": true
     },
     {
-      "id": 6589,
-      "name": "Draymond Green",
-      "nbaTeam": "GSW",
-      "primaryPosition": "PF",
+      "id": 4066262,
+      "name": "Malik Monk",
+      "nbaTeam": "SAC",
+      "primaryPosition": "SG",
       "eligiblePositions": [
-        "PF",
-        "C"
+        "PG",
+        "SG"
       ],
       "rank": 161,
       "rankSource": "ROTO",
@@ -2321,14 +2308,29 @@
       "selectable": true
     },
     {
-      "id": 4576060,
-      "name": "Ryan Kalkbrenner",
-      "nbaTeam": "CHA",
-      "primaryPosition": "C",
+      "id": 6589,
+      "name": "Draymond Green",
+      "nbaTeam": "GSW",
+      "primaryPosition": "PF",
       "eligiblePositions": [
+        "PF",
         "C"
       ],
       "rank": 163,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 5107173,
+      "name": "Danny Wolf",
+      "nbaTeam": "BKN",
+      "primaryPosition": "PF",
+      "eligiblePositions": [
+        "PF",
+        "C"
+      ],
+      "rank": 164,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2341,7 +2343,7 @@
       "eligiblePositions": [
         "C"
       ],
-      "rank": 164,
+      "rank": 165,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2354,7 +2356,7 @@
       "eligiblePositions": [
         "C"
       ],
-      "rank": 165,
+      "rank": 166,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2368,34 +2370,7 @@
         "PF",
         "C"
       ],
-      "rank": 166,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4065804,
-      "name": "Sam Hauser",
-      "nbaTeam": "BOS",
-      "primaryPosition": "SF",
-      "eligiblePositions": [
-        "SF",
-        "PF"
-      ],
       "rank": 167,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 3102530,
-      "name": "Jusuf Nurkic",
-      "nbaTeam": "UTA",
-      "primaryPosition": "C",
-      "eligiblePositions": [
-        "C"
-      ],
-      "rank": 168,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2409,7 +2384,47 @@
         "SG",
         "SF"
       ],
+      "rank": 168,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4065804,
+      "name": "Sam Hauser",
+      "nbaTeam": "BOS",
+      "primaryPosition": "SF",
+      "eligiblePositions": [
+        "SF",
+        "PF"
+      ],
       "rank": 169,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 3102530,
+      "name": "Jusuf Nurkic",
+      "nbaTeam": "UTA",
+      "primaryPosition": "C",
+      "eligiblePositions": [
+        "C"
+      ],
+      "rank": 170,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 5093267,
+      "name": "Collin Murray-Boyles",
+      "nbaTeam": "TOR",
+      "primaryPosition": "PF",
+      "eligiblePositions": [
+        "PF"
+      ],
+      "rank": 171,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2423,7 +2438,7 @@
         "PF",
         "C"
       ],
-      "rank": 170,
+      "rank": 172,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2437,7 +2452,7 @@
         "SF",
         "PF"
       ],
-      "rank": 171,
+      "rank": 173,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2450,7 +2465,7 @@
       "eligiblePositions": [
         "C"
       ],
-      "rank": 172,
+      "rank": 174,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2464,20 +2479,7 @@
         "SF",
         "PF"
       ],
-      "rank": 173,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 5093267,
-      "name": "Collin Murray-Boyles",
-      "nbaTeam": "TOR",
-      "primaryPosition": "PF",
-      "eligiblePositions": [
-        "PF"
-      ],
-      "rank": 174,
+      "rank": 175,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2489,20 +2491,6 @@
       "primaryPosition": "PG",
       "eligiblePositions": [
         "PG"
-      ],
-      "rank": 175,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4433192,
-      "name": "Tari Eason",
-      "nbaTeam": "HOU",
-      "primaryPosition": "SF",
-      "eligiblePositions": [
-        "SF",
-        "PF"
       ],
       "rank": 176,
       "rankSource": "ROTO",
@@ -2524,12 +2512,13 @@
       "selectable": true
     },
     {
-      "id": 4432582,
-      "name": "Max Christie",
-      "nbaTeam": "DAL",
-      "primaryPosition": "SG",
+      "id": 4433192,
+      "name": "Tari Eason",
+      "nbaTeam": "HOU",
+      "primaryPosition": "SF",
       "eligiblePositions": [
-        "SG"
+        "SF",
+        "PF"
       ],
       "rank": 178,
       "rankSource": "ROTO",
@@ -2550,20 +2539,6 @@
       "selectable": true
     },
     {
-      "id": 4066436,
-      "name": "De'Anthony Melton",
-      "nbaTeam": "GSW",
-      "primaryPosition": "PG",
-      "eligiblePositions": [
-        "PG",
-        "SG"
-      ],
-      "rank": 180,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
       "id": 5104155,
       "name": "Bilal Coulibaly",
       "nbaTeam": "WAS",
@@ -2572,7 +2547,47 @@
         "SG",
         "SF"
       ],
+      "rank": 180,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4066436,
+      "name": "De'Anthony Melton",
+      "nbaTeam": "GSW",
+      "primaryPosition": "PG",
+      "eligiblePositions": [
+        "PG",
+        "SG"
+      ],
       "rank": 181,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4576060,
+      "name": "Ryan Kalkbrenner",
+      "nbaTeam": "CHA",
+      "primaryPosition": "C",
+      "eligiblePositions": [
+        "C"
+      ],
+      "rank": 182,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4432582,
+      "name": "Max Christie",
+      "nbaTeam": "DAL",
+      "primaryPosition": "SG",
+      "eligiblePositions": [
+        "SG"
+      ],
+      "rank": 183,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2586,7 +2601,7 @@
         "SG",
         "SF"
       ],
-      "rank": 182,
+      "rank": 184,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2600,21 +2615,7 @@
         "SG",
         "SF"
       ],
-      "rank": 183,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 2991139,
-      "name": "Kris Dunn",
-      "nbaTeam": "LAC",
-      "primaryPosition": "PG",
-      "eligiblePositions": [
-        "PG",
-        "SG"
-      ],
-      "rank": 184,
+      "rank": 185,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2628,7 +2629,21 @@
         "SF",
         "PF"
       ],
-      "rank": 185,
+      "rank": 186,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 2991139,
+      "name": "Kris Dunn",
+      "nbaTeam": "LAC",
+      "primaryPosition": "PG",
+      "eligiblePositions": [
+        "PG",
+        "SG"
+      ],
+      "rank": 187,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2641,7 +2656,7 @@
       "eligiblePositions": [
         "PG"
       ],
-      "rank": 186,
+      "rank": 188,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2655,7 +2670,7 @@
         "SG",
         "SF"
       ],
-      "rank": 187,
+      "rank": 189,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2668,7 +2683,7 @@
       "eligiblePositions": [
         "SG"
       ],
-      "rank": 188,
+      "rank": 190,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2682,7 +2697,7 @@
         "SG",
         "SF"
       ],
-      "rank": 189,
+      "rank": 191,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2695,7 +2710,7 @@
       "eligiblePositions": [
         "PG"
       ],
-      "rank": 190,
+      "rank": 192,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2708,7 +2723,7 @@
       "eligiblePositions": [
         "PF"
       ],
-      "rank": 191,
+      "rank": 193,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2720,34 +2735,6 @@
       "primaryPosition": "C",
       "eligiblePositions": [
         "C"
-      ],
-      "rank": 192,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4702177,
-      "name": "Keon Ellis",
-      "nbaTeam": "BKN",
-      "primaryPosition": "SG",
-      "eligiblePositions": [
-        "SG",
-        "SF"
-      ],
-      "rank": 193,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4277813,
-      "name": "Herbert Jones",
-      "nbaTeam": "NOP",
-      "primaryPosition": "SF",
-      "eligiblePositions": [
-        "SF",
-        "PF"
       ],
       "rank": 194,
       "rankSource": "ROTO",
@@ -2769,29 +2756,15 @@
       "selectable": true
     },
     {
-      "id": 3936099,
-      "name": "Derrick Jones Jr.",
-      "nbaTeam": "LAC",
-      "primaryPosition": "SF",
+      "id": 4702177,
+      "name": "Keon Ellis",
+      "nbaTeam": "BKN",
+      "primaryPosition": "SG",
       "eligiblePositions": [
-        "SF",
-        "PF"
+        "SG",
+        "SF"
       ],
       "rank": 195,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 5107173,
-      "name": "Danny Wolf",
-      "nbaTeam": "BKN",
-      "primaryPosition": "PF",
-      "eligiblePositions": [
-        "PF",
-        "C"
-      ],
-      "rank": 196,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2810,10 +2783,24 @@
       "selectable": true
     },
     {
-      "id": 4066648,
-      "name": "Rui Hachimura",
+      "id": 4277813,
+      "name": "Herbert Jones",
+      "nbaTeam": "NOP",
+      "primaryPosition": "SF",
+      "eligiblePositions": [
+        "SF",
+        "PF"
+      ],
+      "rank": 196,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 3936099,
+      "name": "Derrick Jones Jr.",
       "nbaTeam": "LAC",
-      "primaryPosition": "PF",
+      "primaryPosition": "SF",
       "eligiblePositions": [
         "SF",
         "PF"
@@ -2851,13 +2838,13 @@
       "selectable": true
     },
     {
-      "id": 4397189,
-      "name": "Jalen Smith",
-      "nbaTeam": "CHI",
-      "primaryPosition": "PF",
+      "id": 4896372,
+      "name": "Walter Clayton Jr.",
+      "nbaTeam": "MEM",
+      "primaryPosition": "SG",
       "eligiblePositions": [
-        "PF",
-        "C"
+        "PG",
+        "SG"
       ],
       "rank": 200,
       "rankSource": "ROTO",
@@ -2865,12 +2852,13 @@
       "selectable": true
     },
     {
-      "id": 4578893,
-      "name": "Vit Krejci",
-      "nbaTeam": "POR",
-      "primaryPosition": "PG",
+      "id": 4397189,
+      "name": "Jalen Smith",
+      "nbaTeam": "CHI",
+      "primaryPosition": "PF",
       "eligiblePositions": [
-        "PG"
+        "PF",
+        "C"
       ],
       "rank": 201,
       "rankSource": "ROTO",
@@ -2891,6 +2879,19 @@
       "selectable": true
     },
     {
+      "id": 4578893,
+      "name": "Vit Krejci",
+      "nbaTeam": "POR",
+      "primaryPosition": "PG",
+      "eligiblePositions": [
+        "PG"
+      ],
+      "rank": 203,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
       "id": 4065732,
       "name": "De'Andre Hunter",
       "nbaTeam": "SAC",
@@ -2899,7 +2900,7 @@
         "SF",
         "PF"
       ],
-      "rank": 203,
+      "rank": 204,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -2910,20 +2911,6 @@
       "nbaTeam": "LAC",
       "primaryPosition": "SF",
       "eligiblePositions": [
-        "SF"
-      ],
-      "rank": 204,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 6580,
-      "name": "Bradley Beal",
-      "nbaTeam": "LAC",
-      "primaryPosition": "SF",
-      "eligiblePositions": [
-        "SG",
         "SF"
       ],
       "rank": 205,
@@ -2946,19 +2933,6 @@
       "selectable": true
     },
     {
-      "id": 4683689,
-      "name": "Jordan Walsh",
-      "nbaTeam": "BOS",
-      "primaryPosition": "SF",
-      "eligiblePositions": [
-        "SF"
-      ],
-      "rank": 207,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
       "id": 5254165,
       "name": "Keaton Wagler",
       "nbaTeam": "LAC",
@@ -2966,6 +2940,20 @@
       "eligiblePositions": [
         "PG",
         "SG"
+      ],
+      "rank": 207,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4278594,
+      "name": "Naji Marshall",
+      "nbaTeam": "DAL",
+      "primaryPosition": "SF",
+      "eligiblePositions": [
+        "SF",
+        "PF"
       ],
       "rank": 208,
       "rankSource": "ROTO",
@@ -2986,13 +2974,12 @@
       "selectable": true
     },
     {
-      "id": 4278594,
-      "name": "Naji Marshall",
-      "nbaTeam": "DAL",
+      "id": 4683689,
+      "name": "Jordan Walsh",
+      "nbaTeam": "BOS",
       "primaryPosition": "SF",
       "eligiblePositions": [
-        "SF",
-        "PF"
+        "SF"
       ],
       "rank": 209,
       "rankSource": "ROTO",
@@ -3000,12 +2987,13 @@
       "selectable": true
     },
     {
-      "id": 3032979,
-      "name": "Dennis Schroder",
-      "nbaTeam": "CHA",
-      "primaryPosition": "PG",
+      "id": 4431767,
+      "name": "Christian Braun",
+      "nbaTeam": "DEN",
+      "primaryPosition": "SG",
       "eligiblePositions": [
-        "PG"
+        "SG",
+        "SF"
       ],
       "rank": 210,
       "rankSource": "ROTO",
@@ -3027,13 +3015,12 @@
       "selectable": true
     },
     {
-      "id": 4431767,
-      "name": "Christian Braun",
-      "nbaTeam": "DEN",
-      "primaryPosition": "SG",
+      "id": 3032979,
+      "name": "Dennis Schroder",
+      "nbaTeam": "CHA",
+      "primaryPosition": "PG",
       "eligiblePositions": [
-        "SG",
-        "SF"
+        "PG"
       ],
       "rank": 212,
       "rankSource": "ROTO",
@@ -3082,6 +3069,19 @@
       "selectable": true
     },
     {
+      "id": 5211175,
+      "name": "Zaccharie Risacher",
+      "nbaTeam": "DAL",
+      "primaryPosition": "SF",
+      "eligiblePositions": [
+        "SF"
+      ],
+      "rank": 216,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
       "id": 4888725,
       "name": "Ryan Dunn",
       "nbaTeam": "PHX",
@@ -3090,7 +3090,7 @@
         "SF",
         "PF"
       ],
-      "rank": 216,
+      "rank": 217,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3104,20 +3104,21 @@
         "PG",
         "SG"
       ],
-      "rank": 217,
+      "rank": 218,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
     },
     {
-      "id": 5211175,
-      "name": "Zaccharie Risacher",
-      "nbaTeam": "DAL",
-      "primaryPosition": "SF",
+      "id": 4702384,
+      "name": "Nique Clifford",
+      "nbaTeam": "SAC",
+      "primaryPosition": "SG",
       "eligiblePositions": [
+        "SG",
         "SF"
       ],
-      "rank": 218,
+      "rank": 219,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3130,7 +3131,7 @@
       "eligiblePositions": [
         "SF"
       ],
-      "rank": 219,
+      "rank": 220,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3143,7 +3144,7 @@
       "eligiblePositions": [
         "SG"
       ],
-      "rank": 220,
+      "rank": 221,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3157,7 +3158,7 @@
         "PG",
         "SG"
       ],
-      "rank": 221,
+      "rank": 222,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3171,7 +3172,7 @@
         "SG",
         "SF"
       ],
-      "rank": 222,
+      "rank": 223,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3185,7 +3186,7 @@
         "SF",
         "PF"
       ],
-      "rank": 223,
+      "rank": 224,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3199,7 +3200,7 @@
         "SG",
         "SF"
       ],
-      "rank": 224,
+      "rank": 225,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3211,20 +3212,6 @@
       "primaryPosition": "SG",
       "eligiblePositions": [
         "SG"
-      ],
-      "rank": 225,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 5105839,
-      "name": "Brice Sensabaugh",
-      "nbaTeam": "UTA",
-      "primaryPosition": "SF",
-      "eligiblePositions": [
-        "SG",
-        "SF"
       ],
       "rank": 226,
       "rankSource": "ROTO",
@@ -3246,12 +3233,13 @@
       "selectable": true
     },
     {
-      "id": 4683766,
-      "name": "Isaiah Collier",
+      "id": 5105839,
+      "name": "Brice Sensabaugh",
       "nbaTeam": "UTA",
-      "primaryPosition": "PG",
+      "primaryPosition": "SF",
       "eligiblePositions": [
-        "PG"
+        "SG",
+        "SF"
       ],
       "rank": 228,
       "rankSource": "ROTO",
@@ -3287,13 +3275,13 @@
       "selectable": true
     },
     {
-      "id": 4683778,
-      "name": "Jared McCain",
+      "id": 4432823,
+      "name": "Jaylin Williams",
       "nbaTeam": "OKC",
-      "primaryPosition": "SG",
+      "primaryPosition": "C",
       "eligiblePositions": [
-        "PG",
-        "SG"
+        "PF",
+        "C"
       ],
       "rank": 231,
       "rankSource": "ROTO",
@@ -3315,13 +3303,13 @@
       "selectable": true
     },
     {
-      "id": 4432823,
-      "name": "Jaylin Williams",
+      "id": 4683778,
+      "name": "Jared McCain",
       "nbaTeam": "OKC",
-      "primaryPosition": "C",
+      "primaryPosition": "SG",
       "eligiblePositions": [
-        "PF",
-        "C"
+        "PG",
+        "SG"
       ],
       "rank": 232,
       "rankSource": "ROTO",
@@ -3343,6 +3331,19 @@
       "selectable": true
     },
     {
+      "id": 4683766,
+      "name": "Isaiah Collier",
+      "nbaTeam": "UTA",
+      "primaryPosition": "PG",
+      "eligiblePositions": [
+        "PG"
+      ],
+      "rank": 234,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
       "id": 4278541,
       "name": "Jaylen Nowell",
       "nbaTeam": "WAS",
@@ -3356,42 +3357,14 @@
       "selectable": true
     },
     {
-      "id": 4702384,
-      "name": "Nique Clifford",
-      "nbaTeam": "SAC",
+      "id": 5238230,
+      "name": "Tre Johnson",
+      "nbaTeam": "WAS",
       "primaryPosition": "SG",
       "eligiblePositions": [
-        "SG",
-        "SF"
-      ],
-      "rank": 234,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4431823,
-      "name": "Miles McBride",
-      "nbaTeam": "NYK",
-      "primaryPosition": "SG",
-      "eligiblePositions": [
-        "PG",
         "SG"
       ],
       "rank": 235,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4397475,
-      "name": "AJ Green",
-      "nbaTeam": "MIL",
-      "primaryPosition": "SG",
-      "eligiblePositions": [
-        "SG"
-      ],
-      "rank": 236,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3404,6 +3377,20 @@
       "eligiblePositions": [
         "SG",
         "SF"
+      ],
+      "rank": 236,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4431823,
+      "name": "Miles McBride",
+      "nbaTeam": "NYK",
+      "primaryPosition": "SG",
+      "eligiblePositions": [
+        "PG",
+        "SG"
       ],
       "rank": 236,
       "rankSource": "ROTO",
@@ -3425,15 +3412,27 @@
       "selectable": true
     },
     {
-      "id": 4896372,
-      "name": "Walter Clayton Jr.",
-      "nbaTeam": "MEM",
-      "primaryPosition": "SG",
+      "id": 5214640,
+      "name": "Kasparas Jakucionis",
+      "nbaTeam": "MIL",
+      "primaryPosition": "PG",
       "eligiblePositions": [
-        "PG",
-        "SG"
+        "PG"
       ],
       "rank": 237,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4397475,
+      "name": "AJ Green",
+      "nbaTeam": "MIL",
+      "primaryPosition": "SG",
+      "eligiblePositions": [
+        "SG"
+      ],
+      "rank": 238,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3446,7 +3445,7 @@
       "eligiblePositions": [
         "SG"
       ],
-      "rank": 238,
+      "rank": 239,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3459,7 +3458,7 @@
       "eligiblePositions": [
         "PF"
       ],
-      "rank": 239,
+      "rank": 240,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3472,20 +3471,6 @@
       "eligiblePositions": [
         "PG",
         "SG"
-      ],
-      "rank": 240,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4278562,
-      "name": "Paul Reed",
-      "nbaTeam": "DET",
-      "primaryPosition": "C",
-      "eligiblePositions": [
-        "PF",
-        "C"
       ],
       "rank": 241,
       "rankSource": "ROTO",
@@ -3506,12 +3491,13 @@
       "selectable": true
     },
     {
-      "id": 5214640,
-      "name": "Kasparas Jakucionis",
-      "nbaTeam": "MIL",
-      "primaryPosition": "PG",
+      "id": 4278562,
+      "name": "Paul Reed",
+      "nbaTeam": "DET",
+      "primaryPosition": "C",
       "eligiblePositions": [
-        "PG"
+        "PF",
+        "C"
       ],
       "rank": 242,
       "rankSource": "ROTO",
@@ -3533,6 +3519,19 @@
       "selectable": true
     },
     {
+      "id": 5279130,
+      "name": "Nolan Traore",
+      "nbaTeam": "BKN",
+      "primaryPosition": "PG",
+      "eligiblePositions": [
+        "PG"
+      ],
+      "rank": 244,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
       "id": 4683771,
       "name": "Ronald Holland II",
       "nbaTeam": "DET",
@@ -3541,20 +3540,21 @@
         "SF",
         "PF"
       ],
-      "rank": 244,
+      "rank": 245,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
     },
     {
-      "id": 5238230,
-      "name": "Tre Johnson",
-      "nbaTeam": "WAS",
-      "primaryPosition": "SG",
+      "id": 6580,
+      "name": "Bradley Beal",
+      "nbaTeam": "LAC",
+      "primaryPosition": "SF",
       "eligiblePositions": [
-        "SG"
+        "SG",
+        "SF"
       ],
-      "rank": 245,
+      "rank": 246,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3568,7 +3568,7 @@
         "SG",
         "SF"
       ],
-      "rank": 246,
+      "rank": 247,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3582,7 +3582,7 @@
         "PG",
         "SG"
       ],
-      "rank": 247,
+      "rank": 248,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3591,19 +3591,6 @@
       "id": 4997536,
       "name": "Gui Santos",
       "nbaTeam": "GSW",
-      "primaryPosition": "SF",
-      "eligiblePositions": [
-        "SF"
-      ],
-      "rank": 248,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 5175647,
-      "name": "Hugo Gonzalez",
-      "nbaTeam": "BOS",
       "primaryPosition": "SF",
       "eligiblePositions": [
         "SF"
@@ -3627,6 +3614,19 @@
       "selectable": true
     },
     {
+      "id": 5175647,
+      "name": "Hugo Gonzalez",
+      "nbaTeam": "BOS",
+      "primaryPosition": "SF",
+      "eligiblePositions": [
+        "SF"
+      ],
+      "rank": 251,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
       "id": 6585,
       "name": "Andre Drummond",
       "nbaTeam": "NYK",
@@ -3634,7 +3634,7 @@
       "eligiblePositions": [
         "C"
       ],
-      "rank": 251,
+      "rank": 252,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3661,7 +3661,7 @@
       "eligiblePositions": [
         "PF"
       ],
-      "rank": 252,
+      "rank": 253,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3674,7 +3674,7 @@
       "eligiblePositions": [
         "PG"
       ],
-      "rank": 253,
+      "rank": 254,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3687,7 +3687,7 @@
       "eligiblePositions": [
         "SG"
       ],
-      "rank": 254,
+      "rank": 255,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3700,20 +3700,6 @@
       "eligiblePositions": [
         "SF",
         "PF"
-      ],
-      "rank": 255,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4277848,
-      "name": "Marvin Bagley III",
-      "nbaTeam": "DEN",
-      "primaryPosition": "PF",
-      "eligiblePositions": [
-        "PF",
-        "C"
       ],
       "rank": 256,
       "rankSource": "ROTO",
@@ -3748,11 +3734,12 @@
       "selectable": true
     },
     {
-      "id": 3064560,
-      "name": "Luke Kornet",
-      "nbaTeam": "SAS",
-      "primaryPosition": "C",
+      "id": 4277848,
+      "name": "Marvin Bagley III",
+      "nbaTeam": "DEN",
+      "primaryPosition": "PF",
       "eligiblePositions": [
+        "PF",
         "C"
       ],
       "rank": 257,
@@ -3761,12 +3748,12 @@
       "selectable": true
     },
     {
-      "id": 4610139,
-      "name": "Jeremy Sochan",
-      "nbaTeam": "POR",
-      "primaryPosition": "PF",
+      "id": 3064560,
+      "name": "Luke Kornet",
+      "nbaTeam": "SAS",
+      "primaryPosition": "C",
       "eligiblePositions": [
-        "PF"
+        "C"
       ],
       "rank": 258,
       "rankSource": "ROTO",
@@ -3787,12 +3774,12 @@
       "selectable": true
     },
     {
-      "id": 5279130,
-      "name": "Nolan Traore",
-      "nbaTeam": "BKN",
-      "primaryPosition": "PG",
+      "id": 4610139,
+      "name": "Jeremy Sochan",
+      "nbaTeam": "POR",
+      "primaryPosition": "PF",
       "eligiblePositions": [
-        "PG"
+        "PF"
       ],
       "rank": 259,
       "rankSource": "ROTO",
@@ -3974,6 +3961,19 @@
       "selectable": true
     },
     {
+      "id": 4595400,
+      "name": "Olivier-Maxence Prosper",
+      "nbaTeam": "MEM",
+      "primaryPosition": "PF",
+      "eligiblePositions": [
+        "PF"
+      ],
+      "rank": 272,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
       "id": 4278572,
       "name": "Jamal Cain",
       "nbaTeam": "ORL",
@@ -3981,7 +3981,7 @@
       "eligiblePositions": [
         "SF"
       ],
-      "rank": 272,
+      "rank": 273,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -3993,19 +3993,6 @@
       "primaryPosition": "SF",
       "eligiblePositions": [
         "SF"
-      ],
-      "rank": 273,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4595400,
-      "name": "Olivier-Maxence Prosper",
-      "nbaTeam": "MEM",
-      "primaryPosition": "PF",
-      "eligiblePositions": [
-        "PF"
       ],
       "rank": 273,
       "rankSource": "ROTO",
@@ -4132,12 +4119,13 @@
       "selectable": true
     },
     {
-      "id": 4066218,
-      "name": "Grant Williams",
-      "nbaTeam": "CHA",
-      "primaryPosition": "PF",
+      "id": 4280151,
+      "name": "Corey Kispert",
+      "nbaTeam": "ATL",
+      "primaryPosition": "SF",
       "eligiblePositions": [
-        "PF"
+        "SG",
+        "SF"
       ],
       "rank": 279,
       "rankSource": "ROTO",
@@ -4158,12 +4146,12 @@
       "selectable": true
     },
     {
-      "id": 4397077,
-      "name": "Jaxson Hayes",
-      "nbaTeam": "UTA",
-      "primaryPosition": "C",
+      "id": 4066218,
+      "name": "Grant Williams",
+      "nbaTeam": "CHA",
+      "primaryPosition": "PF",
       "eligiblePositions": [
-        "C"
+        "PF"
       ],
       "rank": 280,
       "rankSource": "ROTO",
@@ -4171,13 +4159,12 @@
       "selectable": true
     },
     {
-      "id": 4280151,
-      "name": "Corey Kispert",
-      "nbaTeam": "ATL",
-      "primaryPosition": "SF",
+      "id": 4397077,
+      "name": "Jaxson Hayes",
+      "nbaTeam": "UTA",
+      "primaryPosition": "C",
       "eligiblePositions": [
-        "SG",
-        "SF"
+        "C"
       ],
       "rank": 281,
       "rankSource": "ROTO",
@@ -4224,10 +4211,10 @@
       "selectable": true
     },
     {
-      "id": 5106060,
-      "name": "Jarace Walker",
-      "nbaTeam": "IND",
-      "primaryPosition": "PF",
+      "id": 6609,
+      "name": "Khris Middleton",
+      "nbaTeam": "WAS",
+      "primaryPosition": "SF",
       "eligiblePositions": [
         "SF",
         "PF"
@@ -4238,10 +4225,10 @@
       "selectable": true
     },
     {
-      "id": 6609,
-      "name": "Khris Middleton",
-      "nbaTeam": "WAS",
-      "primaryPosition": "SF",
+      "id": 5106060,
+      "name": "Jarace Walker",
+      "nbaTeam": "IND",
+      "primaryPosition": "PF",
       "eligiblePositions": [
         "SF",
         "PF"
@@ -4265,13 +4252,12 @@
       "selectable": true
     },
     {
-      "id": 4277843,
-      "name": "Gary Trent Jr.",
-      "nbaTeam": "MIL",
-      "primaryPosition": "SG",
+      "id": 4997537,
+      "name": "Tristan Vukcevic",
+      "nbaTeam": "WAS",
+      "primaryPosition": "PF",
       "eligiblePositions": [
-        "SG",
-        "SF"
+        "PF"
       ],
       "rank": 288,
       "rankSource": "ROTO",
@@ -4279,12 +4265,13 @@
       "selectable": true
     },
     {
-      "id": 4997537,
-      "name": "Tristan Vukcevic",
-      "nbaTeam": "WAS",
-      "primaryPosition": "PF",
+      "id": 4277843,
+      "name": "Gary Trent Jr.",
+      "nbaTeam": "MIL",
+      "primaryPosition": "SG",
       "eligiblePositions": [
-        "PF"
+        "SG",
+        "SF"
       ],
       "rank": 289,
       "rankSource": "ROTO",
@@ -4344,13 +4331,12 @@
       "selectable": true
     },
     {
-      "id": 4278077,
-      "name": "Jarred Vanderbilt",
-      "nbaTeam": "LAL",
-      "primaryPosition": "PF",
+      "id": 5164559,
+      "name": "Nate Ament",
+      "nbaTeam": "MIL",
+      "primaryPosition": "SF",
       "eligiblePositions": [
-        "SF",
-        "PF"
+        "SF"
       ],
       "rank": 293,
       "rankSource": "ROTO",
@@ -4371,12 +4357,13 @@
       "selectable": true
     },
     {
-      "id": 5164559,
-      "name": "Nate Ament",
-      "nbaTeam": "MIL",
-      "primaryPosition": "SF",
+      "id": 4278077,
+      "name": "Jarred Vanderbilt",
+      "nbaTeam": "LAL",
+      "primaryPosition": "PF",
       "eligiblePositions": [
-        "SF"
+        "SF",
+        "PF"
       ],
       "rank": 294,
       "rankSource": "ROTO",
@@ -4449,20 +4436,6 @@
       "selectable": true
     },
     {
-      "id": 2528426,
-      "name": "Jordan Clarkson",
-      "nbaTeam": "NYK",
-      "primaryPosition": "SG",
-      "eligiblePositions": [
-        "SG",
-        "SF"
-      ],
-      "rank": 298,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
       "id": 2489663,
       "name": "Kelly Olynyk",
       "nbaTeam": "FA",
@@ -4483,20 +4456,21 @@
       "eligiblePositions": [
         "SF"
       ],
-      "rank": 299,
+      "rank": 298,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
     },
     {
-      "id": 4873201,
-      "name": "Asa Newell",
-      "nbaTeam": "ATL",
-      "primaryPosition": "PF",
+      "id": 2528426,
+      "name": "Jordan Clarkson",
+      "nbaTeam": "NYK",
+      "primaryPosition": "SG",
       "eligiblePositions": [
-        "PF"
+        "SG",
+        "SF"
       ],
-      "rank": 300,
+      "rank": 299,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -4509,6 +4483,19 @@
       "eligiblePositions": [
         "SG",
         "SF"
+      ],
+      "rank": 300,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4873201,
+      "name": "Asa Newell",
+      "nbaTeam": "ATL",
+      "primaryPosition": "PF",
+      "eligiblePositions": [
+        "PF"
       ],
       "rank": 301,
       "rankSource": "ROTO",
@@ -4529,6 +4516,19 @@
       "selectable": true
     },
     {
+      "id": 4066650,
+      "name": "Zach Collins",
+      "nbaTeam": "CHI",
+      "primaryPosition": "C",
+      "eligiblePositions": [
+        "C"
+      ],
+      "rank": 303,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
       "id": 3150844,
       "name": "Moritz Wagner",
       "nbaTeam": "BKN",
@@ -4536,7 +4536,7 @@
       "eligiblePositions": [
         "C"
       ],
-      "rank": 303,
+      "rank": 304,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -4548,19 +4548,6 @@
       "primaryPosition": "PF",
       "eligiblePositions": [
         "PF"
-      ],
-      "rank": 304,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4066650,
-      "name": "Zach Collins",
-      "nbaTeam": "CHI",
-      "primaryPosition": "C",
-      "eligiblePositions": [
-        "C"
       ],
       "rank": 304,
       "rankSource": "ROTO",
@@ -4608,9 +4595,9 @@
       "selectable": true
     },
     {
-      "id": 2990962,
-      "name": "Taurean Prince",
-      "nbaTeam": "DET",
+      "id": 5044385,
+      "name": "Leonard Miller",
+      "nbaTeam": "CHI",
       "primaryPosition": "SF",
       "eligiblePositions": [
         "SF"
@@ -4621,9 +4608,9 @@
       "selectable": true
     },
     {
-      "id": 5044385,
-      "name": "Leonard Miller",
-      "nbaTeam": "CHI",
+      "id": 2990962,
+      "name": "Taurean Prince",
+      "nbaTeam": "DET",
       "primaryPosition": "SF",
       "eligiblePositions": [
         "SF"
@@ -4699,12 +4686,12 @@
       "selectable": true
     },
     {
-      "id": 2578185,
-      "name": "Dorian Finney-Smith",
-      "nbaTeam": "ATL",
-      "primaryPosition": "PF",
+      "id": 4701232,
+      "name": "Mark Williams",
+      "nbaTeam": "PHX",
+      "primaryPosition": "C",
       "eligiblePositions": [
-        "PF"
+        "C"
       ],
       "rank": 313,
       "rankSource": "ROTO",
@@ -4712,12 +4699,12 @@
       "selectable": true
     },
     {
-      "id": 4701232,
-      "name": "Mark Williams",
-      "nbaTeam": "PHX",
-      "primaryPosition": "C",
+      "id": 2578185,
+      "name": "Dorian Finney-Smith",
+      "nbaTeam": "ATL",
+      "primaryPosition": "PF",
       "eligiblePositions": [
-        "C"
+        "PF"
       ],
       "rank": 314,
       "rankSource": "ROTO",
@@ -4765,12 +4752,12 @@
       "selectable": true
     },
     {
-      "id": 4432247,
-      "name": "Jaylen Clark",
-      "nbaTeam": "MIN",
-      "primaryPosition": "SG",
+      "id": 5242496,
+      "name": "Noa Essengue",
+      "nbaTeam": "CHI",
+      "primaryPosition": "PF",
       "eligiblePositions": [
-        "SG"
+        "PF"
       ],
       "rank": 317,
       "rankSource": "ROTO",
@@ -4792,9 +4779,9 @@
       "selectable": true
     },
     {
-      "id": 4432811,
-      "name": "Josh Green",
-      "nbaTeam": "UTA",
+      "id": 5099752,
+      "name": "Rayan Rupert",
+      "nbaTeam": "PHI",
       "primaryPosition": "SG",
       "eligiblePositions": [
         "SG"
@@ -4818,9 +4805,9 @@
       "selectable": true
     },
     {
-      "id": 5099752,
-      "name": "Rayan Rupert",
-      "nbaTeam": "PHI",
+      "id": 4432811,
+      "name": "Josh Green",
+      "nbaTeam": "UTA",
       "primaryPosition": "SG",
       "eligiblePositions": [
         "SG"
@@ -4844,12 +4831,12 @@
       "selectable": true
     },
     {
-      "id": 3907387,
-      "name": "Ben Simmons",
-      "nbaTeam": "SAC",
-      "primaryPosition": "PG",
+      "id": 4432247,
+      "name": "Jaylen Clark",
+      "nbaTeam": "MIN",
+      "primaryPosition": "SG",
       "eligiblePositions": [
-        "PG"
+        "SG"
       ],
       "rank": 321,
       "rankSource": "ROTO",
@@ -4865,6 +4852,19 @@
         "SF"
       ],
       "rank": 321,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 3907387,
+      "name": "Ben Simmons",
+      "nbaTeam": "SAC",
+      "primaryPosition": "PG",
+      "eligiblePositions": [
+        "PG"
+      ],
+      "rank": 322,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -4887,19 +4887,6 @@
       "id": 4431714,
       "name": "Jalen Wilson",
       "nbaTeam": "ATL",
-      "primaryPosition": "PF",
-      "eligiblePositions": [
-        "PF"
-      ],
-      "rank": 322,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4065654,
-      "name": "Jonathan Isaac",
-      "nbaTeam": "ORL",
       "primaryPosition": "PF",
       "eligiblePositions": [
         "PF"
@@ -4936,12 +4923,12 @@
       "selectable": true
     },
     {
-      "id": 5081727,
-      "name": "Sidy Cissoko",
-      "nbaTeam": "POR",
-      "primaryPosition": "SG",
+      "id": 4065654,
+      "name": "Jonathan Isaac",
+      "nbaTeam": "ORL",
+      "primaryPosition": "PF",
       "eligiblePositions": [
-        "SG"
+        "PF"
       ],
       "rank": 325,
       "rankSource": "ROTO",
@@ -4962,12 +4949,12 @@
       "selectable": true
     },
     {
-      "id": 3134916,
-      "name": "Jordan McLaughlin",
-      "nbaTeam": "SAS",
-      "primaryPosition": "PG",
+      "id": 5081727,
+      "name": "Sidy Cissoko",
+      "nbaTeam": "POR",
+      "primaryPosition": "SG",
       "eligiblePositions": [
-        "PG"
+        "SG"
       ],
       "rank": 326,
       "rankSource": "ROTO",
@@ -4975,12 +4962,12 @@
       "selectable": true
     },
     {
-      "id": 4683750,
-      "name": "Jordan Hawkins",
-      "nbaTeam": "MEM",
-      "primaryPosition": "SG",
+      "id": 3134916,
+      "name": "Jordan McLaughlin",
+      "nbaTeam": "SAS",
+      "primaryPosition": "PG",
       "eligiblePositions": [
-        "SG"
+        "PG"
       ],
       "rank": 327,
       "rankSource": "ROTO",
@@ -5001,12 +4988,12 @@
       "selectable": true
     },
     {
-      "id": 5105806,
-      "name": "Jett Howard",
-      "nbaTeam": "DAL",
-      "primaryPosition": "SF",
+      "id": 4683750,
+      "name": "Jordan Hawkins",
+      "nbaTeam": "CHI",
+      "primaryPosition": "SG",
       "eligiblePositions": [
-        "SF"
+        "SG"
       ],
       "rank": 328,
       "rankSource": "ROTO",
@@ -5053,6 +5040,19 @@
       "selectable": true
     },
     {
+      "id": 5105806,
+      "name": "Jett Howard",
+      "nbaTeam": "DAL",
+      "primaryPosition": "SF",
+      "eligiblePositions": [
+        "SF"
+      ],
+      "rank": 330,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
       "id": 4914336,
       "name": "Shaedon Sharpe",
       "nbaTeam": "POR",
@@ -5061,7 +5061,7 @@
         "SG",
         "SF"
       ],
-      "rank": 330,
+      "rank": 331,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -5075,7 +5075,7 @@
         "SG",
         "SF"
       ],
-      "rank": 331,
+      "rank": 332,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -5087,19 +5087,6 @@
       "primaryPosition": "PG",
       "eligiblePositions": [
         "PG",
-        "SG"
-      ],
-      "rank": 332,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 2578239,
-      "name": "Pat Connaughton",
-      "nbaTeam": "CHA",
-      "primaryPosition": "SG",
-      "eligiblePositions": [
         "SG"
       ],
       "rank": 333,
@@ -5121,9 +5108,9 @@
       "selectable": true
     },
     {
-      "id": 4591259,
-      "name": "Koby Brea",
-      "nbaTeam": "PHX",
+      "id": 2578239,
+      "name": "Pat Connaughton",
+      "nbaTeam": "CHA",
       "primaryPosition": "SG",
       "eligiblePositions": [
         "SG"
@@ -5134,12 +5121,12 @@
       "selectable": true
     },
     {
-      "id": 4431752,
-      "name": "Kobe Brown",
-      "nbaTeam": "IND",
-      "primaryPosition": "PF",
+      "id": 4591259,
+      "name": "Koby Brea",
+      "nbaTeam": "PHX",
+      "primaryPosition": "SG",
       "eligiblePositions": [
-        "PF"
+        "SG"
       ],
       "rank": 335,
       "rankSource": "ROTO",
@@ -5147,12 +5134,12 @@
       "selectable": true
     },
     {
-      "id": 2999547,
-      "name": "Gary Harris",
-      "nbaTeam": "FA",
-      "primaryPosition": "SG",
+      "id": 5217746,
+      "name": "Yang Hansen",
+      "nbaTeam": "POR",
+      "primaryPosition": "C",
       "eligiblePositions": [
-        "SG"
+        "C"
       ],
       "rank": 336,
       "rankSource": "ROTO",
@@ -5186,9 +5173,9 @@
       "selectable": true
     },
     {
-      "id": 5239561,
-      "name": "Jase Richardson",
-      "nbaTeam": "ORL",
+      "id": 2999547,
+      "name": "Gary Harris",
+      "nbaTeam": "FA",
       "primaryPosition": "SG",
       "eligiblePositions": [
         "SG"
@@ -5212,14 +5199,27 @@
       "selectable": true
     },
     {
-      "id": 5242496,
-      "name": "Noa Essengue",
-      "nbaTeam": "CHI",
+      "id": 4431752,
+      "name": "Kobe Brown",
+      "nbaTeam": "IND",
       "primaryPosition": "PF",
       "eligiblePositions": [
         "PF"
       ],
       "rank": 340,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 5239561,
+      "name": "Jase Richardson",
+      "nbaTeam": "ORL",
+      "primaryPosition": "SG",
+      "eligiblePositions": [
+        "SG"
+      ],
+      "rank": 341,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -5231,20 +5231,6 @@
       "primaryPosition": "SF",
       "eligiblePositions": [
         "SF"
-      ],
-      "rank": 341,
-      "rankSource": "ROTO",
-      "active": true,
-      "selectable": true
-    },
-    {
-      "id": 4398390,
-      "name": "Jalen Pickett",
-      "nbaTeam": "LAC",
-      "primaryPosition": "SG",
-      "eligiblePositions": [
-        "PG",
-        "SG"
       ],
       "rank": 342,
       "rankSource": "ROTO",
@@ -5265,12 +5251,13 @@
       "selectable": true
     },
     {
-      "id": 5217746,
-      "name": "Yang Hansen",
-      "nbaTeam": "POR",
-      "primaryPosition": "C",
+      "id": 4398390,
+      "name": "Jalen Pickett",
+      "nbaTeam": "LAC",
+      "primaryPosition": "SG",
       "eligiblePositions": [
-        "C"
+        "PG",
+        "SG"
       ],
       "rank": 344,
       "rankSource": "ROTO",
@@ -5320,7 +5307,7 @@
     {
       "id": 4433569,
       "name": "Johni Broome",
-      "nbaTeam": "FA",
+      "nbaTeam": "MIL",
       "primaryPosition": "PF",
       "eligiblePositions": [
         "PF"
@@ -5353,6 +5340,19 @@
         "SF"
       ],
       "rank": 349,
+      "rankSource": "ROTO",
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 3468,
+      "name": "Russell Westbrook",
+      "nbaTeam": "FA",
+      "primaryPosition": "PG",
+      "eligiblePositions": [
+        "PG"
+      ],
+      "rank": 350,
       "rankSource": "ROTO",
       "active": true,
       "selectable": true
@@ -5978,6 +5978,19 @@
       "primaryPosition": "SG",
       "eligiblePositions": [
         "SG"
+      ],
+      "rank": null,
+      "rankSource": null,
+      "active": true,
+      "selectable": true
+    },
+    {
+      "id": 4065813,
+      "name": "Alpha Diallo",
+      "nbaTeam": "DEN",
+      "primaryPosition": "SF",
+      "eligiblePositions": [
+        "SF"
       ],
       "rank": null,
       "rankSource": null,
@@ -7277,7 +7290,7 @@
     {
       "id": 4397134,
       "name": "Cole Swider",
-      "nbaTeam": "LAL",
+      "nbaTeam": "FA",
       "primaryPosition": "PF",
       "eligiblePositions": [
         "PF"
@@ -8801,7 +8814,7 @@
     {
       "id": 4432117,
       "name": "Isaiah Stevens",
-      "nbaTeam": "FA",
+      "nbaTeam": "CHI",
       "primaryPosition": "PG",
       "eligiblePositions": [
         "PG"
@@ -9166,7 +9179,7 @@
     {
       "id": 4702785,
       "name": "Jahmyl Telfort",
-      "nbaTeam": "FA",
+      "nbaTeam": "LAC",
       "primaryPosition": "PF",
       "eligiblePositions": [
         "PF"
@@ -9205,7 +9218,7 @@
     {
       "id": 4432946,
       "name": "Jalen Bridges",
-      "nbaTeam": "FA",
+      "nbaTeam": "CHI",
       "primaryPosition": "SF",
       "eligiblePositions": [
         "SF"
@@ -9726,7 +9739,7 @@
     {
       "id": 4708972,
       "name": "Jazian Gortman",
-      "nbaTeam": "FA",
+      "nbaTeam": "WAS",
       "primaryPosition": "PG",
       "eligiblePositions": [
         "PG"
@@ -10834,7 +10847,7 @@
     {
       "id": 3950760,
       "name": "Kylor Kelley",
-      "nbaTeam": "FA",
+      "nbaTeam": "MIA",
       "primaryPosition": "C",
       "eligiblePositions": [
         "C"
@@ -11238,7 +11251,7 @@
     {
       "id": 4277880,
       "name": "Malik Williams",
-      "nbaTeam": "SAS",
+      "nbaTeam": "FA",
       "primaryPosition": "C",
       "eligiblePositions": [
         "C"
@@ -11798,7 +11811,7 @@
     {
       "id": 4696317,
       "name": "Miles Kelly",
-      "nbaTeam": "GSW",
+      "nbaTeam": "FA",
       "primaryPosition": "PG",
       "eligiblePositions": [
         "PG"
@@ -13313,7 +13326,7 @@
     {
       "id": 4703421,
       "name": "Taelon Peter",
-      "nbaTeam": "SAS",
+      "nbaTeam": "FA",
       "primaryPosition": "SG",
       "eligiblePositions": [
         "SG"
@@ -13443,7 +13456,7 @@
     {
       "id": 4279815,
       "name": "Terry Taylor",
-      "nbaTeam": "FA",
+      "nbaTeam": "SAS",
       "primaryPosition": "PF",
       "eligiblePositions": [
         "PF"
@@ -13560,7 +13573,7 @@
     {
       "id": 4065673,
       "name": "Tony Bradley",
-      "nbaTeam": "FA",
+      "nbaTeam": "NYK",
       "primaryPosition": "C",
       "eligiblePositions": [
         "C"

@@ -9,6 +9,7 @@ import { useWorkflowDraft } from './use-workflow-draft';
 import { buildTradePickInventory, type TradePickInventory } from '@/lib/trade-pick-inventory';
 import { isValidKeeperPaymentAllocation, keeperPaymentOptions, type PaymentAssignment } from '@/lib/keeper-payment-options';
 import { PaymentAllocationFields, paymentAssignments, paymentInput, paymentKey, paymentStatusEligible } from './keeper-payment-editor';
+import { tradeLedgerLabel } from '@/lib/live-trade-ledger';
 
 type Transfer = { from_franchise_id: string; to_franchise_id: string };
 type Obligation = Transfer & { id: string; kind: ObligationKind; terms: string; due_at: string | null; status: 'open' | 'fulfilled' | 'waived'; resolution_note: string | null };
@@ -356,8 +357,9 @@ function ScopedTradeWorkspace({ account }: { account: LeagueAccount }) {
   function renderTrade(trade: LiveTrade) {
     const deadlineReached = Number.isFinite(Date.parse(trade.review_deadline)) && now >= Date.parse(trade.review_deadline);
     const playerTransferPaused = playersPaused && trade.trade_player_transfers.length > 0;
+    const ledgerTrade = account.data.trades.find(record => record.id === trade.id);
     return <article className={styles.record} key={trade.id} id={`trade-${trade.id}`}>
-      <div className={styles.heading}><div><h4>{trade.trade_participants.map(p => teamName(p.franchise_id)).join(' ↔ ')}</h4><span className={styles.date}>{trade.category === 'player_only' ? 'Player only' : 'Advanced'} · logged {dateLabel(trade.created_at)} · record {trade.id.slice(0, 8)}</span></div><span className={styles.status}>{trade.status === 'proposed' ? 'Pending review' : trade.status === 'cancelled' ? 'Withdrawn' : 'Finalized'}</span></div>
+      <div className={styles.heading}><div><h4>{ledgerTrade?.ledgerNumber !== undefined && `Trade ${tradeLedgerLabel(ledgerTrade)} · `}{trade.trade_participants.map(p => teamName(p.franchise_id)).join(' ↔ ')}</h4><span className={styles.date}>{trade.category === 'player_only' ? 'Player only' : 'Advanced'} · logged {dateLabel(trade.created_at)} · record {trade.id.slice(0, 8)}</span></div><span className={styles.status}>{trade.status === 'proposed' ? 'Pending review' : trade.status === 'cancelled' ? 'Withdrawn' : 'Finalized'}</span></div>
       {trade.corrects_trade_id && <p className={styles.help}>Revision of withdrawn proposal {trade.corrects_trade_id.slice(0, 8)}. The original is retained in withdrawal history.</p>}
       {trade.status === 'cancelled' && <p className={styles.window}>Withdrawn by the commissioner {dateLabel(trade.cancelled_at)}. Reason: {trade.cancellation_reason || 'No reason was recorded in the historical record.'} Ownership was not changed.</p>}
       <ul className={styles.moves}>

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mergeFinalizedTradeLedger, type FinalizedTradeRow } from '../../src/lib/live-trade-ledger';
+import { mergeFinalizedTradeLedger, tradeLedgerLabel, type FinalizedTradeRow } from '../../src/lib/live-trade-ledger';
 import type { TradeRecord } from '../../src/lib/types';
 
 const archive: TradeRecord[] = [{ id: '103', parties: ['Old manager', 'Other manager'], status: 'recorded', summary: 'Original terms', notes: 'Preserved notes' }];
@@ -21,6 +21,8 @@ test('public ledger appends finalized transfers while preserving year, direction
   assert.equal(rows[0], archive[0]);
   assert.equal(rows[1].status, 'finalized');
   assert.equal(rows[1].source, 'live');
+  assert.equal(rows[1].ledgerNumber, 104);
+  assert.equal(rows[1].id, trade.id);
   assert.deepEqual(rows[1].participantTeamIds, [2, 1]);
   assert.deepEqual(rows[1].transferLines, [
     'Bizarre Bazaar → Lo Fi Hip Hop Beats to Win To: 2027 round 3 (originally Bizarre Bazaar)',
@@ -42,7 +44,34 @@ test('duplicate live IDs count once and newest completed records appear last for
   const newer = { ...trade, id: 'newer', created_at: '2026-10-15T21:34:37Z', finalized_at: '2026-10-16T03:07:26Z' };
   const rows = mergeFinalizedTradeLedger(archive, [newer, trade, trade], teams, seasons);
   assert.deepEqual(rows.map(row => row.id), ['103', trade.id, 'newer']);
+  assert.deepEqual(rows.map(tradeLedgerLabel), ['#103', '#104', '#105']);
   assert.deepEqual(mergeFinalizedTradeLedger(rows, [trade, newer], teams, seasons), rows);
+});
+
+test('live trade numbers continue after the highest archive number, preserving archive gaps and voids', () => {
+  const history = ['0', '89', '92'].map(id => ({ ...archive[0], id, status: id === '92' ? 'voided' as const : 'recorded' as const }));
+  const newer = { ...trade, id: '47cc6d5e-8d7e-47ca-b8d1-d9773e9647ff', created_at: '2026-10-15T21:34:37Z', finalized_at: '2026-10-16T03:07:26Z' };
+  const rows = mergeFinalizedTradeLedger(history, [newer, { ...trade, id: 'pending', status: 'proposed' }, trade, trade], teams, seasons);
+  assert.deepEqual(rows.map(tradeLedgerLabel), ['#0', '#89', '#92', '#93', '#94']);
+  assert.deepEqual(rows.slice(-2).map(row => row.id), [trade.id, newer.id]);
+  assert.deepEqual(history.map(row => row.ledgerNumber), [undefined, undefined, undefined]);
+});
+
+test('an older proposal finalized later receives the next number without renumbering completed trades', () => {
+  const later = { ...trade, id: 'older-proposal', created_at: '2026-10-01T00:00:00Z', finalized_at: '2026-10-17T00:00:00Z' };
+  const first = mergeFinalizedTradeLedger(archive, [trade], teams, seasons);
+  const full = mergeFinalizedTradeLedger(archive, [later, trade], teams, seasons);
+  assert.deepEqual(full.map(tradeLedgerLabel), ['#103', '#104', '#105']);
+  assert.equal(full[1].id, first[1].id);
+  assert.deepEqual(mergeFinalizedTradeLedger(first, [later, trade], teams, seasons), full);
+  assert.deepEqual(mergeFinalizedTradeLedger(archive, [trade, later], teams, seasons), full);
+});
+
+test('completion ties use canonical IDs consistently and unnumbered live records keep their reference', () => {
+  const tied = { ...trade, id: 'zz-later-id' };
+  const rows = mergeFinalizedTradeLedger(archive, [tied, trade], teams, seasons);
+  assert.deepEqual(rows.slice(-2).map(row => [row.id, tradeLedgerLabel(row)]), [[trade.id, '#104'], [tied.id, '#105']]);
+  assert.equal(tradeLedgerLabel({ id: trade.id, source: 'live' }), 'dad5e436');
 });
 
 test('missing public transfer context fails explicitly instead of showing incomplete pick labels', () => {

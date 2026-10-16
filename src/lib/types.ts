@@ -5,7 +5,7 @@ export interface DraftPick { id: string; season: number; round: number; original
 export interface HistoricalDraft { year: number; selections: { round: number; pick: number; originalOwner: string; owner: string; player: string; kept: boolean | null }[] }
 export interface TradeRecord {
   id: string; parties: string[]; summary: string; notes: string; status: "recorded" | "voided" | "review" | "finalized";
-  source?: 'live'; participantTeamIds?: number[]; createdAt?: string; finalizedAt?: string; season?: number; transferLines?: string[];
+  source?: 'live'; ledgerNumber?: number; participantTeamIds?: number[]; createdAt?: string; finalizedAt?: string; season?: number; transferLines?: string[];
 }
 export interface ReviewItem { id: string; player: string; detail: string; status: "provisional" | "needs-review" }
 export interface CharterSection { title: string; paragraphs: string[] }

@@ -93,8 +93,8 @@ test('published analytics cover each historical franchise and reconcile official
   assert.equal(roster.seasons.length, 9);
   assert.ok(category.seasons.every(season => season.teams.length === 8 && season.teams.every(team => team.standingsMatch === true)));
   assert.ok(roster.seasons.every(season => season.teams.length === 8 && season.teams.every(team => team.rosterAvailable && team.unknownPlayers === 0)));
-  assert.equal(catalog.players.length, 1095);
+  assert.equal(catalog.players.length, 1096);
   assert.equal(catalog.coverage.ranked, 410);
-  assert.equal(new Set(catalog.players.map(player => player.id)).size, 1095);
+  assert.equal(new Set(catalog.players.map(player => player.id)).size, 1096);
   assert.ok(!JSON.stringify([category, roster, catalog]).match(/"(?:espn_s2|swid|members|acquisitionDate|seasonOutlook|ownership)"\s*:/i));
 });

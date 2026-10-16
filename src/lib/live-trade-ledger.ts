@@ -10,6 +10,16 @@ export type FinalizedTradeRow = {
 };
 export type TradeLedgerTeam = { franchiseId: string; teamId: number; name: string };
 
+export function tradeLedgerNumber(trade: Pick<TradeRecord, 'id' | 'ledgerNumber' | 'source'>): number | null {
+  const value = trade.ledgerNumber ?? (trade.source !== 'live' && /^\d+$/.test(trade.id) ? Number(trade.id) : null);
+  return value !== null && Number.isSafeInteger(value) && value >= 0 ? value : null;
+}
+
+export function tradeLedgerLabel(trade: Pick<TradeRecord, 'id' | 'ledgerNumber' | 'source'>): string {
+  const number = tradeLedgerNumber(trade);
+  return number === null ? trade.id.slice(0, 8) : `#${number}`;
+}
+
 /** Keep the imported ledger intact; only newly finalized live agreements extend it. */
 export function mergeFinalizedTradeLedger(archive: TradeRecord[], rows: FinalizedTradeRow[], teams: TradeLedgerTeam[], seasons: { id: string; draft_year: number }[]): TradeRecord[] {
   const teamById = new Map(teams.map(team => [team.franchiseId, team]));
@@ -26,7 +36,10 @@ export function mergeFinalizedTradeLedger(archive: TradeRecord[], rows: Finalize
     return result;
   };
   const live: TradeRecord[] = [];
-  for (const row of [...rows].sort((a, b) => a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id))) {
+  let nextNumber = archive.reduce((highest, trade) => Math.max(highest, tradeLedgerNumber(trade) ?? 0), 0) + 1;
+  // Completion order keeps existing numbers stable when an older proposal is finalized later.
+  // UUIDs remain the canonical IDs for deduplication, analytics, and official actions.
+  for (const row of [...rows].sort((a, b) => (a.finalized_at ?? a.created_at).localeCompare(b.finalized_at ?? b.created_at) || a.id.localeCompare(b.id))) {
     if (row.status !== 'finalized' || row.application_mode !== 'live' || known.has(row.id)) continue;
     if (!row.finalized_at) throw new Error('A finalized trade is missing its completion date.');
     const participants = [...new Set(row.trade_participants.map(participant => participant.franchise_id))].map(team);
@@ -45,7 +58,7 @@ export function mergeFinalizedTradeLedger(archive: TradeRecord[], rows: Finalize
       ...row.trade_obligations.map(leg => `${direction(leg)}: ${leg.terms} (${leg.status})`),
     ];
     if (!transferLines.length) throw new Error('A finalized trade is missing its assets or obligations.');
-    live.push({ id: row.id, source: 'live', status: 'finalized', parties: participants.map(participant => participant.name), participantTeamIds: participants.map(participant => participant.teamId),
+    live.push({ id: row.id, source: 'live', ledgerNumber: nextNumber++, status: 'finalized', parties: participants.map(participant => participant.name), participantTeamIds: participants.map(participant => participant.teamId),
       summary: transferLines.join(' · '), notes: row.terms, transferLines, createdAt: row.created_at, finalizedAt: row.finalized_at, season: year(row.season_id),
     });
     known.add(row.id);

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { draftProjectionDatasetSchema, extractEspnDraftProjections, importDraftProjections } from '../../src/lib/draft-projections';
+import { draftProjectionDatasetSchema, ESPN_PROJECTION_PARSER_VERSION, extractEspnDraftProjections, importDraftProjections } from '../../src/lib/draft-projections';
 import type { DraftCatalogPlayer } from '../../src/lib/draft-player-catalog';
 
 const player = (id: number, name: string): DraftCatalogPlayer => ({ id, name, nbaTeam: 'DEN', primaryPosition: 'C', eligiblePositions: ['C'], rank: id, rankSource: 'ROTO', active: true, selectable: true });
@@ -261,6 +261,57 @@ test('ESPN excludes incomplete projections and rejects duplicated identities or 
   assert.equal(result.players.length, 1);
   assert.throws(() => extractEspnDraftProjections({ players: [entry(1, [record()]), entry(1, [record()])] }, 2027, catalog), /duplicate/);
   assert.throws(() => extractEspnDraftProjections({ players: [entry(1, [record(), record()])] }, 2027, catalog), /conflicting full-season/);
+});
+
+// ESPN's October 16 Duren projection omits zero 3PM but supplies this scoring identity.
+function sparseThreeRecord() {
+  const result = { ...record(), averageStats: { ...averages, '0': 1458 / 72, '13': 561 / 72, '14': 857 / 72, '15': 336 / 72, '16': 454 / 72 } as Record<string, unknown>,
+    stats: { '42': 72, '0': 1458, '13': 561, '14': 857, '15': 336, '16': 454 } as Record<string, unknown> };
+  delete result.averageStats['17'];
+  return result;
+}
+
+test('ESPN recovers an omitted zero 3PM from its own full-season scoring totals and versions the parser result', () => {
+  const sparse = sparseThreeRecord(), original = structuredClone(sparse);
+  const result = extractEspnDraftProjections({ players: [entry(1, [sparse])] }, 2027, catalog, importedAt);
+  assert.equal(result.players[0].games, 72);
+  assert.equal(result.players[0].stats.three, 0);
+  assert.equal(result.players[0].stats.pts, 20.25);
+  assert.equal(result.players[0].stats.fgm, 561 / 72);
+  assert.equal(result.espnParserVersion, ESPN_PROJECTION_PARSER_VERSION);
+  assert.equal(draftProjectionDatasetSchema.parse(result).espnParserVersion, ESPN_PROJECTION_PARSER_VERSION);
+  assert.match(result.warnings.join(' '), /same projection's points/);
+  assert.deepEqual(sparse, original);
+});
+
+test('ESPN can recover nonzero missing 3PM only when same-source scoring totals and averages agree', () => {
+  const sparse = sparseThreeRecord();
+  sparse.stats['0'] = 1530; sparse.averageStats['0'] = 1530 / 72; sparse.stats['18'] = 200;
+  const result = extractEspnDraftProjections({ players: [entry(1, [sparse])] }, 2027, catalog);
+  assert.equal(result.players[0].stats.three, 1);
+  sparse.averageStats['17'] = 0;
+  assert.equal(extractEspnDraftProjections({ players: [entry(1, [sparse])] }, 2027, catalog).players[0].stats.three, 0);
+});
+
+test('ESPN never repairs explicitly invalid 3PM or guesses missing totals, other categories, or conflicting scoring data', () => {
+  const mutations: ((value: ReturnType<typeof sparseThreeRecord>) => void)[] = [
+    ...[null, -1, '0', Infinity].map(value => (row: ReturnType<typeof sparseThreeRecord>) => { row.averageStats['17'] = value; }),
+    ...[undefined, null, -1, 1458.5, '1458'].map(value => (row: ReturnType<typeof sparseThreeRecord>) => { row.stats['0'] = value; }),
+    ...[undefined, null, 0, 83, '72'].map(value => (row: ReturnType<typeof sparseThreeRecord>) => { row.stats['42'] = value; }),
+    row => { row.averageStats['0'] = 21; },
+    row => { row.stats['17'] = 1; },
+    row => { row.stats['18'] = -1; },
+    row => { row.stats['0'] = 1400; row.averageStats['0'] = 1400 / 72; },
+    row => { row.stats['0'] = 2100; row.averageStats['0'] = 2100 / 72; },
+    row => { row.stats['0'] = 1530; row.averageStats['0'] = 1530 / 72; row.stats['18'] = 10; },
+    row => { delete row.averageStats['1']; },
+    row => { row.seasonId = 2026; },
+    row => { row.statSourceId = 0; },
+  ];
+  for (const mutate of mutations) {
+    const sparse = sparseThreeRecord(); mutate(sparse);
+    assert.throws(() => extractEspnDraftProjections({ players: [entry(1, [sparse])] }, 2027, catalog), /did not return complete projections/);
+  }
 });
 
 test('ESPN projections preserve current overall ROTO ranks independently of catalog ranks and statistics', () => {

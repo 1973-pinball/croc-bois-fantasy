@@ -78,15 +78,28 @@ test('database catalog matches the reviewed ESPN artifact and its import is inac
   const catalog = JSON.parse(await readFile(new URL('../../data/draft-player-catalog.json', import.meta.url), 'utf8')) as { source: { sha256: string }; espnSeasonId: number; players: { id: number; name: string; selectable: boolean; rank: number | null }[] };
   const saved = (await db.query<{ player_id: number; full_name: string; selectable: boolean }>('select player_id,full_name,selectable from public.draft_player_catalog where source_sha256=$1 and source_season=$2 order by player_id', [catalog.source.sha256, catalog.espnSeasonId])).rows;
   assert.deepEqual(saved, [...catalog.players].sort((a, b) => a.id - b.id).map(p => ({ player_id: p.id, full_name: p.name, selectable: p.selectable })));
-  assert.equal(saved.length, 1095);
+  assert.equal(saved.length, 1096);
   const rankings = (await db.query<{ player_id: number; espn_rank: number | null }>('select player_id,espn_rank from private.draft_player_rankings where source_sha256=$1 and source_season=$2 order by player_id', [catalog.source.sha256, catalog.espnSeasonId])).rows;
   assert.deepEqual(rankings, [...catalog.players].sort((a, b) => a.id - b.id).map(p => ({ player_id: p.id, espn_rank: p.rank })));
+  assert.equal(rankings.filter(player => player.espn_rank !== null).length, 410);
   for (const role of ['anon', 'authenticated']) {
     assert.equal((await db.query<{ allowed: boolean }>("select has_function_privilege($1,'private.import_draft_player_catalog(jsonb,text,integer)','EXECUTE') as allowed", [role])).rows[0].allowed, false);
   }
   await asUser(commissioner);
   await rejects(() => db.query("insert into public.draft_player_catalog values(800000001,'Forged player',true,$1,2027)", ['a'.repeat(64)]), /permission denied/);
   await rejects(() => db.query('update public.live_draft_selections set player_name=$1', ['Forged name']), /permission denied/);
+}));
+
+test('catalog refresh rolls back player changes when the matching automatic-pick ranks fail', () => isolated(async () => {
+  const migration = await readFile(new URL('../../supabase/migrations/20261016000026_refresh_draft_catalog.sql', import.meta.url), 'utf8');
+  const invalid = migration.replace('"rank":1}', '"rank":0}');
+  assert.notEqual(invalid, migration);
+  await db.query("update public.draft_player_catalog set full_name='Before refresh',source_sha256=repeat('b',64) where player_id=3112335");
+  const beforeCatalog = (await db.query('select * from public.draft_player_catalog order by player_id')).rows;
+  const beforeRankings = (await db.query('select * from private.draft_player_rankings order by player_id')).rows;
+  await rejects(() => db.exec(invalid), /draft_player_rankings_espn_rank_check/);
+  assert.deepEqual((await db.query('select * from public.draft_player_catalog order by player_id')).rows, beforeCatalog);
+  assert.deepEqual((await db.query('select * from private.draft_player_rankings order by player_id')).rows, beforeRankings);
 }));
 
 test('public board has blank owners without a complete order and no keeper submission, notes or identity leakage', () => isolated(async () => {

@@ -9,9 +9,10 @@ import type { DraftRosterEligibility, DraftRosterSettings } from '@/lib/espn-ros
 import { DRAFT_REFRESH_INTERVAL_MS, draftBoardSchema, type DraftBoard } from '@/lib/draft-board';
 import { buildDraftAdvisor, type DraftAdvisorCandidate, type DraftAdvisorTeam } from '@/lib/draft-advisor';
 import { buildDraftTeamValues } from '@/lib/draft-team-values';
+import { defaultDraftTeamSortDirection, sortDraftTeamProjections, sortDraftTeamValues, type DraftTeamProjectionColumn, type DraftTeamSort, type DraftTeamSortDirection, type DraftTeamValueColumn } from '@/lib/draft-team-sorting';
 import { draftAdvisorScheduleSchema, parseDraftScheduleText, type DraftAdvisorSchedule } from '@/lib/draft-advisor-schedule';
-import { draftProjectionDatasetSchema, PROJECTION_SOURCES, type DraftProjectionDataset, type DraftProjectionSource } from '@/lib/draft-projections';
-import { draftProjectionRankSnapshotSchema, needsDirectRankRefresh } from '@/lib/draft-projection-ranks';
+import { draftProjectionDatasetSchema, ESPN_PROJECTION_PARSER_VERSION, PROJECTION_SOURCES, type DraftProjectionDataset, type DraftProjectionSource } from '@/lib/draft-projections';
+import { draftProjectionRankSnapshotSchema, needsDirectRankRefresh, needsEspnCatalogRefresh, needsEspnParserRefresh } from '@/lib/draft-projection-ranks';
 import type { DraftCandidateRankSnapshots } from '@/lib/draft-candidate-ranks';
 import { workflowDraftKey, workflowDrafts } from '@/lib/workflow-drafts';
 import type { LeagueAccount } from './league-account';
@@ -24,6 +25,7 @@ import styles from './commissioner-strategy.module.css';
 import teamTableStyles from './draft-team-projections.module.css';
 
 const catalog = catalogFile as DraftPlayerCatalog;
+const espnCatalogRefreshVersion = `${catalog.source.sha256}:${catalog.fetchedAt}`;
 const settings = settingsFile as DraftRosterSettings;
 const eligibility = eligibilityFile as DraftRosterEligibility;
 export type ProjectionLibrary = Partial<Record<DraftProjectionSource, DraftProjectionDataset>>;
@@ -84,9 +86,13 @@ function StrategyWorkspace({ account, view }: { account: LeagueAccount; view: 'd
     for (const provider of DIRECT_PROJECTION_SOURCES) {
       const migrateRanks = needsDirectRankRefresh(provider.id, cached[provider.id], catalog.espnSeasonId)
         && !workflowDrafts.read(`${storageKey}:${provider.id}-ranks-v1-attempted`, (value): value is boolean => value === true);
+      const refreshCatalog = provider.id === 'espn' && needsEspnCatalogRefresh(cached.espn, catalog.espnSeasonId, catalog.fetchedAt)
+        && !workflowDrafts.read(`${storageKey}:espn-catalog-${espnCatalogRefreshVersion}-attempted`, (value): value is boolean => value === true);
+      const refreshParser = provider.id === 'espn' && needsEspnParserRefresh(cached.espn, catalog.espnSeasonId)
+        && !workflowDrafts.read(`${storageKey}:espn-parser-v${ESPN_PROJECTION_PARSER_VERSION}-attempted`, (value): value is boolean => value === true);
       const failure = workflowDrafts.read(`${storageKey}:${provider.id}-import-error`, (value): value is string => typeof value === 'string') ?? '';
-      if (failure && !migrateRanks) previousFailures[provider.id] = failure;
-      if ((cached[provider.id] || failure) && !migrateRanks) attempted.add(provider.id);
+      if (failure && !migrateRanks && !refreshCatalog && !refreshParser) previousFailures[provider.id] = failure;
+      if ((cached[provider.id] || failure) && !migrateRanks && !refreshCatalog && !refreshParser) attempted.add(provider.id);
     }
     libraryRef.current = cached;
     setLibrary(cached); setDirectErrors(previousFailures);
@@ -135,6 +141,13 @@ function StrategyWorkspace({ account, view }: { account: LeagueAccount; view: 'd
       if (automatic && needsDirectRankRefresh(directProvider, libraryRef.current[directProvider], catalog.espnSeasonId)) {
         workflowDrafts.write(`${storageKey}:${directProvider}-ranks-v1-attempted`, true);
       }
+      if (directProvider === 'espn' && needsEspnCatalogRefresh(libraryRef.current.espn, catalog.espnSeasonId, catalog.fetchedAt)) {
+        // Record before requesting so failures or navigation do not repeat this catalog refresh.
+        workflowDrafts.write(`${storageKey}:espn-catalog-${espnCatalogRefreshVersion}-attempted`, true);
+      }
+      if (directProvider === 'espn' && needsEspnParserRefresh(libraryRef.current.espn, catalog.espnSeasonId)) {
+        workflowDrafts.write(`${storageKey}:espn-parser-v${ESPN_PROJECTION_PARSER_VERSION}-attempted`, true);
+      }
     }
     const controller = new AbortController(); request.current = controller;
     try {
@@ -175,7 +188,9 @@ function StrategyWorkspace({ account, view }: { account: LeagueAccount; view: 'd
   useEffect(() => {
     if (!hydrated || busy || account.connection !== 'live' || request.current) return;
     const next = DIRECT_PROJECTION_SOURCES.find(provider => !automaticAttempted.current.has(provider.id)
-      && (!libraryRef.current[provider.id] || needsDirectRankRefresh(provider.id, libraryRef.current[provider.id], catalog.espnSeasonId)));
+      && (!libraryRef.current[provider.id] || needsDirectRankRefresh(provider.id, libraryRef.current[provider.id], catalog.espnSeasonId)
+        || (provider.id === 'espn' && (needsEspnCatalogRefresh(libraryRef.current.espn, catalog.espnSeasonId, catalog.fetchedAt)
+          || needsEspnParserRefresh(libraryRef.current.espn, catalog.espnSeasonId)))));
     if (!next) return;
     automaticAttempted.current.add(next.id);
     void importData(next.id, true, true);
@@ -186,7 +201,7 @@ function StrategyWorkspace({ account, view }: { account: LeagueAccount; view: 'd
     <div className={styles.header}><div><span className={styles.badge}>COMMISSIONER ONLY</span><h2>{view === 'draft' ? 'Your draft edge' : 'Keeper Suggestions'}</h2><p>{view === 'draft' ? 'Live rosters, category win probabilities, and two ways to find your next pick.' : 'Compare every projection source at once. Find value in your roster and a legal way to pay for it.'}</p></div><span className={styles.badge}>PRIVATE STRATEGY</span></div>
     {account.connection !== 'live' && <p className={styles.error} role="alert">Restore the league connection to import projections or record draft picks. Showing the last loaded data.</p>}
     <details className={styles.panel} aria-label="Private projection library">
-      <summary>Projection library · import and refresh</summary><p className={styles.subtle}>ESPN and Yahoo load automatically when missing and refresh older imports that lack player ranks. Projection statistics are shared by both tools in this browser session. Supplied BBM player ranks are saved privately to your account and season and restored on future visits. Upload Basketball Monster once here to use its projections in both tools.</p>
+      <summary>Projection library · import and refresh</summary><p className={styles.subtle}>ESPN and Yahoo load automatically when missing and refresh older imports that lack player ranks. ESPN also refreshes once for published ranking and projection updates. Projection statistics are shared by both tools in this browser session. Supplied BBM player ranks are saved privately to your account and season and restored on future visits. Upload Basketball Monster once here to use its projections in both tools.</p>
       {DIRECT_PROJECTION_SOURCES.map(item => {
         const loading = directLoading?.source === item.id ? directLoading.mode : null;
         const failure = directErrors[item.id];
@@ -216,16 +231,34 @@ function Recommendation({ candidate, fit }: { candidate: DraftAdvisorCandidate |
   return <section className={`${styles.panel} ${styles.recommendation}`}><span className={styles.eyebrow}>{fit ? 'Full-season schedule + roster fit' : 'Maximum season category win rate'}</span><h3>{candidate?.player.name ?? 'No recommendation yet'}</h3>{candidate ? <><p className={styles.subtle}>ESPN #{candidate.player.rank ?? '—'} · {candidate.player.eligiblePositions.join(' / ')} · {candidate.player.nbaTeam}</p><p className={styles.subtle}>{pct(candidate.scheduleWinRate)} projected season category win rate · <strong className={styles.gain}>{gain(candidate.scheduleGain)}</strong></p>{fit && <p className={styles.subtle}>Fit score {pct(candidate.fitScore)} · roster adjustment {gain(candidate.fitAdjustment)}. Fit score includes a roster preference and is not a win probability.</p>}<ul>{candidate.reasons.map((reason, index) => <li key={index}>{reason}</li>)}</ul></> : <p className={styles.subtle}>A recommendation needs imported projections, a full-season schedule, comparable opponent rosters, and an open roster slot. Check coverage and draft assumptions above.</p>}</section>;
 }
 
+function TeamTableSortButton({ label, active, direction, defaultDirection, onSort, children, detail }: {
+  label: string; active: boolean; direction: DraftTeamSortDirection; defaultDirection: DraftTeamSortDirection;
+  onSort: (direction: DraftTeamSortDirection) => void; children: ReactNode; detail?: string;
+}) {
+  const nextDirection = active ? direction === 'ascending' ? 'descending' : 'ascending' : defaultDirection;
+  return <button type="button" className={teamTableStyles.sortButton} onClick={() => onSort(nextDirection)} aria-label={`Sort by ${label}, ${nextDirection}`}>
+    <span>{children}{detail && <small>{detail}</small>}</span><span className={teamTableStyles.sortIndicator} aria-hidden="true">{active ? direction === 'ascending' ? '↑' : '↓' : '↕'}</span>
+  </button>;
+}
+
 function AllTeamProjections({ teams, franchiseId }: { teams: DraftAdvisorTeam[]; franchiseId: string }) {
-  const rankedTeams = [...teams].sort((a, b) => (b.categoryWinRate ?? -1) - (a.categoryWinRate ?? -1) || a.displayName.localeCompare(b.displayName) || a.franchiseId.localeCompare(b.franchiseId));
+  const [sort, setSort] = useState<DraftTeamSort<DraftTeamProjectionColumn>>({ column: 'overall', direction: 'descending' });
+  const rankedTeams = useMemo(() => sortDraftTeamProjections(teams, sort), [teams, sort]);
+  const sortButton = (column: DraftTeamProjectionColumn, label: string, children: ReactNode, detail?: string) => <TeamTableSortButton label={label} active={sort.column === column} direction={sort.direction} defaultDirection={defaultDraftTeamSortDirection(column)} onSort={direction => setSort({ column, direction })} detail={detail}>{children}</TeamTableSortButton>;
   return <section className={styles.panel} aria-labelledby="all-team-projections-title">
     <h3 id="all-team-projections-title">All-team projections</h3>
-    <p className={styles.subtle}>Every live roster, ranked by overall category win rate against the rest of the league. Overall is the expected share of the nine categories won, not the chance of winning a matchup. Your selected team is highlighted.</p>
+    <p className={styles.subtle}>Every live roster, initially ranked by overall category win rate against the rest of the league. Overall is the expected share of the nine categories won, not the chance of winning a matchup. Your selected team is highlighted.</p>
     <p className={styles.subtle}>Full season: daily active-slot production and category win rates are averaged across the season’s weeks, adjusted for projected availability. FG% and FT% use total makes / attempts. Lower TO is better. These estimates compare drafted players so far; uneven roster sizes affect the results.</p>
     <div className={styles.tableWrap} tabIndex={0} role="region" aria-label="All-team projections, scroll horizontally to compare all categories">
       <table className={teamTableStyles.table}>
-        <caption>Category cells show <strong>win chance</strong> above average weekly production across the full season. — means projections, shooting attempts, or comparable opponents are unavailable.</caption>
-        <thead><tr><th scope="col">Team / projection coverage</th><th scope="col">Overall win rate<small>Share of categories won</small></th>{catalog.categories.map(category => <th key={category.id} scope="col">{category.label}{category.lowerIsBetter ? ' ↓' : ''}<small>Win chance / production</small></th>)}</tr></thead>
+        <caption>Category cells show <strong>win chance</strong> above average weekly production across the full season. Click a header to sort, or its Production button to sort that category’s output; click again to reverse. Missing values stay last.</caption>
+        <thead><tr><th scope="col" aria-sort={sort.column === 'team' ? sort.direction : undefined}>{sortButton('team', 'team name', 'Team', 'Projection coverage below')}</th><th scope="col" aria-sort={sort.column === 'overall' ? sort.direction : undefined}>{sortButton('overall', 'overall win rate', 'Overall win rate', 'Share of categories won')}</th>{catalog.categories.map(category => {
+          const winColumn = `win:${category.id}` as const, productionColumn = `production:${category.id}` as const;
+          return <th key={category.id} scope="col" aria-sort={sort.column === winColumn || sort.column === productionColumn ? sort.direction : undefined}>
+            {sortButton(winColumn, `${category.label} win chance`, category.label, 'Win chance')}
+            {sortButton(productionColumn, `${category.label} average weekly production`, 'Production', category.lowerIsBetter ? 'Lower is better' : undefined)}
+          </th>;
+        })}</tr></thead>
         <tbody>{rankedTeams.map(team => {
           const selected = team.franchiseId === franchiseId;
           return <tr key={team.franchiseId} className={selected ? teamTableStyles.selected : undefined}>
@@ -249,12 +282,12 @@ function AllTeamProjections({ teams, franchiseId }: { teams: DraftAdvisorTeam[];
 
 function AllTeamCategoryValues({ teams, franchiseId }: { teams: DraftAdvisorTeam[]; franchiseId: string }) {
   const report = useMemo(() => buildDraftTeamValues(teams), [teams]);
-  const names = new Map(teams.map(team => [team.franchiseId, team.displayName]));
-  const rankedTeams = [...report.teams].sort((a, b) => {
-    if (a.value === null && b.value !== null) return 1;
-    if (a.value !== null && b.value === null) return -1;
-    return (b.value ?? 0) - (a.value ?? 0) || (names.get(a.franchiseId) ?? a.franchiseId).localeCompare(names.get(b.franchiseId) ?? b.franchiseId);
-  });
+  const names = useMemo(() => new Map(teams.map(team => [team.franchiseId, team.displayName])), [teams]);
+  const [sort, setSort] = useState<DraftTeamSort<DraftTeamValueColumn>>({ column: 'value', direction: 'descending' });
+  const rankedTeams = useMemo(() => sortDraftTeamValues(report.teams, names, sort), [report, names, sort]);
+  const sortHeader = (column: DraftTeamValueColumn, label: string, children: ReactNode, detail?: string) => <th key={column} scope="col" aria-sort={sort.column === column ? sort.direction : undefined}>
+    <TeamTableSortButton label={label} active={sort.column === column} direction={sort.direction} defaultDirection={defaultDraftTeamSortDirection(column)} onSort={direction => setSort({ column, direction })} detail={detail}>{children}</TeamTableSortButton>
+  </th>;
   const columns = report.teams[0]?.categories ?? [];
   const formatValue = (value: number | null) => value === null ? '—' : `${value > 0 && value.toFixed(2) !== '0.00' ? '+' : ''}${Math.abs(value) < 0.005 ? '0.00' : value.toFixed(2)}`;
   return <section className={styles.panel} aria-labelledby="all-team-category-values-title">
@@ -262,8 +295,8 @@ function AllTeamCategoryValues({ teams, franchiseId }: { teams: DraftAdvisorTeam
     <p className={styles.subtle}>Compare strengths and weaknesses across current rosters in standard deviations. Each category centers on 0; positive values are stronger and negative values are weaker. Value is the sum of all nine category scores, calculated from the selected projection source and current league rosters.</p>
     <div className={styles.tableWrap} tabIndex={0} role="region" aria-label="All-team category values, scroll horizontally to compare all categories">
       <table className={`${teamTableStyles.table} ${teamTableStyles.valuesTable}`}>
-        <caption>Full-season average weekly projections · higher is better, including toV · — means a category cannot be compared.</caption>
-        <thead><tr><th scope="col">Team</th><th scope="col">Value<small>Sum of 9 scores</small></th>{columns.map(category => <th key={category.id} scope="col"><abbr title={`${category.label} category value`}>{category.valueLabel}</abbr></th>)}</tr></thead>
+        <caption>Full-season average weekly projections · higher is better, including toV. Click any header to sort; click again to reverse. Missing values stay last.</caption>
+        <thead><tr>{sortHeader('team', 'team name', 'Team')}{sortHeader('value', 'total category value', 'Value', 'Sum of 9 scores')}{columns.map(category => sortHeader(`category:${category.id}`, `${category.label} category value`, <abbr title={`${category.label} category value`}>{category.valueLabel}</abbr>))}</tr></thead>
         <tbody>{rankedTeams.map(team => <tr key={team.franchiseId} className={team.franchiseId === franchiseId ? teamTableStyles.selected : undefined}>
           <th scope="row"><strong>{names.get(team.franchiseId) ?? team.franchiseId}</strong>{team.franchiseId === franchiseId && <span className={teamTableStyles.selectedBadge}>Selected team</span>}</th>
           <td><strong className={team.value === null ? undefined : team.value > 0 ? teamTableStyles.favored : team.value < 0 ? teamTableStyles.underdog : undefined}>{formatValue(team.value)}</strong></td>
@@ -334,7 +367,7 @@ function DraftAdvisorView({ account, projections, library, rankSnapshots, rankSt
       <Recommendation candidate={seasonLoaded ? report?.scheduleRecommendation ?? null : null}/>
       <Recommendation candidate={seasonLoaded ? report?.fitRecommendation ?? null : null} fit/>
     </div></DraftSection>
-    <DraftSection title="Available players · source ranks and BBM value"><DraftCandidateTable catalog={catalog} library={library} report={report} seasonLoaded={seasonLoaded} rankSnapshots={rankSnapshots} rankStatus={rankStatus}/></DraftSection>
+    <DraftSection title="Available players · source ranks and BBM value"><DraftCandidateTable catalog={catalog} library={library} report={report} board={live.board} seasonLoaded={seasonLoaded} rankSnapshots={rankSnapshots} rankStatus={rankStatus}/></DraftSection>
     {live.board && <DraftTradeEditor account={account} board={live.board} stale={Boolean(live.error)} accept={live.accept} refresh={live.refresh}/>}
     {live.board && <RecordDraftPick account={account} board={live.board} stale={Boolean(live.error)} accept={live.accept} refresh={live.refresh}/>}
     {live.board && <DraftSection title="Draft rosters · every team"><DraftRosters board={live.board} preferredFranchiseId={ownFranchiseId}/></DraftSection>}

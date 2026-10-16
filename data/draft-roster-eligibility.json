@@ -3,9 +3,9 @@
   "leagueId": 139935,
   "espnSeasonId": 2027,
   "source": {
-    "sha256": "db3440ed66d5ab56bb42ef370ed838198b352575c656db30ec2516c2697e5c74",
+    "sha256": "24c87b98012dceb2f16e0df4c00a1db2e91deb36044ab36eb0b6f1fae39c4794",
     "url": "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/2027/segments/0/leagues/139935?view=kona_player_info",
-    "capturedAt": "2026-10-03T18:55:24.465Z"
+    "capturedAt": "2026-10-16T17:57:49.587Z"
   },
   "players": [
     {
@@ -24,7 +24,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -198,7 +198,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -353,7 +353,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -636,7 +636,7 @@
         13
       ],
       "primaryPositionId": 4,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -790,7 +790,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -880,7 +880,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "OUT",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -917,7 +917,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -952,7 +952,7 @@
         13
       ],
       "primaryPositionId": 4,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -988,7 +988,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -1566,7 +1566,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -1961,7 +1961,7 @@
         13
       ],
       "primaryPositionId": 1,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -2615,7 +2615,7 @@
         13
       ],
       "primaryPositionId": 4,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -2720,7 +2720,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -3865,7 +3865,7 @@
         13
       ],
       "primaryPositionId": 1,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -3951,7 +3951,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -4142,7 +4142,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -4824,7 +4824,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -4949,7 +4949,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -5089,7 +5089,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -5225,7 +5225,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -5427,7 +5427,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "OUT",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -5446,7 +5446,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "OUT",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -5672,7 +5672,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -5775,7 +5775,7 @@
         13
       ],
       "primaryPositionId": 4,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -5842,7 +5842,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -5910,7 +5910,7 @@
         13
       ],
       "primaryPositionId": 1,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -6469,7 +6469,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -6504,7 +6504,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -6843,7 +6843,7 @@
         13
       ],
       "primaryPositionId": 1,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -6879,7 +6879,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -7145,7 +7145,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -7248,7 +7248,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "OUT",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -7285,7 +7285,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -7597,7 +7597,7 @@
         13
       ],
       "primaryPositionId": 4,
-      "injuryStatus": null,
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -7646,7 +7646,7 @@
         13
       ],
       "primaryPositionId": 1,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -7747,7 +7747,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -8125,7 +8125,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -8161,7 +8161,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "OUT",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -8198,6 +8198,24 @@
       ],
       "primaryPositionId": 1,
       "injuryStatus": null,
+      "active": true,
+      "poolStatus": "FREEAGENT"
+    },
+    {
+      "id": 4065813,
+      "name": "Alpha Diallo",
+      "eligibleSlots": [
+        2,
+        6,
+        7,
+        8,
+        10,
+        11,
+        12,
+        13
+      ],
+      "primaryPositionId": 3,
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -8317,7 +8335,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -8335,7 +8353,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -8369,7 +8387,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -8637,7 +8655,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -8945,7 +8963,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -9250,7 +9268,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -9306,7 +9324,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -9715,7 +9733,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -9765,7 +9783,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -10135,7 +10153,7 @@
         13
       ],
       "primaryPositionId": 1,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -10394,7 +10412,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -10591,7 +10609,7 @@
         13
       ],
       "primaryPositionId": 1,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -10678,7 +10696,7 @@
         13
       ],
       "primaryPositionId": 1,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -10732,7 +10750,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -10768,7 +10786,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -10873,7 +10891,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -10891,7 +10909,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -10963,7 +10981,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -11037,7 +11055,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -11230,7 +11248,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -11268,7 +11286,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -11472,7 +11490,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -11827,7 +11845,7 @@
         13
       ],
       "primaryPositionId": 4,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -11843,7 +11861,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -12199,7 +12217,7 @@
         13
       ],
       "primaryPositionId": 4,
-      "injuryStatus": "OUT",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -12286,7 +12304,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -12302,7 +12320,7 @@
         13
       ],
       "primaryPositionId": 1,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -12350,7 +12368,7 @@
         13
       ],
       "primaryPositionId": 1,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -12612,7 +12630,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -12993,7 +13011,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "OUT",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -13151,7 +13169,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -13170,7 +13188,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -13223,7 +13241,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -13422,7 +13440,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -13491,7 +13509,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "OUT",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -13507,7 +13525,7 @@
         13
       ],
       "primaryPositionId": 1,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -13655,7 +13673,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -13672,7 +13690,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -13814,7 +13832,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -13906,7 +13924,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -14028,7 +14046,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -14048,7 +14066,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -14133,7 +14151,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -14168,7 +14186,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": null,
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -14275,7 +14293,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -14346,7 +14364,7 @@
         13
       ],
       "primaryPositionId": 4,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -14703,7 +14721,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -14721,7 +14739,7 @@
         13
       ],
       "primaryPositionId": 4,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -14741,7 +14759,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -14937,7 +14955,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -15291,7 +15309,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -15379,7 +15397,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -15428,7 +15446,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -15446,7 +15464,7 @@
         13
       ],
       "primaryPositionId": 4,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -15464,7 +15482,7 @@
         13
       ],
       "primaryPositionId": 4,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -15654,7 +15672,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -15712,7 +15730,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -15729,7 +15747,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -15847,7 +15865,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -15863,7 +15881,7 @@
         13
       ],
       "primaryPositionId": 1,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -16009,7 +16027,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -16149,7 +16167,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -16187,7 +16205,7 @@
         13
       ],
       "primaryPositionId": 4,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -16207,7 +16225,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -16289,7 +16307,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "OUT",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -16562,7 +16580,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "OUT",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -16726,7 +16744,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -16936,7 +16954,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -17025,7 +17043,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -17284,7 +17302,7 @@
         13
       ],
       "primaryPositionId": 1,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -17585,7 +17603,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -17763,7 +17781,7 @@
         13
       ],
       "primaryPositionId": 4,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -17819,7 +17837,7 @@
         13
       ],
       "primaryPositionId": 4,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -17836,7 +17854,7 @@
         13
       ],
       "primaryPositionId": 2,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "OUT",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -18049,7 +18067,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -18082,7 +18100,7 @@
         13
       ],
       "primaryPositionId": 1,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -18277,7 +18295,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -18328,7 +18346,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -18396,7 +18414,7 @@
         13
       ],
       "primaryPositionId": 5,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -18414,7 +18432,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "ACTIVE",
+      "injuryStatus": "DAY_TO_DAY",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -18485,7 +18503,7 @@
         13
       ],
       "primaryPositionId": 4,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -18753,7 +18771,7 @@
         13
       ],
       "primaryPositionId": 4,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },
@@ -18821,7 +18839,7 @@
         13
       ],
       "primaryPositionId": 3,
-      "injuryStatus": "DAY_TO_DAY",
+      "injuryStatus": "ACTIVE",
       "active": true,
       "poolStatus": "FREEAGENT"
     },

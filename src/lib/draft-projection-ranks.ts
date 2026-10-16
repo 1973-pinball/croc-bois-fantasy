@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { draftProjectionDatasetSchema, type DraftProjectionDataset } from './draft-projections';
+import { draftProjectionDatasetSchema, ESPN_PROJECTION_PARSER_VERSION, type DraftProjectionDataset } from './draft-projections';
 
 const positiveInteger = z.number().int().positive().max(Number.MAX_SAFE_INTEGER);
 
@@ -23,6 +23,20 @@ export function needsDirectRankRefresh(provider: 'espn' | 'yahoo', value: unknow
 
 export function needsYahooRankRefresh(value: unknown, seasonId: number): boolean {
   return needsDirectRankRefresh('yahoo', value, seasonId);
+}
+
+/** A newly published ESPN catalog supersedes older ESPN imports, without changing other providers. */
+export function needsEspnCatalogRefresh(value: unknown, seasonId: number, catalogFetchedAt: string): boolean {
+  const parsed = draftProjectionDatasetSchema.safeParse(value);
+  return parsed.success && parsed.data.source === 'espn' && parsed.data.seasonId === seasonId
+    && Date.parse(parsed.data.importedAt) < Date.parse(catalogFetchedAt);
+}
+
+/** Retry saved ESPN forecasts once when an updated extractor can restore excluded projections. */
+export function needsEspnParserRefresh(value: unknown, seasonId: number): boolean {
+  const parsed = draftProjectionDatasetSchema.safeParse(value);
+  return parsed.success && parsed.data.source === 'espn' && parsed.data.seasonId === seasonId
+    && (parsed.data.espnParserVersion ?? 0) < ESPN_PROJECTION_PARSER_VERSION;
 }
 
 /**

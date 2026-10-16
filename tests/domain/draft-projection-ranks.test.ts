@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { draftProjectionRankSnapshotSchema, mergeDraftProjectionRanks, needsDirectRankRefresh, needsYahooRankRefresh, type DraftProjectionRankSnapshot } from '../../src/lib/draft-projection-ranks';
+import { draftProjectionRankSnapshotSchema, mergeDraftProjectionRanks, needsDirectRankRefresh, needsEspnCatalogRefresh, needsEspnParserRefresh, needsYahooRankRefresh, type DraftProjectionRankSnapshot } from '../../src/lib/draft-projection-ranks';
+import { ESPN_PROJECTION_PARSER_VERSION } from '../../src/lib/draft-projections';
 import type { DraftPlayerProjection, DraftProjectionDataset } from '../../src/lib/draft-projections';
 
 const player = (id: number, providerRank?: number): DraftPlayerProjection => ({ id, name: `Synthetic player ${id}`, games: 70,
@@ -30,6 +31,34 @@ test('both direct providers can migrate old rankless imports without refreshing 
     assert.equal(needsDirectRankRefresh(source, dataset(source === 'espn' ? 'yahoo' : 'espn'), 2027), false);
     assert.equal(needsDirectRankRefresh(source, null, 2027), false);
   }
+});
+
+test('a newer catalog refreshes only older matching ESPN imports and preserves provider data', () => {
+  const espn = { ...dataset('espn'), players: [player(1, 8), player(2, 12)] };
+  const original = structuredClone(espn);
+  assert.equal(needsEspnCatalogRefresh(espn, 2027, '2026-10-16T10:00:00.000Z'), true);
+  assert.equal(needsEspnCatalogRefresh(espn, 2027, espn.importedAt), false);
+  assert.equal(needsEspnCatalogRefresh(espn, 2027, '2026-10-12T10:00:00.000Z'), false);
+  assert.equal(needsEspnCatalogRefresh(espn, 2028, '2026-10-16T10:00:00.000Z'), false);
+  assert.equal(needsEspnCatalogRefresh(espn, 2027, 'invalid date'), false);
+  for (const value of [dataset('yahoo'), dataset(), undefined, { ...espn, importedAt: 'invalid date' }]) {
+    assert.equal(needsEspnCatalogRefresh(value, 2027, '2026-10-16T10:00:00.000Z'), false);
+  }
+  assert.deepEqual(espn, original);
+});
+
+test('the ESPN parser migration refreshes recent old-version imports but leaves current versions and other providers intact', () => {
+  const espn = { ...dataset('espn'), importedAt: '2026-10-16T23:00:00.000Z', players: [player(1, 8)] };
+  const before = structuredClone(espn);
+  assert.equal(needsEspnParserRefresh(espn, 2027), true);
+  assert.equal(needsEspnParserRefresh({ ...espn, espnParserVersion: 1 }, 2027), true);
+  assert.equal(needsEspnParserRefresh({ ...espn, espnParserVersion: ESPN_PROJECTION_PARSER_VERSION }, 2027), false);
+  assert.equal(needsEspnParserRefresh({ ...espn, espnParserVersion: ESPN_PROJECTION_PARSER_VERSION + 1 }, 2027), false);
+  assert.equal(needsEspnParserRefresh(espn, 2028), false);
+  for (const value of [dataset('yahoo'), dataset(), undefined, { ...espn, espnParserVersion: -1 }]) {
+    assert.equal(needsEspnParserRefresh(value, 2027), false);
+  }
+  assert.deepEqual(espn, before);
 });
 
 test('rank hydration preserves every forecast field, supplied gaps and input objects without inventing unmatched players', () => {

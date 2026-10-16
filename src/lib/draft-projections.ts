@@ -5,7 +5,8 @@ export type DraftProjectionSource = 'espn' | 'yahoo' | 'basketball-monster';
 export type DraftProjectionStats = { pts: number; reb: number; ast: number; stl: number; blk: number; tov: number; three: number; fgm: number; fga: number; ftm: number; fta: number };
 /** Stats are per NBA game; games is expected full-season appearances, when supplied. */
 export type DraftPlayerProjection = { id: number; name: string; games: number | null; stats: DraftProjectionStats; /** Original provider rank, when imported; never recalculated from projections. */ providerRank?: number };
-export type DraftProjectionDataset = { source: DraftProjectionSource; sourceLabel: string; seasonId: number; importedAt: string; players: DraftPlayerProjection[]; warnings: string[] };
+export type DraftProjectionDataset = { source: DraftProjectionSource; sourceLabel: string; seasonId: number; importedAt: string; players: DraftPlayerProjection[]; warnings: string[]; espnParserVersion?: number };
+export const ESPN_PROJECTION_PARSER_VERSION = 2;
 
 export const PROJECTION_SOURCES: { id: DraftProjectionSource; label: string; url: string; help: string }[] = [
   { id: 'espn', label: 'ESPN projections', url: 'https://fantasy.espn.com/basketball/players/projections', help: 'Import this season’s ESPN projections through the league’s server connection, or paste a CSV/TSV export.' },
@@ -18,6 +19,7 @@ export const draftProjectionStatsSchema = z.object({ pts: stat, reb: stat, ast: 
 export const draftProjectionDatasetSchema = z.object({
   source: z.enum(['espn', 'yahoo', 'basketball-monster']), sourceLabel: z.string().min(1).max(100),
   seasonId: z.number().int().min(2000).max(2100), importedAt: z.string().datetime(),
+  espnParserVersion: z.number().int().positive().max(Number.MAX_SAFE_INTEGER).optional(),
   players: z.array(z.object({ id: z.number().int().positive().max(Number.MAX_SAFE_INTEGER), name: z.string().min(1).max(150), games: z.number().finite().min(0).max(82).nullable(), stats: draftProjectionStatsSchema, providerRank: z.number().int().positive().max(Number.MAX_SAFE_INTEGER).optional() })).min(1).max(2000),
   warnings: z.array(z.string().max(500)).max(110),
 }).refine(value => new Set(value.players.map(player => player.id)).size === value.players.length, 'Duplicate ESPN player identities.');
@@ -241,7 +243,7 @@ export function extractEspnDraftProjections(payload: unknown, seasonId: number, 
   if (seasonId !== catalog.espnSeasonId) throw new Error('These projections need the matching season’s ESPN player catalog.');
   const rows = object(payload)?.players;
   if (!Array.isArray(rows) || !rows.length || rows.length >= 2000) throw new Error('ESPN projections are missing or the player pool may be truncated.');
-  const known = new Map(catalog.players.map(player => [player.id, player])), seen = new Set<number>(), players: DraftPlayerProjection[] = []; let excluded = 0;
+  const known = new Map(catalog.players.map(player => [player.id, player])), seen = new Set<number>(), players: DraftPlayerProjection[] = []; let excluded = 0, recoveredThrees = 0;
   for (const row of rows) {
     const entry = object(row), player = object(entry?.player), id = player?.id;
     if (typeof id !== 'number' || !Number.isSafeInteger(id) || id < 1 || entry?.id !== id || seen.has(id)) throw new Error('ESPN returned duplicate or conflicting player identities.');
@@ -251,6 +253,24 @@ export function extractEspnDraftProjections(payload: unknown, seasonId: number, 
     const record = records[0], averages = object(record?.averageStats), totals = object(record?.stats), knownPlayer = known.get(id);
     if (!record || !averages || !knownPlayer) { excluded++; continue; }
     const rawStats = Object.fromEntries(Object.entries(ESPN_STATS).map(([key, statId]) => [key, averages[statId]]));
+    let recoveredThree = false;
+    // ESPN omits zero-valued 3PM for some centers. Recover only from this same
+    // projection's scoring identity, never by treating every missing stat as zero.
+    if (rawStats.three === undefined && totals) {
+      const games = totals['42'], points = totals['0'], fieldGoals = totals['13'], freeThrows = totals['15'];
+      if (typeof games === 'number' && Number.isFinite(games) && games > 0 && games <= 82
+        && [points, fieldGoals, freeThrows].every(value => typeof value === 'number' && Number.isSafeInteger(value) && value >= 0)
+        && ['0', '13', '15'].every(stat => typeof averages[stat] === 'number' && Math.abs(Number(averages[stat]) - Number(totals[stat]) / games) < 1e-8)) {
+        const threes = Number(points) - 2 * Number(fieldGoals) - Number(freeThrows);
+        const suppliedThrees = totals['17'], attempts = totals['18'];
+        if (Number.isSafeInteger(threes) && threes >= 0 && threes <= Number(fieldGoals)
+          && (suppliedThrees === undefined || suppliedThrees === threes)
+          && (attempts === undefined || (typeof attempts === 'number' && Number.isSafeInteger(attempts) && attempts >= threes))) {
+          rawStats.three = threes / games;
+          recoveredThree = true;
+        }
+      }
+    }
     const checked = draftProjectionStatsSchema.safeParse(rawStats);
     if (!checked.success) { excluded++; continue; }
     // ESPN's GP stat is 42; appliedTotal is fantasy points and must not be used as games.
@@ -261,9 +281,11 @@ export function extractEspnDraftProjections(payload: unknown, seasonId: number, 
     const providerRank = suppliedRank?.rankType === 'ROTO' && suppliedRank.slotId === 0
       && typeof suppliedRank.rank === 'number' && Number.isSafeInteger(suppliedRank.rank) && suppliedRank.rank > 0 ? suppliedRank.rank : undefined;
     players.push({ id, name: knownPlayer.name, games, stats: checked.data, ...(providerRank === undefined ? {} : { providerRank }) });
+    if (recoveredThree) recoveredThrees++;
   }
   if (!players.length) throw new Error('ESPN did not return complete projections for this season. Import a current projection export instead.');
   const warnings = excluded ? [`${excluded} ESPN players have no complete current-season projection or matching catalog identity and were excluded. Actual statistics were not substituted.`] : [];
+  if (recoveredThrees) warnings.push(`ESPN omitted projected 3PM for ${recoveredThrees} players; these values were recovered from the same projection's points, field goals made, and free throws made.`);
   if (players.some(player => player.games === null)) warnings.push('ESPN did not provide projected games for some players; their availability is not estimated.');
-  return dataset('espn', seasonId, importedAt, players, warnings);
+  return { ...dataset('espn', seasonId, importedAt, players, warnings), espnParserVersion: ESPN_PROJECTION_PARSER_VERSION };
 }

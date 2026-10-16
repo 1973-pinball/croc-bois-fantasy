@@ -1,9 +1,10 @@
 import type { DraftAdvisorCandidate } from './draft-advisor';
+import type { DraftBoard } from './draft-board';
 import type { DraftPlayerCatalog } from './draft-player-catalog';
 import { draftProjectionDatasetSchema, type DraftProjectionDataset, type DraftProjectionSource } from './draft-projections';
 import { draftProjectionRankSnapshotSchema, type DraftProjectionRankSnapshot } from './draft-projection-ranks';
 
-export type DraftCandidateOrder = 'espn' | 'bbm' | 'yahoo' | 'bbm-value' | 'fit';
+export type DraftCandidateOrder = 'espn' | 'espn-after-keepers' | 'bbm' | 'yahoo' | 'bbm-value' | 'fit';
 export type DraftCandidateDirection = 'ascending' | 'descending';
 export const defaultDraftCandidateDirection = (order: DraftCandidateOrder): DraftCandidateDirection => order === 'bbm-value' || order === 'fit' ? 'descending' : 'ascending';
 export type DraftCandidateRankLibrary = Partial<Record<DraftProjectionSource, DraftProjectionDataset>>;
@@ -17,6 +18,7 @@ export type DraftCandidateRank = {
 };
 export type DraftCandidateRanks = {
   byPlayerId: Map<number, DraftCandidateRank>;
+  espnAfterKeepersByPlayerId: Map<number, number>;
   coverage: { selectable: number; espn: number; bbm: number; yahoo: number };
 };
 
@@ -31,6 +33,7 @@ export function buildDraftCandidateRanks(
   catalog: Pick<DraftPlayerCatalog, 'players' | 'espnSeasonId'>,
   library: DraftCandidateRankLibrary,
   rankSnapshots: DraftCandidateRankSnapshots = {},
+  board?: Pick<DraftBoard, 'keepersRevealedAt' | 'picks'> | null,
 ): DraftCandidateRanks {
   const selectable = catalog.players.filter(player => player.selectable);
   const selectableIds = new Set(selectable.map(player => player.id));
@@ -54,7 +57,16 @@ export function buildDraftCandidateRanks(
     const espnRank = espn.get(player.id) ?? validRank(player.rank), bbmRank = bbm.get(player.id) ?? null;
     return [player.id, { espnRank, bbmRank, yahooRank: yahoo.get(player.id) ?? null, bbmValue: espnRank !== null && bbmRank !== null ? espnRank - bbmRank : null }];
   }));
-  return { byPlayerId, coverage: { selectable: selectable.length, espn: [...byPlayerId.values()].filter(player => player.espnRank !== null).length, bbm: bbm.size, yahoo: yahoo.size } };
+  const espnAfterKeepersByPlayerId = new Map<number, number>();
+  if (board?.keepersRevealedAt) {
+    const keeperIds = new Set(board.picks.filter(pick => pick.status === 'keeper').map(pick => pick.playerId));
+    // Use the complete ranked pool: filters, pages and later selections cannot renumber this baseline.
+    selectable.filter(player => !keeperIds.has(player.id) && byPlayerId.get(player.id)!.espnRank !== null)
+      .sort((a, b) => byPlayerId.get(a.id)!.espnRank! - byPlayerId.get(b.id)!.espnRank!
+        || a.name.localeCompare(b.name) || a.id - b.id)
+      .forEach((player, index) => espnAfterKeepersByPlayerId.set(player.id, index + 1));
+  }
+  return { byPlayerId, espnAfterKeepersByPlayerId, coverage: { selectable: selectable.length, espn: [...byPlayerId.values()].filter(player => player.espnRank !== null).length, bbm: bbm.size, yahoo: yahoo.size } };
 }
 
 function compareNullable(a: number | null, b: number | null, descending = false) {
@@ -80,6 +92,7 @@ export function sortDraftCandidates(candidates: DraftAdvisorCandidate[], ranks: 
     const row = ranks.byPlayerId.get(candidate.player.id);
     switch (order) {
       case 'espn': return row?.espnRank ?? validRank(candidate.player.rank);
+      case 'espn-after-keepers': return ranks.espnAfterKeepersByPlayerId.get(candidate.player.id) ?? null;
       case 'bbm': return row?.bbmRank ?? null;
       case 'yahoo': return row?.yahooRank ?? null;
       case 'bbm-value': return row?.bbmValue ?? null;
@@ -90,4 +103,13 @@ export function sortDraftCandidates(candidates: DraftAdvisorCandidate[], ranks: 
     || compareNullable(ranks.byPlayerId.get(a.player.id)?.espnRank ?? validRank(a.player.rank), ranks.byPlayerId.get(b.player.id)?.espnRank ?? validRank(b.player.rank))
     || a.player.name.localeCompare(b.player.name) || a.player.id - b.player.id)
     .slice(0, Number.isFinite(limit) ? Math.max(0, Math.trunc(limit)) : 15);
+}
+
+/** Page an already sorted pool; a smaller pool clamps the page without resetting valid pages. */
+export function paginateDraftCandidates(candidates: DraftAdvisorCandidate[], requestedPage: number, pageSize = 15) {
+  const size = Number.isSafeInteger(pageSize) && pageSize > 0 ? pageSize : 15;
+  const total = candidates.length, pageCount = Math.max(1, Math.ceil(total / size));
+  const page = Math.min(pageCount, Math.max(1, Number.isFinite(requestedPage) ? Math.trunc(requestedPage) : 1));
+  const offset = (page - 1) * size;
+  return { candidates: candidates.slice(offset, offset + size), page, pageCount, total, start: total ? offset + 1 : 0, end: Math.min(offset + size, total) };
 }

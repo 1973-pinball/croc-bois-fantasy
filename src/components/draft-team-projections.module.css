@@ -17,4 +17,11 @@
 .valuesTable { min-width: 950px; }
 .valuesTable td > strong { font-size: 13px; }
 .valuesTable abbr { text-decoration: none; cursor: help; }
+.sortButton { display: flex; align-items: flex-start; justify-content: flex-end; gap: 7px; width: 100%; min-height: 44px; padding: 6px 0; background: transparent; color: inherit; font: inherit; text-align: inherit; cursor: pointer; }
+.sortButton:hover { background: var(--green-light); color: var(--green); }
+.sortButton:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
+.sortButton small { margin-top: 3px; }
+.table th:first-child .sortButton { justify-content: flex-start; }
+.sortIndicator { opacity: .55; }
+.table th[aria-sort] { color: var(--green); }
 @media(max-width: 650px) { .table th, .table td { padding: 12px; } .table th:first-child { min-width: 155px; max-width: 180px; } }
