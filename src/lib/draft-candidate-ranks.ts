@@ -4,6 +4,8 @@ import { draftProjectionDatasetSchema, type DraftProjectionDataset, type DraftPr
 import { draftProjectionRankSnapshotSchema, type DraftProjectionRankSnapshot } from './draft-projection-ranks';
 
 export type DraftCandidateOrder = 'espn' | 'bbm' | 'yahoo' | 'bbm-value' | 'fit';
+export type DraftCandidateDirection = 'ascending' | 'descending';
+export const defaultDraftCandidateDirection = (order: DraftCandidateOrder): DraftCandidateDirection => order === 'bbm-value' || order === 'fit' ? 'descending' : 'ascending';
 export type DraftCandidateRankLibrary = Partial<Record<DraftProjectionSource, DraftProjectionDataset>>;
 export type DraftCandidateRankSnapshots = Partial<Record<'basketball-monster' | 'yahoo', DraftProjectionRankSnapshot>>;
 export type DraftCandidateRank = {
@@ -62,7 +64,7 @@ function compareNullable(a: number | null, b: number | null, descending = false)
 }
 
 /** Sort the entire available pool before truncating; unavailable source ranks stay last. */
-export function sortDraftCandidates(candidates: DraftAdvisorCandidate[], ranks: DraftCandidateRanks, order: DraftCandidateOrder, limit = 15): DraftAdvisorCandidate[] {
+export function sortDraftCandidates(candidates: DraftAdvisorCandidate[], ranks: DraftCandidateRanks, order: DraftCandidateOrder, limit = 15, direction: DraftCandidateDirection = defaultDraftCandidateDirection(order)): DraftAdvisorCandidate[] {
   const available = order === 'fit' ? candidates.filter(candidate => !candidate.blocked && candidate.fitScore !== null && Number.isFinite(candidate.fitScore)) : [...candidates];
   const value = (candidate: DraftAdvisorCandidate): number | null => {
     const row = ranks.byPlayerId.get(candidate.player.id);
@@ -74,7 +76,7 @@ export function sortDraftCandidates(candidates: DraftAdvisorCandidate[], ranks: 
       case 'fit': return candidate.fitScore;
     }
   };
-  return available.sort((a, b) => compareNullable(value(a), value(b), order === 'bbm-value' || order === 'fit')
+  return available.sort((a, b) => compareNullable(value(a), value(b), direction === 'descending')
     || compareNullable(ranks.byPlayerId.get(a.player.id)?.espnRank ?? validRank(a.player.rank), ranks.byPlayerId.get(b.player.id)?.espnRank ?? validRank(b.player.rank))
     || a.player.name.localeCompare(b.player.name) || a.player.id - b.player.id)
     .slice(0, Number.isFinite(limit) ? Math.max(0, Math.trunc(limit)) : 15);

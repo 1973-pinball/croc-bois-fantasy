@@ -64,6 +64,47 @@ test('sorts the full candidate pool before the 15-row cutoff and preserves input
   assert.deepEqual(candidates, before);
 });
 
+test('all provider rankings and the ESPN minus BBM gap support both directions with missing ranks last', () => {
+  const pool = catalog(6);
+  [80, 10, 45, 120, 60, null].forEach((rank, index) => { pool.players[index].rank = rank; });
+  const ranks = buildDraftCandidateRanks(pool, {
+    'basketball-monster': dataset('basketball-monster', [45, 20, 5, 200].map((providerRank, index) => ({ ...projection(index + 1), providerRank })).concat([{ ...projection(6), providerRank: 2 }])),
+    yahoo: dataset('yahoo', [3, 4, 1, 2].map((providerRank, index) => ({ ...projection(index + 1), providerRank }))),
+  });
+  const candidates = [...pool.players].reverse().map(row => candidate(row));
+  const expected = {
+    espn: { ascending: [2, 3, 5, 1, 4, 6], descending: [4, 1, 5, 3, 2, 6] },
+    bbm: { ascending: [6, 3, 2, 1, 4, 5], descending: [4, 1, 2, 3, 6, 5] },
+    yahoo: { ascending: [3, 4, 1, 2, 5, 6], descending: [2, 1, 4, 3, 5, 6] },
+    'bbm-value': { ascending: [4, 2, 1, 3, 5, 6], descending: [3, 1, 2, 4, 5, 6] },
+  };
+  for (const order of ['espn', 'bbm', 'yahoo', 'bbm-value'] as const) {
+    for (const direction of ['ascending', 'descending'] as const) {
+      assert.deepEqual(sortDraftCandidates(candidates, ranks, order, 15, direction).map(row => row.player.id), expected[order][direction], `${order} ${direction}`);
+    }
+  }
+});
+
+test('reversing the rank gap keeps equal-value players in ESPN, name and ID order', () => {
+  const pool = catalog(5);
+  [80, 80, 80, 60, 120].forEach((rank, index) => { pool.players[index].rank = rank; });
+  pool.players[0].name = 'Beta'; pool.players[1].name = 'Alpha'; pool.players[2].name = 'Alpha';
+  const ranks = buildDraftCandidateRanks(pool, {
+    'basketball-monster': dataset('basketball-monster', [45, 45, 45, 25, 60].map((providerRank, index) => ({ ...projection(index + 1), providerRank }))),
+  });
+  const candidates = [...pool.players].reverse().map(row => candidate(row));
+  assert.deepEqual(sortDraftCandidates(candidates, ranks, 'bbm-value', 15, 'ascending').map(row => row.player.id), [4, 2, 3, 1, 5]);
+  assert.deepEqual(sortDraftCandidates(candidates, ranks, 'bbm-value', 15, 'descending').map(row => row.player.id), [5, 4, 2, 3, 1]);
+});
+
+test('reversing ranking direction sorts the entire available pool before the row limit', () => {
+  const pool = catalog(), ranks = buildDraftCandidateRanks(pool, library());
+  const candidates = pool.players.map(row => candidate(row)), before = structuredClone(candidates);
+  assert.deepEqual(sortDraftCandidates(candidates, ranks, 'espn', 15, 'descending').map(row => row.player.id), Array.from({ length: 15 }, (_, index) => 25 - index));
+  assert.deepEqual(sortDraftCandidates(candidates, ranks, 'bbm-value', 3, 'ascending').map(row => row.player.id), [1, 2, 3]);
+  assert.deepEqual(candidates, before);
+});
+
 test('rank coverage includes only selectable catalog players and preserves original rank gaps and zero-game rows', () => {
   const pool = catalog(4), imports = library(4);
   pool.players[3].selectable = false;

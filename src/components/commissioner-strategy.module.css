@@ -42,6 +42,13 @@
  .table small { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; max-width: 260px; white-space: normal; line-height: 1.65; }
  .table button { background: var(--green-light); color: var(--green); padding: 8px 12px; min-height: 36px; border-radius: 5px; }
  .candidateTable { min-width: 950px; }
+ .candidateTable th.rankHeader { padding: 4px 8px; }
+ .candidateTable .rankSortButton { display: flex; align-items: flex-start; gap: 8px; width: 100%; min-height: 44px; padding: 9px 6px; background: transparent; color: inherit; font: inherit; text-align: left; white-space: nowrap; cursor: pointer; }
+ .candidateTable .rankSortButton:hover { background: var(--green-light); color: var(--green); }
+ .candidateTable .rankSortButton:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+ .rankSortIndicator { opacity: .55; }
+ .rankHeader[aria-sort] { color: var(--green); }
+ .rankHeader[aria-sort] .rankSortIndicator { opacity: 1; font-weight: 700; }
  .candidateTable td:last-child { min-width: 230px; max-width: 280px; white-space: normal; }
  .categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(95px, 1fr)); gap: 10px; margin-top: 18px; }
  .category { border: 1px solid var(--line); border-radius: 7px; padding: 12px; }

@@ -3,15 +3,15 @@
 import { useMemo, useState } from 'react';
 import type { DraftAdvisorReport } from '@/lib/draft-advisor';
 import type { DraftPlayerCatalog } from '@/lib/draft-player-catalog';
-import { buildDraftCandidateRanks, sortDraftCandidates, type DraftCandidateOrder, type DraftCandidateRankLibrary, type DraftCandidateRankSnapshots } from '@/lib/draft-candidate-ranks';
+import { buildDraftCandidateRanks, defaultDraftCandidateDirection, sortDraftCandidates, type DraftCandidateDirection, type DraftCandidateOrder, type DraftCandidateRankLibrary, type DraftCandidateRankSnapshots } from '@/lib/draft-candidate-ranks';
 import styles from './commissioner-strategy.module.css';
 
-const titles: Record<DraftCandidateOrder, string> = {
-  espn: 'Next 15 available · ESPN order',
-  bbm: 'Top 15 available · BBM rank',
-  yahoo: 'Top 15 available · Yahoo rank',
-  'bbm-value': 'Top 15 available · biggest BBM value',
-  fit: 'Top 15 · schedule and roster fit',
+const labels: Record<DraftCandidateOrder, string> = {
+  espn: 'ESPN rank',
+  bbm: 'BBM rank',
+  yahoo: 'Yahoo rank',
+  'bbm-value': 'ESPN − BBM',
+  fit: 'Schedule + roster fit',
 };
 const pct = (value: number | null) => value === null ? '—' : `${(value * 100).toFixed(1)}%`;
 const gain = (value: number | null) => value === null ? '—' : `${value >= 0 ? '+' : ''}${(value * 100).toFixed(1)} pp`;
@@ -21,20 +21,38 @@ const valueLabel = (value: number | null | undefined) => value == null ? '—' :
 export function DraftCandidateTable({ catalog, library, report, seasonLoaded, rankSnapshots, rankStatus }: {
   catalog: DraftPlayerCatalog; library: DraftCandidateRankLibrary; report: DraftAdvisorReport | null; seasonLoaded: boolean; rankSnapshots?: DraftCandidateRankSnapshots; rankStatus?: string;
 }) {
-  const [order, setOrder] = useState<DraftCandidateOrder>('espn');
+  const [sort, setSort] = useState<{ order: DraftCandidateOrder; direction: DraftCandidateDirection }>({ order: 'bbm-value', direction: 'descending' });
+  const { order, direction } = sort;
   const ranks = useMemo(() => buildDraftCandidateRanks(catalog, library, rankSnapshots), [catalog, library, rankSnapshots]);
-  const candidates = useMemo(() => sortDraftCandidates(order === 'fit' && !seasonLoaded ? [] : report?.candidates ?? [], ranks, order), [report, ranks, order, seasonLoaded]);
+  const candidates = useMemo(() => sortDraftCandidates(order === 'fit' && !seasonLoaded ? [] : report?.candidates ?? [], ranks, order, 15, direction), [report, ranks, order, direction, seasonLoaded]);
   const missingSource = (order === 'bbm' || order === 'bbm-value') && !ranks.coverage.bbm ? 'Basketball Monster' : order === 'yahoo' && !ranks.coverage.yahoo ? 'Yahoo' : null;
+  const directionLabel = order === 'bbm-value'
+    ? direction === 'descending' ? 'biggest BBM values first' : 'smallest rank gaps first'
+    : direction === 'ascending' ? 'low to high' : 'high to low';
+  function chooseOrder(next: DraftCandidateOrder) { setSort({ order: next, direction: defaultDraftCandidateDirection(next) }); }
+  function rankHeader(column: Exclude<DraftCandidateOrder, 'fit'>, detail?: string) {
+    const active = order === column;
+    const nextDirection = active ? direction === 'ascending' ? 'descending' : 'ascending' : defaultDraftCandidateDirection(column);
+    return <th scope="col" aria-sort={active ? direction : undefined} className={styles.rankHeader}>
+      <button type="button" className={styles.rankSortButton} onClick={() => setSort({ order: column, direction: nextDirection })} aria-label={`Sort by ${labels[column]}, ${nextDirection}`}>
+        <span>{labels[column]}{detail && <small>{detail}</small>}</span><span className={styles.rankSortIndicator} aria-hidden="true">{active ? direction === 'ascending' ? '↑' : '↓' : '↕'}</span>
+      </button>
+    </th>;
+  }
   return <section className={styles.panel} aria-labelledby="draft-candidates-title">
-    <h3 id="draft-candidates-title">{titles[order]}</h3>
-    <div className={styles.toolbar}><label>Player ranking<select value={order} onChange={event => setOrder(event.target.value as DraftCandidateOrder)}>
+    <h3 id="draft-candidates-title">Available players · {labels[order]}</h3>
+    <div className={styles.toolbar}><label>Player ranking<select aria-label="Player ranking" value={order} onChange={event => chooseOrder(event.target.value as DraftCandidateOrder)}>
       <option value="espn">ESPN rank</option>
       <option value="bbm">BBM rank</option>
       <option value="yahoo">Yahoo rank · preseason</option>
-      <option value="bbm-value">Biggest BBM value (ESPN rank − BBM rank)</option>
+      <option value="bbm-value">ESPN − BBM · rank gap</option>
       <option value="fit">Schedule + roster fit</option>
+    </select></label><label>Sort direction<select aria-label="Sort direction" value={direction} onChange={event => setSort({ order, direction: event.target.value as DraftCandidateDirection })}>
+      <option value="ascending">{order === 'bbm-value' ? 'Smallest gap first' : 'Low to high'}</option>
+      <option value="descending">{order === 'bbm-value' ? 'Biggest BBM values first' : 'High to low'}</option>
     </select></label></div>
-    <p className={styles.subtle}>ESPN − BBM measures the rank gap: ESPN #80 and BBM #45 is <strong>+35</strong>. Bigger positive numbers mean better BBM value relative to ESPN. Sorting searches all available players before showing 15; missing ranks appear last.</p>
+    <p className={styles.subtle} role="status">Showing {candidates.length} of {report?.candidates.length ?? 0} available players · {missingSource ? 'ESPN order until source ranks are available' : directionLabel}. Click a rank column to sort; click it again to reverse.</p>
+    <p className={styles.subtle}>ESPN − BBM measures the rank gap: ESPN #80 and BBM #45 is <strong>+35</strong>. Bigger positive numbers highlight players BBM ranks earlier than ESPN. Sorting searches all available players before showing 15; missing ranks appear last in either direction.</p>
     <p className={styles.subtle}>Player ranks are available before the draft and do not need team rosters. ESPN uses its imported ROTO draft rank, with the captured catalog as a fallback. BBM uses its supplied Rank column or your privately saved ranked list. Yahoo uses its published preseason rank. Ranks include drafted players and do not change when a player is picked. ESPN: {ranks.coverage.espn || 'no'} · BBM: {ranks.coverage.bbm || 'no'} · Yahoo: {ranks.coverage.yahoo || 'no'} ranked players.</p>
     {rankStatus && <p className={styles.subtle} role="status">{rankStatus}</p>}
     {rankSnapshots?.['basketball-monster'] && <p className={styles.subtle}>Saved BBM ranked list: {new Date(rankSnapshots['basketball-monster'].importedAt).toLocaleDateString()}.</p>}
@@ -46,7 +64,7 @@ export function DraftCandidateTable({ catalog, library, report, seasonLoaded, ra
     <div className={styles.tableWrap} tabIndex={0} role="region" aria-label="Available player ranks and value, scroll horizontally for all columns">
       <table className={`${styles.table} ${styles.candidateTable}`}>
         <caption className="visually-hidden">Available players compared by ESPN rank, Basketball Monster supplied rank, Yahoo preseason rank, and ESPN minus BBM rank value</caption>
-        <thead><tr><th scope="col">Player</th><th scope="col">Position</th><th scope="col">ESPN rank</th><th scope="col">BBM rank<small>Supplied rank</small></th><th scope="col">Yahoo rank<small>Preseason</small></th><th scope="col">ESPN − BBM<small>Bigger is better</small></th><th scope="col">Season category win rate</th><th scope="col">Gain</th><th scope="col">Usable / scheduled games<small>Full season</small></th><th scope="col">Fit score</th></tr></thead>
+        <thead><tr><th scope="col">Player</th><th scope="col">Position</th>{rankHeader('espn')}{rankHeader('bbm', 'Supplied rank')}{rankHeader('yahoo', 'Preseason')}{rankHeader('bbm-value', 'Bigger is better')}<th scope="col">Season category win rate</th><th scope="col">Gain</th><th scope="col">Usable / scheduled games<small>Full season</small></th><th scope="col">Fit score</th></tr></thead>
         <tbody>{candidates.map(candidate => {
           const values = ranks.byPlayerId.get(candidate.player.id);
           return <tr key={candidate.player.id}>
