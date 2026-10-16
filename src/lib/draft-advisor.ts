@@ -41,6 +41,8 @@ export type DraftAdvisorReport = {
 export type DraftAdvisorInput = {
   board: DraftBoard; catalog: DraftPlayerCatalog; settings: DraftRosterSettings; eligibility: DraftRosterEligibility;
   projections: DraftProjectionDataset | null; franchiseId: string; schedule?: DraftAdvisorSchedule | null;
+  /** Internal snapshot mode skips the expensive one-player recommendation loop. */
+  evaluateCandidates?: boolean;
 };
 
 const KEYS: (keyof DraftProjectionStats)[] = ['pts', 'reb', 'ast', 'stl', 'blk', 'tov', 'three', 'fgm', 'fga', 'ftm', 'fta'];
@@ -128,7 +130,7 @@ type ScheduleContext = {
   days: { teams: Set<string>; week: number }[]; weeklyScale: number; weeks: number; season: boolean; allTeams: Set<string>;
   activeSlots: number[]; weights: Map<number, number>; lineupCache: Map<string, number[]>;
 };
-type ScheduledTotals = { totals: DraftProjectionStats | null; weekly: (DraftProjectionStats | null)[]; games: Map<number, number>; usable: Map<number, number> };
+export type ScheduledTotals = { totals: DraftProjectionStats | null; weekly: (DraftProjectionStats | null)[]; games: Map<number, number>; usable: Map<number, number> };
 function scheduledTotals(players: DraftRosterPlayer[], projections: Map<number, DraftPlayerProjection>, catalog: Map<number, DraftCatalogPlayer>, context: ScheduleContext): ScheduledTotals {
   const result: ScheduledTotals = { totals: null, weekly: Array.from({ length: context.weeks }, () => null), games: new Map(), usable: new Map() };
   const playerTeams = new Map(players.map(player => [player.id, normalizeTeam(catalog.get(player.id)?.nbaTeam ?? '')]));
@@ -143,7 +145,11 @@ function scheduledTotals(players: DraftRosterPlayer[], projections: Map<number, 
     // idle, share one slot assignment across the entire candidate pool.
     const key = playing.map(player => player.id).join(',');
     let active = context.lineupCache.get(key);
-    if (!active) { active = activePlayers(playing, context.activeSlots, context.weights); context.lineupCache.set(key, active); }
+    if (!active) {
+      active = activePlayers(playing, context.activeSlots, context.weights);
+      if (context.lineupCache.size >= 8192) context.lineupCache.clear();
+      context.lineupCache.set(key, active);
+    }
     for (const id of active) {
       result.usable.set(id, (result.usable.get(id) ?? 0) + 1);
       const projection = projections.get(id)!;
@@ -165,6 +171,70 @@ function compareScheduled(a: ScheduledTotals, opponents: ScheduledTotals[], cate
       winProbability: average(complete.map(week => week.categories[index].winProbability!)),
       opponentsCompared: complete.length ? Math.min(...complete.map(week => week.categories[index].opponentsCompared)) : 0,
     })),
+  };
+}
+
+function createScheduleContext(board: DraftBoard, settings: DraftRosterSettings, projections: Map<number, DraftPlayerProjection>, schedule?: DraftAdvisorSchedule | null) {
+  const warnings: string[] = [];
+  let scheduleContext: ScheduleContext | null = null;
+  if (schedule) {
+    const start = Date.parse(`${schedule.startDate}T00:00:00Z`), end = Date.parse(`${schedule.endDate}T00:00:00Z`);
+    const days = Math.round((end - start) / 86_400_000) + 1;
+    if (schedule.seasonId !== board.draftYear + 1 || !draftAdvisorScheduleSchema.safeParse(schedule).success) {
+      warnings.push('The schedule is empty, has an invalid season/window, or is for another season; using equal games.');
+    } else {
+      const dates = new Map<string, Set<string>>();
+      for (const game of schedule.games) {
+        if (game.date < schedule.startDate || game.date > schedule.endDate) continue;
+        const teams = dates.get(game.date) ?? new Set<string>(); teams.add(normalizeTeam(game.team)); dates.set(game.date, teams);
+      }
+      if (dates.size) {
+        const activeSlots = settings.slots.filter(slot => slot.kind === 'normal' && !settings.slotDefinitions.find(definition => definition.slotId === slot.slotId)?.bench && slot.slotId !== 12)
+          .flatMap(slot => Array.from({ length: slot.count }, () => slot.slotId));
+        const season = schedule.scope === 'season';
+        const weeks = new Map<string, number>();
+        const scheduleDays = [...dates].sort(([a], [b]) => a.localeCompare(b)).map(([date, teams]) => {
+          const timestamp = Date.parse(`${date}T12:00:00Z`), weekday = new Date(timestamp).getUTCDay();
+          const monday = new Date(timestamp - ((weekday + 6) % 7) * 86_400_000).toISOString().slice(0, 10);
+          const weekKey = season ? monday : schedule.startDate;
+          if (!weeks.has(weekKey)) weeks.set(weekKey, weeks.size);
+          return { teams, week: weeks.get(weekKey)! };
+        });
+        scheduleContext = { days: scheduleDays, weeklyScale: season ? 1 : 7 / days, weeks: weeks.size, season,
+          allTeams: new Set(schedule.games.map(game => normalizeTeam(game.team))), activeSlots, weights: lineupValues(projections), lineupCache: new Map() };
+        warnings.push(...schedule.warnings);
+      }
+    }
+  }
+
+  return { context: scheduleContext, warnings };
+}
+
+/** Shared exact weekly evaluator for completed-roster scenarios; caches stay private and bounded. */
+export function createDraftRosterEvaluator(input: DraftAdvisorInput) {
+  const projections = new Map((input.projections?.players ?? []).map(player => [player.id, player]));
+  const catalog = new Map(input.catalog.players.map(player => [player.id, player]));
+  const eligibility = new Map(input.eligibility.players.map(player => [player.id, player]));
+  const { context } = createScheduleContext(input.board, input.settings, projections, input.schedule);
+  if (!context || !context.season) return null;
+  const cache = new Map<string, ScheduledTotals>();
+  return {
+    scheduledTeams: context.allTeams,
+    evaluate(ids: readonly number[]): ScheduledTotals {
+      const sorted = [...ids].sort((a, b) => a - b), key = sorted.join(',');
+      const cached = cache.get(key);
+      if (cached) return cached;
+      const players: DraftRosterPlayer[] = sorted.map(id => {
+        const eligible = eligibility.get(id);
+        return { id, name: catalog.get(id)?.name ?? String(id), status: 'selected', pickId: String(id), overallPick: null,
+          eligibleSlots: eligible?.eligibleSlots ?? null, eligibleLabels: [], primaryPositionId: eligible?.primaryPositionId ?? null, injuryStatus: null };
+      });
+      const result = scheduledTotals(players, projections, catalog, context);
+      if (cache.size >= 1024) cache.clear();
+      cache.set(key, result);
+      return result;
+    },
+    compare(team: ScheduledTotals, opponents: ScheduledTotals[]) { return compareScheduled(team, opponents, input.catalog.categories); },
   };
 }
 
@@ -215,38 +285,10 @@ export function buildDraftAdvisor(input: DraftAdvisorInput): DraftAdvisorReport 
     return total;
   };
 
-  let scheduleContext: ScheduleContext | null = null;
-  const schedule = input.schedule;
-  if (schedule) {
-    const start = Date.parse(`${schedule.startDate}T00:00:00Z`), end = Date.parse(`${schedule.endDate}T00:00:00Z`);
-    const days = Math.round((end - start) / 86_400_000) + 1;
-    if (schedule.seasonId !== board.draftYear + 1 || !draftAdvisorScheduleSchema.safeParse(schedule).success) {
-      report.warnings.push('The schedule is empty, has an invalid season/window, or is for another season; using equal games.');
-    } else {
-      const dates = new Map<string, Set<string>>();
-      for (const game of schedule.games) {
-        if (game.date < schedule.startDate || game.date > schedule.endDate) continue;
-        const teams = dates.get(game.date) ?? new Set<string>(); teams.add(normalizeTeam(game.team)); dates.set(game.date, teams);
-      }
-      if (dates.size) {
-        const activeSlots = settings.slots.filter(slot => slot.kind === 'normal' && !settings.slotDefinitions.find(definition => definition.slotId === slot.slotId)?.bench && slot.slotId !== 12)
-          .flatMap(slot => Array.from({ length: slot.count }, () => slot.slotId));
-        const season = schedule.scope === 'season';
-        const weeks = new Map<string, number>();
-        const scheduleDays = [...dates].sort(([a], [b]) => a.localeCompare(b)).map(([date, teams]) => {
-          const timestamp = Date.parse(`${date}T12:00:00Z`), weekday = new Date(timestamp).getUTCDay();
-          const monday = new Date(timestamp - ((weekday + 6) % 7) * 86_400_000).toISOString().slice(0, 10);
-          const weekKey = season ? monday : schedule.startDate;
-          if (!weeks.has(weekKey)) weeks.set(weekKey, weeks.size);
-          return { teams, week: weeks.get(weekKey)! };
-        });
-        scheduleContext = { days: scheduleDays, weeklyScale: season ? 1 : 7 / days, weeks: weeks.size, season,
-          allTeams: new Set(schedule.games.map(game => normalizeTeam(game.team))), activeSlots, weights: lineupValues(projections), lineupCache: new Map() };
-        report.scheduleMode = 'actual';
-        report.warnings.push(...schedule.warnings);
-      }
-    }
-  }
+  const setup = createScheduleContext(board, settings, projections, input.schedule);
+  const scheduleContext = setup.context;
+  report.warnings.push(...setup.warnings);
+  if (scheduleContext) report.scheduleMode = 'actual';
   if (!scheduleContext) report.warnings.push('No usable NBA schedule loaded: the fit ranking uses equal 3.5 games/week plus roster balance; it cannot identify light-day or schedule advantages.');
 
   const scheduledByTeam = new Map<string, ScheduledTotals>();
@@ -288,7 +330,7 @@ export function buildDraftAdvisor(input: DraftAdvisorInput): DraftAdvisorReport 
   const taken = new Set(board.picks.filter(pick => pick.status === 'selected' || (pick.status === 'keeper' && board.keepersRevealedAt)).flatMap(pick => pick.playerId === null ? [] : [pick.playerId]));
   const available = catalog.players.filter(player => player.selectable && !taken.has(player.id)).sort(compareDraftCatalogPlayers);
   const centers = selected.roster.players.filter(player => player.eligibleSlots?.includes(4)).length;
-  const allCandidates = available.map((player): DraftAdvisorCandidate => {
+  const allCandidates = (input.evaluateCandidates === false ? [] : available).map((player): DraftAdvisorCandidate => {
     const row: DraftAdvisorCandidate = { player, hasProjection: projections.has(player.id), categoryWinRate: null, categoryGain: null, scheduleWinRate: null, scheduleGain: null, fitScore: null, fitAdjustment: 0, scheduledGames: null, usableGames: null, reasons: [], blocked: false };
     const eligible = eligibilityById.get(player.id);
     if (selected.roster.remainingCapacity === 0) { row.blocked = true; row.reasons.push('The configured normal roster is full; IR does not add draft capacity.'); }

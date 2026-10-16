@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { DraftAdvisorReport } from '@/lib/draft-advisor';
 import type { DraftBoard } from '@/lib/draft-board';
+import type { DraftForecastReport } from '@/lib/draft-forecast';
 import type { DraftPlayerCatalog } from '@/lib/draft-player-catalog';
 import { buildDraftCandidateRanks, defaultDraftCandidateDirection, filterDraftCandidatesByEspnRank, paginateDraftCandidates, sortDraftCandidates, type DraftCandidateDirection, type DraftCandidateOrder, type DraftCandidateRankLibrary, type DraftCandidateRankSnapshots } from '@/lib/draft-candidate-ranks';
 import styles from './commissioner-strategy.module.css';
@@ -20,8 +21,9 @@ const gain = (value: number | null) => value === null ? '—' : `${value >= 0 ? 
 const rankLabel = (value: number | null | undefined) => value == null ? '—' : `#${value}`;
 const valueLabel = (value: number | null | undefined) => value == null ? '—' : `${value > 0 ? '+' : ''}${value}`;
 
-export function DraftCandidateTable({ catalog, library, report, board, seasonLoaded, rankSnapshots, rankStatus }: {
+export function DraftCandidateTable({ catalog, library, report, board, seasonLoaded, forecastMode = false, forecast, analysisPending = false, rankSnapshots, rankStatus }: {
   catalog: DraftPlayerCatalog; library: DraftCandidateRankLibrary; report: DraftAdvisorReport | null; board?: DraftBoard | null; seasonLoaded: boolean; rankSnapshots?: DraftCandidateRankSnapshots; rankStatus?: string;
+  forecastMode?: boolean; forecast?: DraftForecastReport['forecast']; analysisPending?: boolean;
 }) {
   const [sort, setSort] = useState<{ order: DraftCandidateOrder; direction: DraftCandidateDirection }>({ order: 'bbm-value', direction: 'descending' });
   const [rankLimitInput, setRankLimitInput] = useState({ value: '150', badInput: false });
@@ -31,7 +33,11 @@ export function DraftCandidateTable({ catalog, library, report, board, seasonLoa
   const invalidRankLimit = maxEspnRank !== null && (!Number.isSafeInteger(maxEspnRank) || maxEspnRank < 1);
   const ranks = useMemo(() => buildDraftCandidateRanks(catalog, library, rankSnapshots, board), [catalog, library, rankSnapshots, board]);
   const filteredCandidates = useMemo(() => filterDraftCandidatesByEspnRank(report?.candidates ?? [], ranks, maxEspnRank), [report, ranks, maxEspnRank]);
-  const sortedCandidates = useMemo(() => sortDraftCandidates(order === 'fit' && !seasonLoaded ? [] : filteredCandidates, ranks, order, filteredCandidates.length, direction), [filteredCandidates, ranks, order, direction, seasonLoaded]);
+  const sortedCandidates = useMemo(() => {
+    const pool = order === 'fit' && !seasonLoaded ? [] : forecastMode && order === 'fit'
+      ? filteredCandidates.map(candidate => ({ ...candidate, fitScore: candidate.scheduleWinRate })) : filteredCandidates;
+    return sortDraftCandidates(pool, ranks, order, filteredCandidates.length, direction);
+  }, [filteredCandidates, ranks, order, direction, seasonLoaded, forecastMode]);
   const pagination = paginateDraftCandidates(sortedCandidates, page);
   const candidates = pagination.candidates;
   useEffect(() => { if (page !== pagination.page) setPage(pagination.page); }, [page, pagination.page]);
@@ -51,14 +57,14 @@ export function DraftCandidateTable({ catalog, library, report, board, seasonLoa
     </th>;
   }
   return <section className={styles.panel} aria-labelledby="draft-candidates-title">
-    <h3 id="draft-candidates-title">Available players · {labels[order]}</h3>
+    <h3 id="draft-candidates-title">Available players · {forecastMode && order === 'fit' ? 'Completed-roster forecast' : labels[order]}</h3>
     <div className={`${styles.toolbar} ${styles.rankingToolbar}`}><div className={styles.rankingFields}><label>Player ranking<select aria-label="Player ranking" value={order} onChange={event => chooseOrder(event.target.value as DraftCandidateOrder)}>
       <option value="espn">ESPN rank</option>
       <option value="espn-after-keepers">ESPN after keepers</option>
       <option value="bbm">BBM rank</option>
       <option value="yahoo">Yahoo rank · preseason</option>
       <option value="bbm-value">ESPN − BBM · rank gap</option>
-      <option value="fit">Schedule + roster fit</option>
+      <option value="fit">{forecastMode ? 'Completed-roster forecast' : 'Schedule + roster fit'}</option>
     </select></label><label className={styles.rankLimit}>ESPN rank at most<input aria-label="ESPN rank at most" type="number" inputMode="numeric" min={1} step={1} placeholder="No limit" value={rankLimitInput.value} onChange={event => { setRankLimitInput({ value: event.currentTarget.value, badInput: event.currentTarget.validity.badInput }); setPage(1); }} aria-invalid={invalidRankLimit || undefined} aria-describedby={`draft-rank-limit-help${invalidRankLimit ? ' draft-rank-limit-error' : ''}`}/></label><small id="draft-rank-limit-help" className={styles.rankLimitHelp}>Includes the entered rank. Leave blank for all players; unranked players are hidden while a limit is set.</small></div><label>Sort direction<select aria-label="Sort direction" value={direction} onChange={event => changeSort({ order, direction: event.target.value as DraftCandidateDirection })}>
       <option value="ascending">{order === 'bbm-value' ? 'Smallest gap first' : 'Low to high'}</option>
       <option value="descending">{order === 'bbm-value' ? 'Biggest BBM values first' : 'High to low'}</option>
@@ -73,24 +79,25 @@ export function DraftCandidateTable({ catalog, library, report, board, seasonLoa
     {library['basketball-monster'] && !ranks.coverage.bbm && <p className={styles.notice} role="status">Upload a Basketball Monster projection file with its Rank column to enable BBM rank and value comparisons. Your saved projections still work for win-rate estimates.</p>}
     {library.yahoo && !ranks.coverage.yahoo && <p className={styles.notice} role="status">Refresh Yahoo projections above to load its published preseason ranks.</p>}
     {missingSource && <p className={styles.notice} role="status">Import {missingSource} projections above to use this ranking. Until then, players remain in ESPN order and missing ranks show —.</p>}
-    <p className={styles.subtle}>Win rates and fit scores use your selected projection source and the full season. Usable / scheduled games shows how many of the player’s season games fit the active lineup versus how many are published. Recommendations consider all {report?.evaluatedCandidates ?? 0} evaluated players and may fall outside this list. Gains are percentage points (pp); lower turnovers are better.</p>
-    {!seasonLoaded && <p className={styles.subtle}>Season win rates and usable games will appear when the full-season schedule is loaded.</p>}
+    <p className={styles.subtle}>{forecastMode ? 'Category shares compare completed rosters after your next owned pick. Expected gains average every scenario, including the baseline result when a player is taken before your turn. Availability counts require the player to reach your pick and remain on your completed roster; they describe simulated drafts, not calibrated probabilities.' : 'Win rates and fit scores use the selected projection source and current rosters across the full season.'} Usable / scheduled games shows how many season games fit the active lineup versus how many are published{forecastMode ? ', assuming the player reaches your completed roster' : ''}. Recommendations consider all {report?.evaluatedCandidates ?? 0} evaluated players and may fall outside this list. Gains are percentage points (pp); lower turnovers are better.</p>
+    {!seasonLoaded && <p className={styles.subtle} role="status">{analysisPending ? 'Updating estimates; source ranks remain available while the calculation runs.' : forecastMode ? 'Completed-roster estimates appear when the forecast is ready. Check the forecast status above.' : 'Season win rates and usable games will appear when the full-season schedule and analysis are ready.'}</p>}
     <div className={styles.tableWrap} tabIndex={0} role="region" aria-label="Available player ranks and value, scroll horizontally for all columns">
       <table className={`${styles.table} ${styles.candidateTable}`}>
         <caption className="visually-hidden">Available players compared by ESPN rank, ESPN rank after keepers, Basketball Monster supplied rank, Yahoo preseason rank, and ESPN minus BBM rank value</caption>
-        <thead><tr><th scope="col">Player</th><th scope="col">Position</th>{rankHeader('espn')}{rankHeader('espn-after-keepers')}{rankHeader('bbm', 'Supplied rank')}{rankHeader('yahoo', 'Preseason')}{rankHeader('bbm-value', 'Bigger is better')}<th scope="col">Season category win rate</th><th scope="col">Gain</th><th scope="col">Usable / scheduled games<small>Full season</small></th><th scope="col">Fit score</th></tr></thead>
+        <thead><tr><th scope="col">Player</th><th scope="col">Position</th>{rankHeader('espn')}{rankHeader('espn-after-keepers')}{rankHeader('bbm', 'Supplied rank')}{rankHeader('yahoo', 'Preseason')}{rankHeader('bbm-value', 'Bigger is better')}<th scope="col">{forecastMode ? 'Completed-roster category share' : 'Season category win rate'}</th><th scope="col">{forecastMode ? 'Expected gain' : 'Gain'}</th><th scope="col">Usable / scheduled games<small>Full season</small></th><th scope="col">{forecastMode ? 'Available & retained' : 'Fit score'}{forecastMode && <small>Scenario count</small>}</th></tr></thead>
         <tbody>{candidates.map(candidate => {
           const values = ranks.byPlayerId.get(candidate.player.id);
+          const scenario = forecast?.candidateRanges.find(row => row.playerId === candidate.player.id);
           return <tr key={candidate.player.id}>
             <td><strong>{candidate.player.name}</strong><small>{candidate.player.nbaTeam}{candidate.hasProjection ? '' : ' · missing projection'}{candidate.blocked ? ' · not recommended' : ''}</small></td>
             <td>{candidate.player.eligiblePositions.join(' / ')}</td>
             <td>{rankLabel(values?.espnRank)}</td><td>{rankLabel(ranks.espnAfterKeepersByPlayerId.get(candidate.player.id))}</td><td>{rankLabel(values?.bbmRank)}</td><td>{rankLabel(values?.yahooRank)}</td>
             <td className={values?.bbmValue == null || values.bbmValue === 0 ? undefined : values.bbmValue > 0 ? styles.gain : styles.negative}>{valueLabel(values?.bbmValue)}</td>
-            <td>{pct(seasonLoaded ? candidate.scheduleWinRate : null)}</td><td className={(candidate.scheduleGain ?? 0) < 0 ? styles.negative : styles.gain}>{gain(seasonLoaded ? candidate.scheduleGain : null)}</td>
+            <td>{pct(seasonLoaded ? candidate.scheduleWinRate : null)}{seasonLoaded && scenario && <small>{pct(scenario.min)}–{pct(scenario.max)} scenario range</small>}</td><td className={(candidate.scheduleGain ?? 0) < 0 ? styles.negative : styles.gain}>{gain(seasonLoaded ? candidate.scheduleGain : null)}</td>
             <td>{seasonLoaded ? candidate.usableGames ?? '—' : '—'} / {seasonLoaded ? candidate.scheduledGames ?? '—' : '—'}</td>
-            <td>{pct(seasonLoaded ? candidate.fitScore : null)}<small>{seasonLoaded ? candidate.reasons.join(' ') : 'Full-season schedule required.'}</small></td>
+            <td>{forecastMode ? <>{seasonLoaded && scenario ? `${scenario.availableScenarios} / ${scenario.scenarioCount}` : '—'}{seasonLoaded && scenario?.conditionalWinRate != null && <small>When available and retained: {pct(scenario.conditionalWinRate)} · {gain(scenario.conditionalGain)}</small>}</> : pct(seasonLoaded ? candidate.fitScore : null)}<small>{seasonLoaded ? candidate.reasons.join(' ') : 'Estimates pending.'}</small></td>
           </tr>;
-        })}{!candidates.length && <tr><td colSpan={11}>{invalidRankLimit ? 'Enter a valid ESPN rank limit to view players.' : report && maxEspnRank !== null && !filteredCandidates.length ? 'No available players match this ESPN rank limit. Increase it or leave it blank to show all players.' : order === 'fit' && report?.candidates.length ? 'No available players currently have an eligible roster-fit score.' : 'Available candidates appear after the draft board loads.'}</td></tr>}</tbody>
+        })}{!candidates.length && <tr><td colSpan={11}>{invalidRankLimit ? 'Enter a valid ESPN rank limit to view players.' : report && maxEspnRank !== null && !filteredCandidates.length ? 'No available players match this ESPN rank limit. Increase it or leave it blank to show all players.' : order === 'fit' && report?.candidates.length ? forecastMode ? 'Completed-roster forecasts will appear when the calculation is ready.' : 'No available players currently have an eligible roster-fit score.' : 'Available candidates appear after the draft board loads.'}</td></tr>}</tbody>
       </table>
     </div>
     <nav className={styles.actions} aria-label="Available player pages">

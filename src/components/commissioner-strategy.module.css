@@ -31,6 +31,7 @@
  .recommendations { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
  .recommendation { border-top: 4px solid var(--green); }
  .recommendation:last-child { border-top-color: var(--orange); }
+ .recommendations > .recommendation:only-child { grid-column: 1 / -1; border-top-color: var(--green); }
  .recommendation h3 { margin: 10px 0 4px; font-size: 27px; }
  .recommendation ul { color: var(--muted); font-size: 12px; line-height: 1.8; padding-left: 18px; }
  .recommendation .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
