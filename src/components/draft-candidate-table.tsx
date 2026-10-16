@@ -22,7 +22,7 @@ export function DraftCandidateTable({ catalog, library, report, seasonLoaded, ra
   catalog: DraftPlayerCatalog; library: DraftCandidateRankLibrary; report: DraftAdvisorReport | null; seasonLoaded: boolean; rankSnapshots?: DraftCandidateRankSnapshots; rankStatus?: string;
 }) {
   const [sort, setSort] = useState<{ order: DraftCandidateOrder; direction: DraftCandidateDirection }>({ order: 'bbm-value', direction: 'descending' });
-  const [rankLimitInput, setRankLimitInput] = useState({ value: '100', badInput: false });
+  const [rankLimitInput, setRankLimitInput] = useState({ value: '150', badInput: false });
   const { order, direction } = sort;
   const maxEspnRank = rankLimitInput.badInput ? NaN : rankLimitInput.value.trim() === '' ? null : Number(rankLimitInput.value);
   const invalidRankLimit = maxEspnRank !== null && (!Number.isSafeInteger(maxEspnRank) || maxEspnRank < 1);
