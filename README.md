@@ -35,6 +35,7 @@ pnpm build
 - Assigned owners and co-managers can save private keeper drafts during setup. Official submission opens separately through the commissioner's season controls.
 - **10/14/2026 vote passed:** keeper payment costs are incurred only after the keeper deadline has passed and every participating team has submitted, including empty keeper lists. The payment inventory is the picks each team owned at the deadline. Earlier drafts and submissions are unreserved previews.
 - After the keeper deadline, the saved player list stays fixed. Assigned owners, co-managers and commissioners may still change legal payment picks for submitted, approved or locked selections before the live draft starts, using only picks owned at the deadline that the team still owns and can spend. Later acquisitions cannot improve the keeper budget. Payment changes preserve approval/lock status, nominal costs and tenure; they do not reopen player selection. See [the payment walkthrough](docs/KEEPER_READINESS.md#changing-payment-picks-after-the-deadline).
+- A commissioner can grant a single late submission for a team that missed the deadline through the audited `reopen_keeper_submission` RPC. Only a missing, draft or rejected submission can reopen, before reveal or draft start. The team can save and edit until it submits; submission consumes the exception. The original deadline and payment-pick inventory stay fixed, and every other team's player selections stay closed. Migration 00025 adds this capability without granting any exceptions automatically.
 
 ## Workbook audit
 

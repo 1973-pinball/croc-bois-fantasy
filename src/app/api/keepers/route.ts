@@ -14,8 +14,12 @@ export async function GET(request: Request) {
   if ('response' in auth) return auth.response;
   const seasonId = new URL(request.url).searchParams.get('seasonId');
   if (!uuid.safeParse(seasonId).success) return json({ error: 'INVALID_SEASON' }, 400);
-  const { data, error } = await auth.client.from('keeper_submissions').select('*,keeper_assignments(*)').eq('season_id', seasonId).eq('is_current', true);
-  return error ? rpcError(error) : json({ submissions: data });
+  const [submissions, lateSubmissions] = await Promise.all([
+    auth.client.from('keeper_submissions').select('*,keeper_assignments(*)').eq('season_id', seasonId).eq('is_current', true),
+    auth.client.from('keeper_late_submissions').select('season_id,franchise_id,consumed_at').eq('season_id', seasonId),
+  ]);
+  const error = submissions.error || lateSubmissions.error;
+  return error ? rpcError(error) : json({ submissions: submissions.data, lateSubmissions: lateSubmissions.data });
 }
 
 export async function POST(request: Request) {

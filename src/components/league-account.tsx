@@ -24,6 +24,7 @@ export type KeeperSubmission = {
   review_note?: string | null;
   keeper_assignments: { player_id: number; pick_id: string; base_round_at_submission?: number | null; tenure_at_submission?: number | null }[];
 };
+type KeeperLateSubmission = { season_id: string; franchise_id: string; consumed_at: string | null };
 type LiveLeague = {
   configured: true; source: 'supabase'; seasonId: string;
   phase: string; participantCount: number; keepersRevealedAt: string | null; tradingOpenedAt: string | null;
@@ -58,6 +59,7 @@ export function useLeagueAccount() {
   const [lastLeagueCheckedAt, setLastLeagueCheckedAt] = useState<string | null>(null);
   const [connectionError, setConnectionError] = useState('');
   const [submissions, setSubmissions] = useState<KeeperSubmission[]>([]);
+  const [lateSubmissions, setLateSubmissions] = useState<KeeperLateSubmission[]>([]);
   const [submissionsLoaded, setSubmissionsLoaded] = useState(false);
   const [loadingSubmissions, setLoadingSubmissions] = useState(false);
   const [actionBusy, setActionBusy] = useState<string | null>(null);
@@ -88,10 +90,10 @@ export function useLeagueAccount() {
     setLoadingSubmissions(true);
     try {
       const response = await fetch('/api/keepers?seasonId=' + encodeURIComponent(requestedSeason), { cache: 'no-store', credentials: 'same-origin' });
-      const result = await readResponse<{ submissions: KeeperSubmission[] }>(response);
+      const result = await readResponse<{ submissions: KeeperSubmission[]; lateSubmissions: KeeperLateSubmission[] }>(response);
       if (version !== permissionVersion.current) throw new Error('Your account access changed. Refresh to load current keeper submissions.');
       const records = result.submissions.map(item => ({ ...item, keeper_assignments: item.keeper_assignments || [] }));
-      setSubmissions(records); setSubmissionsLoaded(true);
+      setSubmissions(records); setLateSubmissions(result.lateSubmissions || []); setSubmissionsLoaded(true);
       return records;
     } finally { setLoadingSubmissions(false); }
   }, [seasonId]);
@@ -104,16 +106,16 @@ export function useLeagueAccount() {
       const key = JSON.stringify([body.user?.id, body.memberships, body.assignments]);
       if (key !== permissionKey.current) {
         permissionKey.current = key; permissionVersion.current++;
-        setSubmissions([]); setSubmissionsLoaded(false);
+        setSubmissions([]); setLateSubmissions([]); setSubmissionsLoaded(false);
       }
       workflowDrafts.account(body.user?.id ?? null);
       setSession(body); setSessionError('');
-      if (!body.user) { setSubmissions([]); setSubmissionsLoaded(false); }
+      if (!body.user) { setSubmissions([]); setLateSubmissions([]); setSubmissionsLoaded(false); }
       return body;
     } catch {
       if (read === sessionRead.current) {
         permissionKey.current = ''; permissionVersion.current++;
-        setSession(null); setSubmissions([]); setSubmissionsLoaded(false);
+        setSession(null); setSubmissions([]); setLateSubmissions([]); setSubmissionsLoaded(false);
         setSessionError('Your account access could not be checked. Refresh to try again.');
       }
       return null;
@@ -155,6 +157,17 @@ export function useLeagueAccount() {
     });
   }
   function submissionFor(teamId: number) { return submissions.find(item => item.franchise_id === franchiseId(teamId)); }
+  function keeperLateSubmissionOpen(teamId: number) {
+    const current = submissionFor(teamId);
+    return connection === 'live' && submissionsLoaded && canManageTeam(teamId) && keeperDeadlinePassed
+      && live?.phase === 'keeper_selection' && !live.keepersRevealedAt && live.draftStarted === false
+      && (!current || ['draft', 'rejected'].includes(current.status))
+      && lateSubmissions.some(item => item.season_id === seasonId && item.franchise_id === franchiseId(teamId) && item.consumed_at === null);
+  }
+  function keeperPlayersFrozen(teamId: number) {
+    return (keeperDeadlinePassed && !keeperLateSubmissionOpen(teamId)) || Boolean(live?.keepersRevealedAt)
+      || live?.draftStarted === true || submissionFor(teamId)?.status === 'locked';
+  }
 
   async function refreshOfficial() {
     setActionError(''); setActionNotice('');
@@ -180,6 +193,7 @@ export function useLeagueAccount() {
       const previous = submissions.find(item => item.franchise_id === result.submission.franchise_id);
       const saved = { ...result.submission, keeper_assignments: result.submission.keeper_assignments || (body.action === 'save' || body.action === 'reassign_payments' ? body.assignments.map(item => ({ ...previous?.keeper_assignments.find(savedItem => Number(savedItem.player_id) === item.playerId), player_id: item.playerId, pick_id: item.pickId })) : previous?.keeper_assignments || []) };
       setSubmissions(current => [...current.filter(item => item.franchise_id !== saved.franchise_id), saved]);
+      if (body.action === 'submit') setLateSubmissions(current => current.map(item => item.season_id === seasonId && item.franchise_id === saved.franchise_id ? { ...item, consumed_at: new Date().toISOString() } : item));
       const messages: Record<Action, string> = { save: live?.phase === 'setup' ? 'Private draft saved. You can return to it anytime; submission opens after season setup.' : 'Private draft saved. Submit it when you are ready for commissioner review.', submit: 'Keepers submitted for commissioner review. Payment picks remain previews until finalization.', approve: 'Submission approved. Keeper payments follow the deadline and all-submissions requirements.', reject: 'Submission returned to the manager with your review note.', lock: 'Submission locked. The final lock applies every team’s keeper costs and reveals keepers together.', reassign_payments: live?.keepersRevealedAt ? 'Payment picks updated. Your keeper players and submission status are unchanged.' : 'Payment preview updated. No picks have been spent.' };
       setActionNotice(messages[body.action]);
       const refreshedLeague = await reloadLeague();
@@ -203,7 +217,7 @@ export function useLeagueAccount() {
     finally { setActionBusy(null); }
   }
 
-  return { data, lastLeagueCheckedAt, session, sessionLoading, sessionError, reloadSession, ownTeamIds, live, connection, connectionError, submissions, submissionsLoaded, loadingSubmissions, commissioner, actionBusy, actionError, actionNotice, reloadRequired, seasonId, keeperDeadlinePassed, allKeeperTeamsSubmitted, canManageTeam, franchiseId, officialPickId, toPlannerAssignments, submissionFor, refreshOfficial, runAction, openKeeperSelection, reloadLeague };
+  return { data, lastLeagueCheckedAt, session, sessionLoading, sessionError, reloadSession, ownTeamIds, live, connection, connectionError, submissions, submissionsLoaded, loadingSubmissions, commissioner, actionBusy, actionError, actionNotice, reloadRequired, seasonId, keeperDeadlinePassed, keeperLateSubmissionOpen, keeperPlayersFrozen, allKeeperTeamsSubmitted, canManageTeam, franchiseId, officialPickId, toPlannerAssignments, submissionFor, refreshOfficial, runAction, openKeeperSelection, reloadLeague };
 }
 
 export type LeagueAccount = ReturnType<typeof useLeagueAccount>;
@@ -264,7 +278,7 @@ export function OfficialKeeperControls({ account, teamId, draft, onLoad, onSaved
   const key = (items: PlannerAssignment[]) => JSON.stringify([...items].sort((a, b) => a.playerId - b.playerId).map(item => [item.playerId, account.officialPickId(item.pickId)]));
   const dirty = key(assignments) !== key(serverAssignments);
   const locked = current?.status === 'locked';
-  const saveAvailable = account.connection === 'live' && !account.keeperDeadlinePassed && !account.live?.keepersRevealedAt && ['setup', 'keeper_selection'].includes(account.live?.phase || '');
+  const saveAvailable = account.connection === 'live' && !account.keeperPlayersFrozen(teamId) && ['setup', 'keeper_selection'].includes(account.live?.phase || '');
   const submitAvailable = saveAvailable && account.live?.phase === 'keeper_selection';
   const busy = Boolean(account.actionBusy) || account.loadingSubmissions;
   const conflict = account.submissionsLoaded && hasKeeperDraftConflict(draft, current?.revision ?? 0);
@@ -311,7 +325,7 @@ export function OfficialReviewPanel({ account }: { account: LeagueAccount }) {
   const [openingNote, setOpeningNote] = useState('');
   if (!account.session?.user || !account.commissioner) return null;
   const editable = account.connection === 'live' && account.live?.phase === 'keeper_selection' && account.submissionsLoaded && !account.reloadRequired && !account.actionBusy && !account.loadingSubmissions;
-  return <section className="panel official-review-panel"><div className="panel-header"><div><p className="eyebrow">PRIVATE COMMISSIONER WORKSPACE</p><h2>Official keeper submissions</h2></div><button className="text-button" disabled={account.loadingSubmissions || Boolean(account.actionBusy)} onClick={() => void account.refreshOfficial()}>{account.loadingSubmissions ? 'Refreshing…' : 'Refresh'}</button></div><div className="official-review-intro"><p>Review the selected players and payment previews. Approval leaves picks unreserved until the deadline has passed and every team has submitted. After the deadline, approval or locking reallocates outdated previews from eligible deadline-owned picks. The final lock applies costs and reveals every team together.</p>{account.keeperDeadlinePassed && <p>The deadline has passed, so keeper players are fixed. Payment choices must use picks owned at the deadline and still owned by that team. Later acquisitions cannot pay keeper costs.</p>}<WorkflowFeedback account={account}/>{account.live?.phase === 'setup' && <div className="open-season-controls"><h3>Ready to open keeper selection?</h3><p>Confirm that you have reviewed the league roster, pick ownership, and keeper rules before opening submissions.</p><label htmlFor="season-opening-note">Commissioner review note</label><textarea id="season-opening-note" rows={2} maxLength={2000} value={openingNote} onChange={event => setOpeningNote(event.target.value)}/><button className="button button-green" disabled={account.connection !== 'live' || Boolean(account.actionBusy) || !openingNote.trim()} onClick={() => void account.openKeeperSelection(openingNote)}>{account.actionBusy === 'open-season' ? 'Opening selections…' : 'Open keeper selection'}</button></div>}</div>{account.loadingSubmissions && <p className="empty-state" role="status">Loading official submissions…</p>}{!account.loadingSubmissions && account.submissions.length === 0 && <p className="empty-state">No saved keeper submissions are available for this season.</p>}{account.submissions.map(submission => {
+  return <section className="panel official-review-panel"><div className="panel-header"><div><p className="eyebrow">PRIVATE COMMISSIONER WORKSPACE</p><h2>Official keeper submissions</h2></div><button className="text-button" disabled={account.loadingSubmissions || Boolean(account.actionBusy)} onClick={() => void account.refreshOfficial()}>{account.loadingSubmissions ? 'Refreshing…' : 'Refresh'}</button></div><div className="official-review-intro"><p>Review the selected players and payment previews. Approval leaves picks unreserved until the deadline has passed and every team has submitted. After the deadline, approval or locking reallocates outdated previews from eligible deadline-owned picks. The final lock applies costs and reveals every team together.</p>{account.keeperDeadlinePassed && <p>The deadline has passed. Only teams granted a late submission can still choose keeper players, until they submit for review. Payment choices must use picks owned at the deadline and still owned by that team. Later acquisitions cannot pay keeper costs.</p>}<WorkflowFeedback account={account}/>{account.live?.phase === 'setup' && <div className="open-season-controls"><h3>Ready to open keeper selection?</h3><p>Confirm that you have reviewed the league roster, pick ownership, and keeper rules before opening submissions.</p><label htmlFor="season-opening-note">Commissioner review note</label><textarea id="season-opening-note" rows={2} maxLength={2000} value={openingNote} onChange={event => setOpeningNote(event.target.value)}/><button className="button button-green" disabled={account.connection !== 'live' || Boolean(account.actionBusy) || !openingNote.trim()} onClick={() => void account.openKeeperSelection(openingNote)}>{account.actionBusy === 'open-season' ? 'Opening selections…' : 'Open keeper selection'}</button></div>}</div>{account.loadingSubmissions && <p className="empty-state" role="status">Loading official submissions…</p>}{!account.loadingSubmissions && account.submissions.length === 0 && <p className="empty-state">No saved keeper submissions are available for this season.</p>}{account.submissions.map(submission => {
     const team = account.data.teams.find(item => account.franchiseId(item.id) === submission.franchise_id);
     const finalLock = account.keeperDeadlinePassed && account.allKeeperTeamsSubmitted && submission.status === 'approved' && account.data.teams.length > 0 && account.data.teams.length === account.live?.participantCount && account.data.teams.every(item => item.id === team?.id || account.submissionFor(item.id)?.status === 'locked');
     const keeperCount = account.submissions.reduce((total, item) => total + item.keeper_assignments.length, 0);
