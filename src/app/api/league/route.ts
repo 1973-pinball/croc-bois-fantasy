@@ -4,6 +4,8 @@ import type { DraftPick, LeagueData, LeaguePlayer, Team } from '@/lib/types';
 import { getSupabaseConfig } from '@/lib/supabase/config';
 import { json, setupResponse } from '@/lib/supabase/http';
 import { parseKeeperPaymentInventory } from '@/lib/keeper-payment-inventory';
+import { mergeFinalizedTradeLedger, type FinalizedTradeRow } from '@/lib/live-trade-ledger';
+import { readAllRows } from '@/lib/supabase/pagination';
 
 export async function GET() {
   const config = getSupabaseConfig();
@@ -17,7 +19,7 @@ export async function GET() {
     const seasonResult = await client.from('seasons').select('id,phase,participant_count,draft_year,keepers_revealed_at,trading_opened_at,keeper_deadline,draft_at,season_time_zone,schedule_revision').eq('league_id', league.data.id).eq('draft_year', leagueData.season).single();
     if (seasonResult.error || !seasonResult.data) return unavailable();
     const season = seasonResult.data;
-    const [franchises, participation, ownership, profiles, picks, snapshots, roster, keeperRecords, draftBoard] = await Promise.all([
+    const [franchises, participation, ownership, profiles, picks, snapshots, roster, keeperRecords, draftBoard, finalizedTrades, tradeSeasons] = await Promise.all([
       client.from('franchises').select('id,espn_team_id,name').eq('league_id', league.data.id).order('id'),
       client.from('season_teams').select('franchise_id,display_name,draft_position').eq('season_id', season.id),
       client.from('player_ownerships').select('player_id,franchise_id').eq('season_id', season.id),
@@ -27,6 +29,8 @@ export async function GET() {
       client.from('roster_entries').select('player_id,lineup_slot,snapshot_id').eq('season_id', season.id),
       client.from('keeper_season_records').select('player_id,franchise_id,pick_id,base_round,actual_payment_round').eq('season_id', season.id),
       client.rpc('get_draft_board', { p_season: season.id }),
+      readAllRows<FinalizedTradeRow>((from, to) => client.from('trades').select('id,season_id,status,application_mode,terms,created_at,finalized_at,trade_participants(franchise_id),trade_player_transfers(player_id,from_franchise_id,to_franchise_id,players(full_name)),trade_pick_transfers(pick_id,from_franchise_id,to_franchise_id,draft_picks(round,season_id,original_franchise_id)),trade_obligations(kind,terms,from_franchise_id,to_franchise_id,status)', { count: 'exact' }).eq('league_id', league.data.id).eq('status', 'finalized').eq('application_mode', 'live').order('created_at').order('id').range(from, to).overrideTypes<FinalizedTradeRow[], { merge: false }>()),
+      readAllRows<{ id: string; draft_year: number }>((from, to) => client.from('seasons').select('id,draft_year', { count: 'exact' }).eq('league_id', league.data.id).order('draft_year').order('id').range(from, to)),
     ]);
     if ([franchises,participation,ownership,profiles,picks,snapshots,roster,keeperRecords,draftBoard].some((r) => r.error) || typeof draftBoard.data?.orderLocked !== 'boolean' || !snapshots.data || !ownership.data?.length || !participation.data?.length) return unavailable();
     const playerRows = await client.from('players').select('id,full_name').in('id', ownership.data.map((p) => p.player_id));
@@ -63,7 +67,8 @@ export async function GET() {
     if (players.some((p) => p.teamId === undefined || !rosterMap.has(p.id))) return unavailable();
     const livePicks: DraftPick[] = picks.data!.map((p) => ({ id: p.id, season: season.draft_year, round: p.round, originalTeamId: numericIds.get(p.original_franchise_id)!, ownerTeamId: numericIds.get(p.current_owner_id)! }));
     if (livePicks.some((p) => p.originalTeamId === undefined || p.ownerTeamId === undefined)) return unavailable();
-    const data: LeagueData = { ...leagueData, season: season.draft_year, snapshotDate: snapshots.data.snapshot_date, teams, players, picks: livePicks,
+    const trades = mergeFinalizedTradeLedger(leagueData.trades, finalizedTrades, franchises.data!.map((franchise, index) => ({ franchiseId: franchise.id, teamId: numericIds.get(franchise.id) ?? franchise.espn_team_id ?? -(index + 1), name: participantMap.get(franchise.id)?.display_name ?? franchise.name })), tradeSeasons);
+    const data: LeagueData = { ...leagueData, season: season.draft_year, snapshotDate: snapshots.data.snapshot_date, teams, players, picks: livePicks, trades,
       reviewItems: players.filter((p) => p.status === 'review').map((p) => ({ id: String(p.id), player: p.name, detail: p.reason, status: profileMap.get(p.id)?.verification === 'provisional' ? 'provisional' : 'needs-review' })),
     };
     const revealedKeepers = season.keepers_revealed_at ? keeperRecords.data!.map((k) => ({ playerId: k.player_id, teamId: numericIds.get(k.franchise_id), pickId: k.pick_id, baseRound: k.base_round, paymentRound: k.actual_payment_round })) : [];

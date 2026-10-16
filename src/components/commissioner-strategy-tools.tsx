@@ -6,7 +6,7 @@ import settingsFile from '../../data/draft-roster-settings.json';
 import eligibilityFile from '../../data/draft-roster-eligibility.json';
 import type { DraftPlayerCatalog } from '@/lib/draft-player-catalog';
 import type { DraftRosterEligibility, DraftRosterSettings } from '@/lib/espn-roster-settings';
-import { draftBoardSchema, type DraftBoard } from '@/lib/draft-board';
+import { DRAFT_REFRESH_INTERVAL_MS, draftBoardSchema, type DraftBoard } from '@/lib/draft-board';
 import { buildDraftAdvisor, type DraftAdvisorCandidate, type DraftAdvisorTeam } from '@/lib/draft-advisor';
 import { buildDraftTeamValues } from '@/lib/draft-team-values';
 import { draftAdvisorScheduleSchema, parseDraftScheduleText, type DraftAdvisorSchedule } from '@/lib/draft-advisor-schedule';
@@ -316,7 +316,7 @@ function DraftAdvisorView({ account, projections, library, rankSnapshots, rankSt
   })) ?? [], [report, seasonLoaded]);
   const selected = displayedTeams.find(team => team.franchiseId === franchiseId);
   return <>
-    <details className={styles.panel} aria-label="Draft analysis controls"><summary>Draft connection, team and season schedule</summary><div className={styles.status}><strong>Live draft connection</strong><span>{live.checkedAt ? `Checked ${new Date(live.checkedAt).toLocaleTimeString()} · revision ${live.board?.revision} · refreshes every 2 seconds` : 'Loading draft board…'}</span><button type="button" className="text-button" disabled={live.refreshing || account.connection !== 'live'} onClick={() => void live.refresh()}>Refresh now</button></div>
+    <details className={styles.panel} aria-label="Draft analysis controls"><summary>Draft connection, team and season schedule</summary><div className={styles.status}><strong>Live draft connection</strong><span>{live.checkedAt ? `Checked ${new Date(live.checkedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} · revision ${live.board?.revision} · refreshes every ${DRAFT_REFRESH_INTERVAL_MS / 1000} seconds` : 'Loading draft board…'}</span><button type="button" className="text-button" disabled={live.refreshing || account.connection !== 'live'} onClick={() => void live.refresh()}>Refresh now</button></div>
       {live.error && <p className={styles.error} role="alert">{live.error} Recommendations below use the last successful refresh.</p>}
       <div className={styles.toolbar}><label>My draft team<select value={franchiseId} onChange={event => setChoice(event.target.value)}>{live.board?.teams.map(team => <option key={team.franchiseId} value={team.franchiseId}>{team.displayName}</option>)}</select></label><button type="button" className="button button-subtle" disabled={scheduleBusy || account.connection !== 'live'} onClick={() => void loadSchedule()}>{scheduleBusy ? 'Loading full season…' : schedule ? 'Refresh full-season schedule' : 'Load full-season schedule'}</button></div>
       <p className={styles.subtle}>Draft analysis uses the entire published NBA regular season. It assigns active lineup slots each day, estimates category win rates for each Monday–Sunday week, then averages them across the season against the current league rosters.</p>

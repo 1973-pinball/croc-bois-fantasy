@@ -55,6 +55,8 @@ export function useLeagueAccount() {
   const permissionKey = useRef('');
   const permissionVersion = useRef(0);
   const [live, setLive] = useState<LiveLeague | null>(null);
+  const leagueRead = useRef<Promise<LiveLeague | null> | null>(null);
+  const leagueCheckedAt = useRef(0);
   const [connection, setConnection] = useState<'loading' | 'preview' | 'live' | 'error'>('loading');
   const [lastLeagueCheckedAt, setLastLeagueCheckedAt] = useState<string | null>(null);
   const [connectionError, setConnectionError] = useState('');
@@ -75,14 +77,25 @@ export function useLeagueAccount() {
       && ['submitted', 'approved', 'locked'].includes(submission.status)));
   useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 30000); return () => clearInterval(timer); }, []);
 
-  const reloadLeague = useCallback(async () => {
-    try {
-      const response = await fetch('/api/league', { cache: 'no-store', credentials: 'same-origin' });
-      const body = await response.json();
-      if (response.ok && body.source === 'supabase' && body.data) { setLive(body); setLastLeagueCheckedAt(new Date().toISOString()); setConnection('live'); setConnectionError(''); return body as LiveLeague; }
-      if (response.status === 503 && (body.configured === false || body.error === 'SETUP_REQUIRED')) { setConnection('preview'); setConnectionError(''); return null; }
-      throw new Error('Live league records are temporarily unavailable. Official actions are paused until the connection is restored.');
-    } catch (error) { setConnection('error'); setConnectionError(error instanceof Error ? error.message : 'Unable to load live league records.'); return null; }
+  const reloadLeague = useCallback(async (reusePending = false) => {
+    if (reusePending && leagueRead.current) return leagueRead.current;
+    // Writes need a read begun after the write, even if a foreground read was already pending.
+    while (leagueRead.current) await leagueRead.current;
+    leagueRead.current = (async () => {
+      try {
+        const response = await fetch('/api/league', { cache: 'no-store', credentials: 'same-origin' });
+        const body = await response.json();
+        if (response.ok && body.source === 'supabase' && body.data) {
+          setLive(previous => JSON.stringify(previous) === JSON.stringify(body) ? previous : body);
+          leagueCheckedAt.current = Date.now();
+          setLastLeagueCheckedAt(new Date(leagueCheckedAt.current).toISOString()); setConnection('live'); setConnectionError(''); return body as LiveLeague;
+        }
+        if (response.status === 503 && (body.configured === false || body.error === 'SETUP_REQUIRED')) { setConnection('preview'); setConnectionError(''); return null; }
+        throw new Error('Live league records are temporarily unavailable. Official actions are paused until the connection is restored.');
+      } catch (error) { setConnection('error'); setConnectionError(error instanceof Error ? error.message : 'Unable to load live league records.'); return null; }
+      finally { leagueRead.current = null; }
+    })();
+    return leagueRead.current;
   }, []);
 
   const readSubmissions = useCallback(async (requestedSeason = seasonId) => {
@@ -123,8 +136,13 @@ export function useLeagueAccount() {
   }, []);
 
   useEffect(() => {
-    void reloadSession(); void reloadLeague();
-    const refresh = () => { if (document.visibilityState === 'visible') void reloadSession(); };
+    void reloadSession(); void reloadLeague(true);
+    const refresh = () => {
+      if (document.visibilityState !== 'visible') return;
+      void reloadSession();
+      // PWA foreground events commonly arrive together; retain the existing UI while refreshing.
+      if (Date.now() - leagueCheckedAt.current >= 5000) void reloadLeague(true);
+    };
     window.addEventListener('focus', refresh);
     window.addEventListener('pageshow', refresh);
     window.addEventListener('online', refresh);

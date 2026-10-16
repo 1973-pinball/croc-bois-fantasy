@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import catalogFile from '../../data/draft-player-catalog.json';
-import { draftBoardSchema, draftOverallPick, type DraftAction, type DraftBoard } from '@/lib/draft-board';
+import { DRAFT_REFRESH_INTERVAL_MS, draftBoardSchema, draftOverallPick, type DraftAction, type DraftBoard } from '@/lib/draft-board';
 import { draftLotterySchema } from '@/lib/draft-lottery';
 import type { DraftPlayerCatalog } from '@/lib/draft-player-catalog';
 import { franchiseColorStyle } from '@/lib/franchise-colors';
@@ -173,9 +173,9 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
     setBoard(previous => !previous || previous.seasonId !== next.seasonId || next.revision > previous.revision || next.revision === previous.revision && Date.parse(next.clock.serverNow) >= Date.parse(previous.clock.serverNow) ? next : previous);
   }, []);
 
-  const reload = useCallback(async (signal?: AbortSignal) => {
+  const reload = useCallback(async (signal?: AbortSignal, background = false) => {
     if (!seasonId) { setLoading(false); return null; }
-    setRefreshing(true);
+    if (!background) setRefreshing(true);
     try {
       const response = await fetch(`/api/draft-board?seasonId=${encodeURIComponent(seasonId)}`, { cache: 'no-store', credentials: 'same-origin', signal });
       const body = await response.json();
@@ -188,20 +188,20 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
     } catch (failure) {
       if (!signal?.aborted && seasonRef.current === seasonId) setError(failure instanceof Error ? failure.message : 'The live draft board could not be loaded.');
       return null;
-    } finally { if (!signal?.aborted && seasonRef.current === seasonId) { setLoading(false); setRefreshing(false); } }
+    } finally { if (!signal?.aborted && seasonRef.current === seasonId) { setLoading(false); if (!background) setRefreshing(false); } }
   }, [seasonId, acceptBoard]);
 
   useEffect(() => {
-    setBoard(null); setLoading(true); setSelected(null); setEditingPickId(null); setEditingRevision(null); setNotice('');
+    setBoard(null); setLoading(true); setRefreshing(false); setSelected(null); setEditingPickId(null); setEditingRevision(null); setNotice('');
     const controller = new AbortController();
     let polling = false;
     const refresh = async () => {
       if (document.visibilityState !== 'visible' || polling || busyRef.current) return;
       polling = true;
-      try { await reload(controller.signal); } finally { polling = false; }
+      try { await reload(controller.signal, true); } finally { polling = false; }
     };
     void refresh();
-    const interval = window.setInterval(() => void refresh(), 2000);
+    const interval = window.setInterval(() => void refresh(), DRAFT_REFRESH_INTERVAL_MS);
     window.addEventListener('focus', refresh); document.addEventListener('visibilitychange', refresh);
     return () => { controller.abort(); window.clearInterval(interval); window.removeEventListener('focus', refresh); document.removeEventListener('visibilitychange', refresh); };
   }, [reload]);
@@ -240,6 +240,7 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
   const queueClosed = Boolean(board && (board.clock.status === 'completed' || ['in_season', 'archived'].includes(board.phase)));
   const canQueue = draftQueue.enabled && Boolean(draftQueue.queue) && !draftQueue.busy && !draftQueue.loading && !queueClosed;
   const profiles = useMemo(() => new Map(account.data.players.map(player => [player.id, player])), [account.data.players]);
+  const showKeeperEligibility = !account.keeperDeadlinePassed && !account.live?.keepersRevealedAt && !board?.keepersRevealedAt;
   const teams = board?.teams || [];
   const teamName = (id: string | null) => teams.find(team => team.franchiseId === id)?.displayName || '';
   const teamShortName = (id: string | null) => {
@@ -250,7 +251,7 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
   const matchingPlayers = rankedPlayers.filter(player =>
     player.name.toLocaleLowerCase().includes(searchTerm) &&
     (position === 'all' || player.eligiblePositions.some(value => value === position)) &&
-    (eligibility === 'all' || (profiles.get(player.id)?.status ?? 'ineligible') === eligibility) &&
+    (!showKeeperEligibility || eligibility === 'all' || (profiles.get(player.id)?.status ?? 'ineligible') === eligibility) &&
     (!shortlistOnly || shortlistIds.includes(player.id)) &&
     (!availableOnly || (!occupied.has(player.id) && player.selectable)),
   );
@@ -271,7 +272,7 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
   const count = teams.length || account.data.teams.length;
   const rounds = board?.roundCount || 13;
   const slotTeams = [...teams].sort((a, b) => (a.draftPosition ?? Infinity) - (b.draftPosition ?? Infinity));
-  const statusFor = (id: number) => occupied.get(id)?.status === 'keeper' ? 'Kept · off board' : occupied.has(id) ? 'Drafted · off board' : profiles.get(id)?.status === 'eligible' ? 'Eligible keeper' : profiles.get(id)?.status === 'review' ? 'Keeper review pending' : 'Ineligible keeper';
+  const statusFor = (id: number) => occupied.get(id)?.status === 'keeper' ? 'Kept · off board' : occupied.has(id) ? 'Drafted · off board' : !showKeeperEligibility ? '' : profiles.get(id)?.status === 'eligible' ? 'Eligible keeper' : profiles.get(id)?.status === 'review' ? 'Keeper review pending' : 'Ineligible keeper';
 
   function choosePlayer(playerId: number) {
     if (!board) return;
@@ -297,7 +298,7 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
   return <section ref={sectionRef} className={`panel ${styles.panel} ${presenting ? styles.presenting : ''}`} aria-labelledby="live-draft-title">
     <div className="panel-header">
       <div><p className="eyebrow">THE NEXT CHAPTER · {board?.draftYear || account.data.season}</p><h2 id="live-draft-title">Live draft board</h2></div>
-      <div className={styles.liveStatus}><span aria-hidden="true" className={error || account.connection !== 'live' ? styles.offlineDot : styles.liveDot}/>{loading ? 'Connecting…' : error ? 'Refresh needed' : account.connection !== 'live' ? 'Viewing board · official actions paused' : 'Live · updates every 2 seconds'}<button className="text-button" disabled={busy || loading || refreshing} onClick={() => void reload()}>{refreshing ? 'Refreshing…' : 'Refresh'}</button><button ref={presentationButtonRef} className="text-button" onClick={() => void togglePresentation()}>{presenting ? 'Exit presentation' : 'Present board'}</button></div>
+      <div className={styles.liveStatus}><span aria-hidden="true" className={error || account.connection !== 'live' ? styles.offlineDot : styles.liveDot}/>{loading ? 'Connecting…' : error ? 'Refresh needed' : account.connection !== 'live' ? 'Viewing board · official actions paused' : `Live · updates every ${DRAFT_REFRESH_INTERVAL_MS / 1000} seconds`}<button className="text-button" disabled={busy || loading || refreshing} onClick={() => void reload()}>{refreshing ? 'Refreshing…' : 'Refresh'}</button><button ref={presentationButtonRef} className="text-button" onClick={() => void togglePresentation()}>{presenting ? 'Exit presentation' : 'Present board'}</button></div>
     </div>
     <div className={styles.summary}>
       <div><strong>{board?.orderComplete ? currentPick ? `Pick ${currentPick.overallPick} · ${teamShortName(currentPick.currentOwnerId)}` : allPicksFilled ? 'Every pick is filled' : !board.keepersRevealedAt ? 'Waiting for keeper reveal' : 'Draft entry paused' : 'Draft order to be decided'}</strong><p>{!board?.orderComplete ? 'Pick owners will appear once the order is set.' : !board.keepersRevealedAt ? 'Keeper placements appear after every team is locked and keepers are revealed.' : 'Revealed keepers occupy their payment picks. Draft selections fill the remaining spots.'}</p></div>
@@ -312,7 +313,7 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
         {!board?.orderComplete && <div className={styles.unpublished}><h3>Draft order is unpublished</h3><p>The choice-priority lottery decides who chooses first. The board fills after the agreed slots are published.</p><button type="button" className="button button-subtle" aria-expanded={previewBoard} aria-controls="draft-board-preview" onClick={() => setPreviewBoard(value => !value)}>{previewBoard ? 'Hide empty board preview' : `Preview ${count * rounds} draft slots`}</button></div>}
         <div id="draft-board-preview" hidden={!board?.orderComplete && !previewBoard && !presenting}>
         <div className={styles.legend}><span><i className={styles.keeperSwatch}/>Kept</span><span><i className={styles.draftedSwatch}/>Drafted</span><span><i className={styles.nextSwatch}/>Next pick</span><small>{board?.draftFormat === 'linear' ? 'Linear' : 'Snake'} · {rounds} rounds</small></div>
-        {board?.orderComplete && <div className={styles.ownershipKey}><p>Colors show the current pick owner. Slot headings show the original franchise.</p><ul aria-label="Pick owner colors">{slotTeams.map(team => <li key={team.franchiseId} className={styles.ownerColor} style={franchiseColorStyle(team.franchiseId)} title={team.displayName}><span className={styles.ownerSwatch} aria-hidden="true"/>{teamShortName(team.franchiseId)}</li>)}</ul></div>}
+        {board?.orderComplete && <div className={styles.ownershipKey}><p>Kept picks are grey. Other colors show the current pick owner. Slot headings show the original franchise.</p><ul aria-label="Pick owner colors">{slotTeams.map(team => <li key={team.franchiseId} className={styles.ownerColor} style={franchiseColorStyle(team.franchiseId)} title={team.displayName}><span className={styles.ownerSwatch} aria-hidden="true"/>{teamShortName(team.franchiseId)}</li>)}</ul></div>}
         <div className={styles.boardScroll} tabIndex={0} aria-label="Live draft grid; scroll to see all rounds and slots">
           <div className={styles.grid} style={{ '--teams': count } as CSSProperties} role="table" aria-label="Live draft board by original slot" aria-rowcount={rounds + 1} aria-colcount={count + 1}>
             <div className={styles.boardRow} role="row">
@@ -343,7 +344,7 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
           </div>
         </div>
         </div>
-        <p className={styles.footnote}>{lastRead ? `Last checked ${lastRead}. ` : ''}Keeper eligibility belongs to the player’s current franchise. Ineligible keepers can still be drafted.</p>
+        <p className={styles.footnote}>{lastRead ? `Last checked ${lastRead}. ` : ''}{showKeeperEligibility ? 'Keeper eligibility belongs to the player’s current franchise. Ineligible keepers can still be drafted.' : 'Kept and drafted players are marked off board.'}</p>
         {board && <DraftOrderEditor key={`order:${identity}`} board={board} account={account} busy={busy || Boolean(error)} open={openOrderEditor} publish={draft => send({ action: 'set_order', seasonId, expectedRevision: draft.revision, franchiseIds: draft.ids, note: draft.note }, 'Draft order published.')}/>}
       </div>
       <aside className={styles.sidePanel} aria-label="Draft tools">
@@ -356,12 +357,12 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
         <label className={styles.field}>Find a player<input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Search the player pool" aria-describedby="draft-player-search-help"/></label>
         <p id="draft-player-search-help" className={styles.footnote}>Browse the top 200 matches, or search by name to find any player.</p>
         <label className={styles.field}>Position<select value={position} onChange={event => setPosition(event.target.value)}><option value="all">All positions</option>{['PG', 'SG', 'SF', 'PF', 'C'].map(value => <option key={value}>{value}</option>)}</select></label>
-        <label className={styles.field}>Keeper eligibility<select value={eligibility} onChange={event => setEligibility(event.target.value)}><option value="all">All players</option><option value="eligible">Eligible keepers</option><option value="ineligible">Ineligible keepers</option></select></label>
+        {showKeeperEligibility && <label className={styles.field}>Keeper eligibility<select value={eligibility} onChange={event => setEligibility(event.target.value)}><option value="all">All players</option><option value="eligible">Eligible keepers</option><option value="ineligible">Ineligible keepers</option></select></label>}
         <label className={styles.checkbox}><input type="checkbox" checked={availableOnly} onChange={event => setAvailableOnly(event.target.checked)}/>Available players only</label>
         {shortlistKey ? <><label className={styles.checkbox}><input type="checkbox" checked={shortlistOnly} onChange={event => setShortlistOnly(event.target.checked)}/>My shortlist only ({shortlistIds.length})</label><p className={styles.footnote}>Your shortlist is private to this account and season on this browser. It never records a draft pick.</p></> : <p className={styles.footnote}>Sign in to keep a private player shortlist on this browser.</p>}
-        <div className={styles.filterSummary}><span>{matchingPlayers.length} matching players</span>{(query || position !== 'all' || eligibility !== 'all' || availableOnly || shortlistOnly) && <button type="button" className="text-button" onClick={() => { setQuery(''); setPosition('all'); setEligibility('all'); setAvailableOnly(false); setShortlistOnly(false); }}>Reset filters</button>}</div>
-        <label className={styles.field}>Choose a player<select aria-label="Choose a player for the live draft" value={selected?.playerId || ''} onChange={event => event.target.value ? choosePlayer(Number(event.target.value)) : setSelected(null)} disabled={busy || !board}><option value="">Select from ESPN category rankings</option>{filteredPlayers.map(player => <option key={player.id} value={player.id} disabled={!player.selectable || occupied.has(player.id)}>{player.rank === null ? 'NR' : `#${player.rank}`} · {player.name} · {statusFor(player.id)}</option>)}</select></label>
-        {candidate && <div className={styles.candidate}><strong>{candidate.name}</strong><span>{candidate.primaryPosition || 'Position unavailable'} · {candidate.nbaTeam || 'NBA free agent'}</span><span>{statusFor(candidate.id)}{profiles.get(candidate.id)?.status === 'eligible' ? ` · R${profiles.get(candidate.id)?.baseCost}` : ''}</span>{draftQueue.enabled && <button className="button button-subtle" type="button" disabled={!canQueue || !candidateAvailable || (!queuedIds.includes(candidate.id) && queuedIds.length >= 100)} aria-pressed={queuedIds.includes(candidate.id)} onClick={() => toggleQueue(candidate.id)}>{draftQueue.busy ? 'Saving queue…' : queuedIds.includes(candidate.id) ? 'Remove from team queue' : 'Add to team queue'}</button>}{shortlistKey && <button className="text-button" type="button" aria-pressed={shortlistIds.includes(candidate.id)} onClick={() => toggleShortlist(candidate.id)}>{shortlistIds.includes(candidate.id) ? 'Remove from my shortlist' : 'Add to my shortlist'}</button>}</div>}
+        <div className={styles.filterSummary}><span>{matchingPlayers.length} matching players</span>{(query || position !== 'all' || (showKeeperEligibility && eligibility !== 'all') || availableOnly || shortlistOnly) && <button type="button" className="text-button" onClick={() => { setQuery(''); setPosition('all'); setEligibility('all'); setAvailableOnly(false); setShortlistOnly(false); }}>Reset filters</button>}</div>
+        <label className={styles.field}>Choose a player<select aria-label="Choose a player for the live draft" value={selected?.playerId || ''} onChange={event => event.target.value ? choosePlayer(Number(event.target.value)) : setSelected(null)} disabled={busy || !board}><option value="">Select from ESPN category rankings</option>{filteredPlayers.map(player => <option key={player.id} value={player.id} disabled={!player.selectable || occupied.has(player.id)}>{player.rank === null ? 'NR' : `#${player.rank}`} · {player.name}{statusFor(player.id) ? ` · ${statusFor(player.id)}` : ''}</option>)}</select></label>
+        {candidate && <div className={styles.candidate}><strong>{candidate.name}</strong><span>{candidate.primaryPosition || 'Position unavailable'} · {candidate.nbaTeam || 'NBA free agent'}</span>{statusFor(candidate.id) && <span>{statusFor(candidate.id)}{showKeeperEligibility && profiles.get(candidate.id)?.status === 'eligible' ? ` · R${profiles.get(candidate.id)?.baseCost}` : ''}</span>}{draftQueue.enabled && <button className="button button-subtle" type="button" disabled={!canQueue || !candidateAvailable || (!queuedIds.includes(candidate.id) && queuedIds.length >= 100)} aria-pressed={queuedIds.includes(candidate.id)} onClick={() => toggleQueue(candidate.id)}>{draftQueue.busy ? 'Saving queue…' : queuedIds.includes(candidate.id) ? 'Remove from team queue' : 'Add to team queue'}</button>}{shortlistKey && <button className="text-button" type="button" aria-pressed={shortlistIds.includes(candidate.id)} onClick={() => toggleShortlist(candidate.id)}>{shortlistIds.includes(candidate.id) ? 'Remove from my shortlist' : 'Add to my shortlist'}</button>}</div>}
         {draftQueue.enabled && <p className={styles.footnote}>Queue for {teamName(draftQueue.franchiseId)} · <button type="button" className="text-button" onClick={() => setWorkspaceView('queue')}>Manage queue ({queuedIds.length})</button></p>}
         {draftQueue.error && <p className={styles.queueError} role="alert">{draftQueue.error}<button className="text-button" onClick={() => void draftQueue.reload()}>Reload queue</button></p>}
         {account.commissioner || currentPickOwned ? <div ref={correctionRef} tabIndex={-1} className={styles.pickActions} aria-label={editingPick ? `Correct pick ${editingPick.overallPick}` : 'Record next pick'}>
@@ -376,16 +377,16 @@ export function LiveDraftBoard({ account, openOrderEditor = false }: { account: 
           {editingPick && <><button className="button button-subtle" disabled={!canDraft || editStale || changeNote.trim().length < 5} onClick={() => { if (seasonId && editingRevision !== null) void send({ action: 'undo', seasonId, expectedRevision: editingRevision, pickId: editingPick.id, note: changeNote }, 'Draft selection removed; the pick is available again.'); }}>Remove this selection</button><button className="text-button" disabled={busy} onClick={resetSelection}>Back to next pick</button></>}
         </div> : <p className={styles.viewerNote}>{account.session?.user ? 'You can draft when your team owns the pick on the clock. Add players to your team queue to prepare.' : 'Sign in with your team account to draft players and manage your queue.'} The board updates automatically.</p>}
         <div className={styles.poolHeading}><span>{!searchTerm && matchingPlayers.length > 200 ? 'Top 200 matches' : `${filteredPlayers.length} players shown`}</span><span>ESPN rank</span></div>
-        <div className={styles.playerList} aria-label="Ranked players and keeper eligibility">
+        <div className={styles.playerList} aria-label={showKeeperEligibility ? 'Ranked players and keeper eligibility' : 'Ranked players and draft availability'}>
           {filteredPlayers.map(player => {
             const occupiedPick = occupied.get(player.id);
-            return <div key={player.id} className={styles.playerEntry}><button type="button" className={`${styles.playerRow} ${occupiedPick ? styles.offBoard : ''} ${selected?.playerId === player.id ? styles.chosenPlayer : ''}`} disabled={busy || !board || !player.selectable || Boolean(occupiedPick)} onClick={() => choosePlayer(player.id)} aria-pressed={selected?.playerId === player.id} aria-label={`${player.name}, ${player.rank === null ? 'unranked' : `rank ${player.rank}`}, ${statusFor(player.id)}`}>
-              <span className={styles.rank}>{player.rank ?? '—'}</span><span className={styles.playerInfo}><strong>{player.name}</strong><small>{player.primaryPosition || '—'} · {player.nbaTeam || 'FA'}</small><span className={`${styles.playerBadge} ${occupiedPick?.status === 'keeper' ? styles.keptBadge : profiles.get(player.id)?.status === 'eligible' ? styles.eligibleBadge : ''}`}>{statusFor(player.id)}</span></span>{occupiedPick && <span className={styles.offBoardMark} aria-hidden="true">✓</span>}
+            return <div key={player.id} className={styles.playerEntry}><button type="button" className={`${styles.playerRow} ${occupiedPick ? styles.offBoard : ''} ${selected?.playerId === player.id ? styles.chosenPlayer : ''}`} disabled={busy || !board || !player.selectable || Boolean(occupiedPick)} onClick={() => choosePlayer(player.id)} aria-pressed={selected?.playerId === player.id} aria-label={`${player.name}, ${player.rank === null ? 'unranked' : `rank ${player.rank}`}, ${statusFor(player.id) || 'Available'}`}>
+              <span className={styles.rank}>{player.rank ?? '—'}</span><span className={styles.playerInfo}><strong>{player.name}</strong><small>{player.primaryPosition || '—'} · {player.nbaTeam || 'FA'}</small>{statusFor(player.id) && <span className={`${styles.playerBadge} ${occupiedPick?.status === 'keeper' ? styles.keptBadge : showKeeperEligibility && profiles.get(player.id)?.status === 'eligible' ? styles.eligibleBadge : ''}`}>{statusFor(player.id)}</span>}</span>{occupiedPick && <span className={styles.offBoardMark} aria-hidden="true">✓</span>}
             </button>{draftQueue.enabled && <button type="button" className={styles.queueAddButton} disabled={!canQueue || !player.selectable || Boolean(occupiedPick) || (!queuedIds.includes(player.id) && queuedIds.length >= 100)} aria-pressed={queuedIds.includes(player.id)} aria-label={`${queuedIds.includes(player.id) ? 'Remove' : 'Add'} ${player.name} ${queuedIds.includes(player.id) ? 'from' : 'to'} team queue`} onClick={() => toggleQueue(player.id)}><span aria-hidden="true">{queuedIds.includes(player.id) ? '✓' : '+'}</span><small>Queue</small></button>}{shortlistKey && <button type="button" className={styles.shortlistButton} aria-pressed={shortlistIds.includes(player.id)} aria-label={`${shortlistIds.includes(player.id) ? 'Remove' : 'Add'} ${player.name} ${shortlistIds.includes(player.id) ? 'from' : 'to'} my shortlist`} onClick={() => toggleShortlist(player.id)}><span aria-hidden="true">{shortlistIds.includes(player.id) ? '★' : '☆'}</span></button>}</div>;
           })}
           {!filteredPlayers.length && <p className={styles.footnote}>No players match these filters.</p>}
         </div>
-        <p className={styles.footnote}>ESPN’s supplied ROTO category ranking. Players without a supplied rank follow alphabetically. Keeper labels use the league’s current confirmed profiles.</p>
+        <p className={styles.footnote}>ESPN’s supplied ROTO category ranking. Players without a supplied rank follow alphabetically.{showKeeperEligibility && ' Keeper labels use the league’s current confirmed profiles.'}</p>
       </section>
         </div>
         <div id="draft-tools-queue" className={`${styles.sidePanelBody} ${workspaceView !== 'queue' ? styles.workspaceHidden : ''}`}>

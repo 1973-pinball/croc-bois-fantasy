@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { draftBoardSchema, type DraftBoard } from '@/lib/draft-board';
+import { DRAFT_REFRESH_INTERVAL_MS, draftBoardSchema, type DraftBoard } from '@/lib/draft-board';
 
 /** The private advisor follows the same authoritative picks as the public room. */
 export function useAdvisorBoard(seasonId: string, enabled: boolean) {
@@ -17,12 +17,12 @@ export function useAdvisorBoard(seasonId: string, enabled: boolean) {
     setCheckedAt(new Date().toISOString());
     setError('');
   }, []);
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (background = false) => {
     if (!enabled || request.current) return;
     const controller = new AbortController();
     const current = generation.current;
     request.current = controller;
-    setRefreshing(true);
+    if (!background) setRefreshing(true);
     try {
       const response = await fetch(`/api/draft-board?seasonId=${encodeURIComponent(seasonId)}`, { credentials: 'same-origin', cache: 'no-store', signal: controller.signal });
       const body = await response.json();
@@ -34,17 +34,18 @@ export function useAdvisorBoard(seasonId: string, enabled: boolean) {
       if (!controller.signal.aborted && current === generation.current) setError(failure instanceof Error ? failure.message : 'The draft board could not be refreshed.');
     } finally {
       if (request.current === controller) request.current = null;
-      if (current === generation.current) setRefreshing(false);
+      if (!background && current === generation.current) setRefreshing(false);
     }
   }, [accept, enabled, seasonId]);
   useEffect(() => {
     generation.current++;
+    setRefreshing(false);
     if (previousSeason.current !== seasonId) {
       setBoard(null); setError(''); setCheckedAt(null); previousSeason.current = seasonId;
     }
-    const visibleRefresh = () => { if (document.visibilityState === 'visible') void refresh(); };
-    void refresh();
-    const timer = window.setInterval(visibleRefresh, 2000);
+    const visibleRefresh = () => { if (document.visibilityState === 'visible') void refresh(true); };
+    visibleRefresh();
+    const timer = window.setInterval(visibleRefresh, DRAFT_REFRESH_INTERVAL_MS);
     window.addEventListener('focus', visibleRefresh);
     document.addEventListener('visibilitychange', visibleRefresh);
     return () => {

@@ -1,5 +1,13 @@
 # League Lab preferences
 
+## Trade totals and live updates
+
+The **Always on the phone** award and **Does dealing pay off?** chart combine the recorded `data/analytics.json` workbook totals with finalized live trades returned in `/api/league`. Each unique live trade adds one count to each participating franchise, independent of the number of asset transfers. Only `source: live` records with `status: finalized` count. The public league overlay excludes `record_only` imports so the historical ledger is not counted twice; pending and cancelled trades do not contribute.
+
+The award, chart points, trend, and Pearson correlation recalculate together when league records refresh, including after a trade is finalized in the app. A selected chart point shows its archived and live contributions separately. The archived totals retain their original formula adjustments and owner-name inconsistencies. The win totals still cover 2018–2024; adding current trades does not make these different time windows directly comparable or establish causation.
+
+`src/lib/league-trade-analytics.ts` performs the aggregation. `tests/domain/league-trade-analytics.test.ts` checks participation counting, duplicate exclusion, the archive baseline, and correlation updates.
+
 The **Everybody has a type** panel has two completed views: **Players** and **Category Preferences**. The league-wide franchise spotlight filters both views. Each view retains its own year selection when switching tabs.
 
 ## Players: complete draft-board appearances

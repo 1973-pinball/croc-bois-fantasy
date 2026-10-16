@@ -33,7 +33,7 @@
 .legend span { display: flex; gap: 5px; align-items: center; }
 .legend i { width: 11px; height: 11px; border-radius: 3px; display: block; }
 .legend small { margin-left: auto; }
-.keeperSwatch { background: #ad91c6; border: 1px solid #8b65af; }
+.keeperSwatch { background: #e0e3e6; border: 1px solid #9ca3aa; }
 .draftedSwatch { background: #e6e9e2; border: 1px solid #9da994; }
 .nextSwatch { background: #fcf0db; border: 1px solid #dca76b; }
 .ownershipKey { margin-bottom: 14px; }
@@ -59,9 +59,11 @@
 .pickLabel { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; color: #425246; font-size: 12px; letter-spacing: .2px; min-height: 20px; }
 .pickLabel > b { font-weight: 650; }
 .pickLabel > span { color: #526247; }
-.keeperCell { box-shadow: inset 3px 0 0 #8b65af; }
+.cell.keeperCell { background: #e0e3e6; border-color: #9ca3aa; color: #394149; box-shadow: inset 3px 0 0 #7d858d; }
+.cell.keeperCell > strong { color: #394149; }
+.keeperCell .pickLabel, .keeperCell .pickLabel > span, .keeperCell .playerMeta, .keeperCell .cellFooter, .keeperCell .via { color: #515960; }
 .keeperBadge, .draftedBadge, .nextBadge { border-radius: 3px; padding: 1px 3px; font-size: 12px; font-weight: 600; }
-.keeperBadge { color: #593774; background: #eadcf4; border: 1px solid #b397c9; }
+.keeperBadge { color: #394149; background: #cdd1d5; border: 1px solid #969ea5; }
 .draftedBadge { color: #3f5037; background: #e6e9e2; border: 1px solid #9da994; }
 .nextBadge { color: #795021; background: #fff2d5; border: 1px solid #c99253; }
 .draftedCell { border-top-width: 3px; }

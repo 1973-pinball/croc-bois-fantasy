@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { draftBoardSchema, draftQueueSchema, type DraftAction, type DraftBoard, type DraftQueue } from '@/lib/draft-board';
+import { DRAFT_REFRESH_INTERVAL_MS, draftBoardSchema, draftQueueSchema, type DraftAction, type DraftBoard, type DraftQueue } from '@/lib/draft-board';
 import type { LeagueAccount } from './league-account';
 import styles from './live-draft-board.module.css';
 
@@ -109,7 +109,7 @@ export function useDraftQueue(account: LeagueAccount, board: DraftBoard | null) 
       }
       const next = draftQueueSchema.parse(body.queue);
       if (next.seasonId !== account.seasonId || next.franchiseId !== franchiseId) throw new Error('The queue response could not be verified.');
-      setSaved(previous => previous?.key === key && previous.queue.revision > next.revision ? previous : { key, queue: next }); setError('');
+      setSaved(previous => previous?.key === key && previous.queue.revision >= next.revision ? previous : { key, queue: next }); setError('');
     } catch (failure) {
       if (!signal?.aborted && keyRef.current === key) setError(failure instanceof Error ? failure.message : 'Your draft queue could not be loaded.');
     } finally { if (!signal?.aborted && keyRef.current === key) setLoading(false); }
@@ -124,7 +124,7 @@ export function useDraftQueue(account: LeagueAccount, board: DraftBoard | null) 
       pending = true; try { await load(controller.signal); } finally { pending = false; }
     };
     void refresh();
-    const interval = window.setInterval(() => void refresh(), 5000);
+    const interval = window.setInterval(() => void refresh(), DRAFT_REFRESH_INTERVAL_MS);
     window.addEventListener('focus', refresh); document.addEventListener('visibilitychange', refresh);
     return () => { controller.abort(); window.clearInterval(interval); window.removeEventListener('focus', refresh); document.removeEventListener('visibilitychange', refresh); };
   }, [key, load]);

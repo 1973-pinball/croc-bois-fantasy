@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+export const DRAFT_REFRESH_INTERVAL_MS = 15_000;
+
 const uuid = z.string().uuid();
 const playerId = z.number().int().positive().max(Number.MAX_SAFE_INTEGER);
 const revision = z.number().int().min(0).max(2_147_483_647);

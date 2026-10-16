@@ -11,11 +11,11 @@ import styles from './draft-rosters.module.css';
 
 const settings = settingsFile as DraftRosterSettings;
 const eligibility = eligibilityFile as DraftRosterEligibility;
-const reserveLabels = new Set(settings.slots.filter(slot => slot.kind === 'reserve').map(slot => slot.label));
+const hiddenPlayerLabels = new Set(['UTIL', 'BE', ...settings.slots.filter(slot => slot.kind === 'reserve').map(slot => slot.label)]);
 
 function RosterSlot({ slot, reserve = false }: { slot: DraftRosterSlot; reserve?: boolean }) {
   const player = slot.player;
-  const labels = player?.eligibleLabels.filter(label => !reserveLabels.has(label)) ?? [];
+  const labels = player?.eligibleLabels.filter(label => !hiddenPlayerLabels.has(label)) ?? [];
   return <li className={styles.slot}>
     <span className={styles.slotLabel}>{slot.label}{slot.ordinal > 1 && <small>{slot.ordinal}</small>}</span>
     {player ? <div className={styles.player}><div className={styles.playerHeading}><strong>{player.name}</strong><span className={`${styles.badge} ${player.status === 'keeper' ? styles.kept : ''}`}>{player.status === 'keeper' ? 'KEPT' : 'DRAFTED'}</span></div><p>Eligible: {labels.length ? labels.join(' / ') : 'Not available from ESPN'}</p></div> : <span className={styles.empty}>{reserve ? 'Separate reserve slot' : 'Lineup slot unfilled'}</span>}
@@ -46,7 +46,7 @@ export function DraftRosters({ board, preferredFranchiseId, compact = false }: {
         <p className={styles.help}>Filled / configured slots. This is a suggested fit using ESPN eligibility; it does not set your ESPN lineup. Slot counts are not per-position draft limits.</p>
         {team.overflow > 0 && <p className={styles.notice}>{team.overflow} {team.overflow === 1 ? 'player over' : 'players over'} the {team.normalCapacity} regular slots.</p>}
         <ul className={styles.slots} aria-label="Suggested ESPN lineup">{team.slots.map(slot => <RosterSlot key={slot.key} slot={slot}/>)}</ul>
-        {team.unplaced.length > 0 && <div className={styles.unplaced}><h4>{team.unplaced.length} {team.unplaced.length === 1 ? 'player without' : 'players without'} a suggested slot</h4><ul aria-label="Players without a suggested slot">{team.unplaced.map(item => <li key={item.player.id}><strong>{item.player.name}</strong>{' '}<span className={`${styles.badge} ${item.player.status === 'keeper' ? styles.kept : ''}`}>{item.player.status === 'keeper' ? 'KEPT' : 'DRAFTED'}</span><br/>Eligible: {item.player.eligibleLabels.filter(label => !reserveLabels.has(label)).join(' / ') || 'Not available from ESPN'}<br/>{item.message}</li>)}</ul></div>}
+        {team.unplaced.length > 0 && <div className={styles.unplaced}><h4>{team.unplaced.length} {team.unplaced.length === 1 ? 'player without' : 'players without'} a suggested slot</h4><ul aria-label="Players without a suggested slot">{team.unplaced.map(item => <li key={item.player.id}><strong>{item.player.name}</strong>{' '}<span className={`${styles.badge} ${item.player.status === 'keeper' ? styles.kept : ''}`}>{item.player.status === 'keeper' ? 'KEPT' : 'DRAFTED'}</span><br/>Eligible: {item.player.eligibleLabels.filter(label => !hiddenPlayerLabels.has(label)).join(' / ') || 'Not available from ESPN'}<br/>{item.message}</li>)}</ul></div>}
         {team.reserveSlots.length > 0 && <div className={styles.ir}><h4>Reserve · separate from {team.normalCapacity} roster slots</h4><p className={styles.help}>IR placement depends on ESPN injury eligibility. Draft players are not automatically assigned to IR.</p><ul className={styles.slots} aria-label="ESPN reserve slots">{team.reserveSlots.map(slot => <RosterSlot key={slot.key} slot={slot} reserve/>)}</ul></div>}
       </>}
       {issues.length > 0 && <div className={styles.unplaced}><h4>Roster information to check</h4><ul>{issues.map(issue => <li key={issue}>{issue}</li>)}</ul></div>}
