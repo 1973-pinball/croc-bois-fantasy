@@ -63,6 +63,16 @@ function compareNullable(a: number | null, b: number | null, descending = false)
   return descending ? b - a : a - b;
 }
 
+/** Apply the inclusive ESPN cutoff before choosing the best rows for any ranking. */
+export function filterDraftCandidatesByEspnRank(candidates: DraftAdvisorCandidate[], ranks: DraftCandidateRanks, maxRank: number | null): DraftAdvisorCandidate[] {
+  if (maxRank === null) return [...candidates];
+  if (!Number.isSafeInteger(maxRank) || maxRank < 1) return [];
+  return candidates.filter(candidate => {
+    const rank = ranks.byPlayerId.get(candidate.player.id)?.espnRank ?? validRank(candidate.player.rank);
+    return rank !== null && rank <= maxRank;
+  });
+}
+
 /** Sort the entire available pool before truncating; unavailable source ranks stay last. */
 export function sortDraftCandidates(candidates: DraftAdvisorCandidate[], ranks: DraftCandidateRanks, order: DraftCandidateOrder, limit = 15, direction: DraftCandidateDirection = defaultDraftCandidateDirection(order)): DraftAdvisorCandidate[] {
   const available = order === 'fit' ? candidates.filter(candidate => !candidate.blocked && candidate.fitScore !== null && Number.isFinite(candidate.fitScore)) : [...candidates];

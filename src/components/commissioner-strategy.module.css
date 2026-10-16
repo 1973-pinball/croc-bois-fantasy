@@ -11,6 +11,10 @@
  .toolbar label, .field { display: flex; flex-direction: column; gap: 7px; font-size: 12px; font-weight: 600; min-width: 150px; }
  .toolbar label:first-child { flex: 1; }
  .toolbar select, .toolbar input { width: 100%; }
+ .rankingToolbar { align-items: flex-start; }
+ .rankingFields { display: grid; flex: 1; gap: 10px; min-width: min(240px, 100%); }
+ .rankingFields .rankLimit { max-width: 240px; }
+ .rankLimitHelp { color: var(--muted); font-size: 11px; line-height: 1.6; }
  .root input:not([type=checkbox]), .root textarea { padding: 11px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); min-height: 44px; font: inherit; }
  .root textarea { width: 100%; resize: vertical; font-size: 12px; margin-top: 10px; }
  .root summary { padding: 10px 0; cursor: pointer; font-weight: 600; }

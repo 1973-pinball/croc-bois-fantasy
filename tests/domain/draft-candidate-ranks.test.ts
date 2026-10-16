@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { buildDraftAdvisor, type DraftAdvisorCandidate, type DraftAdvisorInput } from '../../src/lib/draft-advisor';
-import { buildDraftCandidateRanks, sortDraftCandidates, type DraftCandidateRankLibrary } from '../../src/lib/draft-candidate-ranks';
+import { buildDraftCandidateRanks, filterDraftCandidatesByEspnRank, sortDraftCandidates, type DraftCandidateRankLibrary } from '../../src/lib/draft-candidate-ranks';
 import type { DraftCatalogPlayer, DraftPlayerCatalog } from '../../src/lib/draft-player-catalog';
 import type { DraftPlayerProjection, DraftProjectionDataset, DraftProjectionSource, DraftProjectionStats } from '../../src/lib/draft-projections';
 import type { DraftProjectionRankSnapshot } from '../../src/lib/draft-projection-ranks';
@@ -50,6 +50,22 @@ test('current ESPN imported ranks override catalog ranks, with catalog fallback 
   assert.deepEqual(sortDraftCandidates(pool.players.map(row => candidate(row)), ranks, 'espn').map(row => row.player.id), [3, 2, 1]);
   imports.espn.seasonId = 2026;
   assert.deepEqual([...buildDraftCandidateRanks(pool, imports).byPlayerId.values()].map(row => row.espnRank), [1, 2, null]);
+});
+
+test('ESPN rank cutoff uses imported ranks inclusively before sorting the full pool, and clearing it restores unranked players', () => {
+  const pool = catalog(), imports = library();
+  pool.players[1].rank = 101;
+  pool.players[2].rank = null;
+  pool.players[3].rank = 100;
+  pool.players[4].rank = 101;
+  pool.players[24].rank = 120;
+  imports.espn = dataset('espn', [{ ...projection(1), providerRank: 101 }, { ...projection(2), providerRank: 100 }, { ...projection(25), providerRank: 99 }]);
+  const ranks = buildDraftCandidateRanks(pool, imports), candidates = pool.players.map(row => candidate(row));
+  const before = structuredClone(candidates), filtered = filterDraftCandidatesByEspnRank(candidates, ranks, 100);
+  assert.deepEqual(filtered.map(row => row.player.id), [2, 4, ...Array.from({ length: 20 }, (_, index) => index + 6)]);
+  assert.deepEqual(sortDraftCandidates(filtered, ranks, 'bbm-value').map(row => row.player.id), [25, 4, 2, ...Array.from({ length: 12 }, (_, index) => 24 - index)]);
+  assert.deepEqual(filterDraftCandidatesByEspnRank(candidates, ranks, null), candidates);
+  assert.deepEqual(candidates, before);
 });
 
 test('sorts the full candidate pool before the 15-row cutoff and preserves inputs', () => {
