@@ -47,6 +47,16 @@
  .table small { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; max-width: 260px; white-space: normal; line-height: 1.65; }
  .table button { background: var(--green-light); color: var(--green); padding: 8px 12px; min-height: 36px; border-radius: 5px; }
  .candidateTable { min-width: 950px; }
+ .candidateTable tbody td { padding-block: 8px; }
+ .candidateTable td small { margin-top: 2px; line-height: 1.35; }
+ .candidateGuide { margin-top: 8px; }
+ .candidateGuide > summary, .candidateDetails > summary { padding: 2px 0; color: var(--green); font-size: 12px; font-weight: 500; cursor: pointer; }
+ .candidateGuide > summary:focus-visible, .candidateDetails > summary:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+ .candidateEstimate { display: flex; align-items: baseline; gap: 12px; }
+ .candidateEstimate > span { white-space: nowrap; }
+ .candidateDetails { min-width: 0; }
+ .candidateDetails > summary { white-space: nowrap; font-size: 11px; }
+ .candidateDetails[open] > summary { margin-bottom: 4px; }
  .candidateTable th.rankHeader { padding: 4px 8px; }
  .candidateTable .rankSortButton { display: flex; align-items: flex-start; gap: 8px; width: 100%; min-height: 44px; padding: 9px 6px; background: transparent; color: inherit; font: inherit; text-align: left; white-space: nowrap; cursor: pointer; }
  .candidateTable .rankSortButton:hover { background: var(--green-light); color: var(--green); }
