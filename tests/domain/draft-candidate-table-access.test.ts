@@ -72,10 +72,12 @@ test('commissioner available players retain the BBM default, private-source cont
   assert.match(html, /Available players · ESPN − BBM/);
   assert.match(html, /<option value="bbm-value" selected="">/);
   assert.match(html, /<option value="bbm">/); assert.match(html, /Saved BBM ranked list:/);
+  assert.match(html, /<option value="bbm-after-keepers">BBM after keepers<\/option>/);
+  assert.match(html, /aria-label="Sort by BBM after keepers, ascending"/);
   assert.match(html, /Private rank status fixture/);
-  assert.equal((html.match(/<thead>(.*?)<\/thead>/)?.[1].match(/<th /g) ?? []).length, 11);
-  assert.ok(bodyRows(html).every(row => (row.match(/<td(?: |>)/g) ?? []).length === 11));
+  assert.equal((html.match(/<thead>(.*?)<\/thead>/)?.[1].match(/<th /g) ?? []).length, 12);
+  assert.ok(bodyRows(html).every(row => (row.match(/<td(?: |>)/g) ?? []).length === 12));
   assert.match(bodyRows(html)[0], /Fixture player 2/);
   assert.match(render({ library: {}, rankSnapshots: {} }), /Import Basketball Monster projections above/);
-  assert.match(render({ report: null }), /<td colSpan="11">/);
+  assert.match(render({ report: null }), /<td colSpan="12">/);
 });

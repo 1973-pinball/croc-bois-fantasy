@@ -4,7 +4,7 @@ import type { DraftPlayerCatalog } from './draft-player-catalog';
 import { draftProjectionDatasetSchema, type DraftProjectionDataset, type DraftProjectionSource } from './draft-projections';
 import { draftProjectionRankSnapshotSchema, type DraftProjectionRankSnapshot } from './draft-projection-ranks';
 
-export type DraftCandidateOrder = 'espn' | 'espn-after-keepers' | 'bbm' | 'yahoo' | 'bbm-value' | 'fit';
+export type DraftCandidateOrder = 'espn' | 'espn-after-keepers' | 'bbm' | 'bbm-after-keepers' | 'yahoo' | 'bbm-value' | 'fit';
 export type DraftCandidateDirection = 'ascending' | 'descending';
 export const defaultDraftCandidateDirection = (order: DraftCandidateOrder): DraftCandidateDirection => order === 'bbm-value' || order === 'fit' ? 'descending' : 'ascending';
 export type DraftCandidateRankLibrary = Partial<Record<DraftProjectionSource, DraftProjectionDataset>>;
@@ -19,6 +19,7 @@ export type DraftCandidateRank = {
 export type DraftCandidateRanks = {
   byPlayerId: Map<number, DraftCandidateRank>;
   espnAfterKeepersByPlayerId: Map<number, number>;
+  bbmAfterKeepersByPlayerId: Map<number, number>;
   coverage: { selectable: number; espn: number; bbm: number; yahoo: number };
 };
 
@@ -58,15 +59,18 @@ export function buildDraftCandidateRanks(
     return [player.id, { espnRank, bbmRank, yahooRank: yahoo.get(player.id) ?? null, bbmValue: espnRank !== null && bbmRank !== null ? espnRank - bbmRank : null }];
   }));
   const espnAfterKeepersByPlayerId = new Map<number, number>();
+  const bbmAfterKeepersByPlayerId = new Map<number, number>();
   if (board?.keepersRevealedAt) {
     const keeperIds = new Set(board.picks.filter(pick => pick.status === 'keeper').map(pick => pick.playerId));
     // Use the complete ranked pool: filters, pages and later selections cannot renumber this baseline.
-    selectable.filter(player => !keeperIds.has(player.id) && byPlayerId.get(player.id)!.espnRank !== null)
-      .sort((a, b) => byPlayerId.get(a.id)!.espnRank! - byPlayerId.get(b.id)!.espnRank!
-        || a.name.localeCompare(b.name) || a.id - b.id)
-      .forEach((player, index) => espnAfterKeepersByPlayerId.set(player.id, index + 1));
+    for (const [rankField, afterKeepers] of [['espnRank', espnAfterKeepersByPlayerId], ['bbmRank', bbmAfterKeepersByPlayerId]] as const) {
+      selectable.filter(player => !keeperIds.has(player.id) && byPlayerId.get(player.id)![rankField] !== null)
+        .sort((a, b) => byPlayerId.get(a.id)![rankField]! - byPlayerId.get(b.id)![rankField]!
+          || a.name.localeCompare(b.name) || a.id - b.id)
+        .forEach((player, index) => afterKeepers.set(player.id, index + 1));
+    }
   }
-  return { byPlayerId, espnAfterKeepersByPlayerId, coverage: { selectable: selectable.length, espn: [...byPlayerId.values()].filter(player => player.espnRank !== null).length, bbm: bbm.size, yahoo: yahoo.size } };
+  return { byPlayerId, espnAfterKeepersByPlayerId, bbmAfterKeepersByPlayerId, coverage: { selectable: selectable.length, espn: [...byPlayerId.values()].filter(player => player.espnRank !== null).length, bbm: bbm.size, yahoo: yahoo.size } };
 }
 
 function compareNullable(a: number | null, b: number | null, descending = false) {
@@ -94,6 +98,7 @@ export function sortDraftCandidates(candidates: DraftAdvisorCandidate[], ranks: 
       case 'espn': return row?.espnRank ?? validRank(candidate.player.rank);
       case 'espn-after-keepers': return ranks.espnAfterKeepersByPlayerId.get(candidate.player.id) ?? null;
       case 'bbm': return row?.bbmRank ?? null;
+      case 'bbm-after-keepers': return ranks.bbmAfterKeepersByPlayerId.get(candidate.player.id) ?? null;
       case 'yahoo': return row?.yahooRank ?? null;
       case 'bbm-value': return row?.bbmValue ?? null;
       case 'fit': return candidate.fitScore;

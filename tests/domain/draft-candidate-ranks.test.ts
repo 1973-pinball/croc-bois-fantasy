@@ -283,10 +283,64 @@ test('ESPN after keepers closes rank gaps across the full selectable pool and st
 });
 
 test('keeper-adjusted ranks wait for a revealed board and do not expose an unrevealed keeper list', () => {
-  const input = advisorFixture();
-  assert.equal(buildDraftCandidateRanks(input.catalog, {}).espnAfterKeepersByPlayerId.size, 0);
-  assert.equal(buildDraftCandidateRanks(input.catalog, {}, {}, { ...input.board, keepersRevealedAt: null }).espnAfterKeepersByPlayerId.size, 0);
-  assert.equal(buildDraftCandidateRanks(input.catalog, {}, {}, input.board).espnAfterKeepersByPlayerId.get(3), 2);
+  const input = advisorFixture(), imports = library();
+  for (const board of [undefined, null, { ...input.board, keepersRevealedAt: null }]) {
+    const ranks = buildDraftCandidateRanks(input.catalog, imports, {}, board);
+    assert.equal(ranks.espnAfterKeepersByPlayerId.size, 0);
+    assert.equal(ranks.bbmAfterKeepersByPlayerId.size, 0);
+  }
+  const revealed = buildDraftCandidateRanks(input.catalog, imports, {}, input.board);
+  assert.equal(revealed.espnAfterKeepersByPlayerId.get(3), 2);
+  assert.equal(revealed.bbmAfterKeepersByPlayerId.get(1), 24);
+  assert.equal(buildDraftCandidateRanks(input.catalog, {}, {}, input.board).bbmAfterKeepersByPlayerId.size, 0);
+});
+
+test('BBM after keepers ranks the full source-ranked pool and stays fixed after filters, pages and selections', () => {
+  const input = advisorFixture(), pool = catalog(9);
+  pool.players[5].name = 'Alpha'; pool.players[8].name = 'Alpha';
+  pool.players[6].selectable = false; pool.players[8].rank = 100;
+  const imports = { 'basketball-monster': dataset('basketball-monster', [1, 4, 7, 2, undefined, 7, 9, 3, 7]
+    .map((providerRank, index) => ({ ...projection(index + 1), providerRank }))
+    .concat([{ ...projection(999, 20), providerRank: 1 }])) };
+  const before = structuredClone({ pool, imports, board: input.board });
+  const ranks = buildDraftCandidateRanks(pool, imports, {}, input.board);
+  // Drafted player 1 still consumes a rank; keeper 2 does not. Ties use name then ID.
+  assert.deepEqual([...ranks.bbmAfterKeepersByPlayerId], [[1, 1], [4, 2], [8, 3], [6, 4], [9, 5], [3, 6]]);
+  assert.deepEqual(ranks.byPlayerId, buildDraftCandidateRanks(pool, imports).byPlayerId);
+  assert.equal(ranks.byPlayerId.get(2)!.bbmRank, 4);
+  assert.equal(ranks.byPlayerId.get(3)!.bbmRank, 7);
+  assert.equal(ranks.byPlayerId.get(3)!.bbmValue, -4);
+  assert.equal(ranks.bbmAfterKeepersByPlayerId.has(5), false); // Missing source rank stays missing.
+  assert.equal(ranks.bbmAfterKeepersByPlayerId.has(7), false); // Nonselectable players do not consume a rank.
+  assert.equal(ranks.bbmAfterKeepersByPlayerId.has(999), false); // Unknown identities do not consume a rank.
+  const available = [...pool.players].reverse().filter(row => row.selectable && row.id !== 1 && row.id !== 2).map(row => candidate(row));
+  const filtered = filterDraftCandidatesByEspnRank(available, ranks, 9);
+  const sorted = sortDraftCandidates(filtered, ranks, 'bbm-after-keepers', filtered.length);
+  assert.deepEqual(sorted.map(row => row.player.id), [4, 8, 6, 3, 5]);
+  const secondPage = paginateDraftCandidates(sorted, 2, 2);
+  assert.deepEqual(secondPage.candidates.map(row => ranks.bbmAfterKeepersByPlayerId.get(row.player.id)), [4, 6]);
+  assert.deepEqual(sortDraftCandidates(available, ranks, 'bbm-after-keepers').map(row => row.player.id), [4, 8, 6, 9, 3, 5]);
+  assert.deepEqual(sortDraftCandidates(available, ranks, 'bbm-after-keepers', 15, 'descending').map(row => row.player.id), [3, 9, 6, 8, 4, 5]);
+  assert.deepEqual({ pool, imports, board: input.board }, before);
+  input.board.picks.push({ ...input.board.picks[0], id: 'pick-8', overallPick: 3, playerId: 8, playerName: 'Player 8', selectionId: 'selection-8' });
+  assert.deepEqual(buildDraftCandidateRanks(pool, imports, {}, input.board), ranks);
+});
+
+test('BBM after keepers uses compatible private ranks and excludes conflicting snapshots', () => {
+  const input = advisorFixture(), pool = catalog(5);
+  const supplied = { ...rankSnapshot(), ranks: [...rankSnapshot().ranks, { id: 4, providerRank: 3 }] };
+  const snapshots = { 'basketball-monster': supplied };
+  const imports = { 'basketball-monster': dataset('basketball-monster', [{ ...projection(1), providerRank: 7 }, projection(2)]) };
+  const before = structuredClone({ imports, snapshots });
+  const ranks = buildDraftCandidateRanks(pool, imports, snapshots, input.board);
+  assert.deepEqual([...ranks.bbmAfterKeepersByPlayerId], [[3, 1], [4, 2], [1, 3]]);
+  assert.deepEqual(buildDraftCandidateRanks(pool, {}, snapshots, input.board).bbmAfterKeepersByPlayerId, ranks.bbmAfterKeepersByPlayerId);
+  assert.deepEqual({ imports, snapshots }, before);
+  imports['basketball-monster'].players[0].providerRank = 5;
+  const conflicting = buildDraftCandidateRanks(pool, imports, snapshots, input.board);
+  assert.deepEqual([...conflicting.bbmAfterKeepersByPlayerId], [[1, 1]]);
+  assert.equal(conflicting.byPlayerId.get(1)!.bbmRank, 5);
+  assert.equal(conflicting.byPlayerId.get(3)!.bbmRank, null);
 });
 
 test('pagination covers every globally sorted candidate once and clamps only pages outside the current pool', () => {

@@ -12,6 +12,7 @@ const labels: Record<DraftCandidateOrder, string> = {
   espn: 'ESPN rank',
   'espn-after-keepers': 'ESPN after keepers',
   bbm: 'BBM rank',
+  'bbm-after-keepers': 'BBM after keepers',
   yahoo: 'Yahoo rank',
   'bbm-value': 'ESPN − BBM',
   fit: 'Schedule + roster fit',
@@ -28,7 +29,7 @@ export function DraftCandidateTable({ catalog, library, report, board, seasonLoa
   const [sort, setSort] = useState<{ order: DraftCandidateOrder; direction: DraftCandidateDirection }>(publicSourcesOnly ? { order: 'espn', direction: 'ascending' } : { order: 'bbm-value', direction: 'descending' });
   const [rankLimitInput, setRankLimitInput] = useState({ value: '150', badInput: false });
   const [page, setPage] = useState(1);
-  const { order, direction } = publicSourcesOnly && (sort.order === 'bbm' || sort.order === 'bbm-value')
+  const { order, direction } = publicSourcesOnly && (sort.order === 'bbm' || sort.order === 'bbm-after-keepers' || sort.order === 'bbm-value')
     ? { order: 'espn' as const, direction: 'ascending' as const } : sort;
   const maxEspnRank = rankLimitInput.badInput ? NaN : rankLimitInput.value.trim() === '' ? null : Number(rankLimitInput.value);
   const invalidRankLimit = maxEspnRank !== null && (!Number.isSafeInteger(maxEspnRank) || maxEspnRank < 1);
@@ -42,7 +43,7 @@ export function DraftCandidateTable({ catalog, library, report, board, seasonLoa
   const pagination = paginateDraftCandidates(sortedCandidates, page);
   const candidates = pagination.candidates;
   useEffect(() => { if (page !== pagination.page) setPage(pagination.page); }, [page, pagination.page]);
-  const missingSource = (order === 'bbm' || order === 'bbm-value') && !ranks.coverage.bbm ? 'Basketball Monster' : order === 'yahoo' && !ranks.coverage.yahoo ? 'Yahoo' : null;
+  const missingSource = (order === 'bbm' || order === 'bbm-after-keepers' || order === 'bbm-value') && !ranks.coverage.bbm ? 'Basketball Monster' : order === 'yahoo' && !ranks.coverage.yahoo ? 'Yahoo' : null;
   const directionLabel = order === 'bbm-value'
     ? direction === 'descending' ? 'biggest BBM values first' : 'smallest rank gaps first'
     : direction === 'ascending' ? 'low to high' : 'high to low';
@@ -63,6 +64,7 @@ export function DraftCandidateTable({ catalog, library, report, board, seasonLoa
       <option value="espn">ESPN rank</option>
       <option value="espn-after-keepers">ESPN after keepers</option>
       {!publicSourcesOnly && <option value="bbm">BBM rank</option>}
+      {!publicSourcesOnly && <option value="bbm-after-keepers">BBM after keepers</option>}
       <option value="yahoo">Yahoo rank · preseason</option>
       {!publicSourcesOnly && <option value="bbm-value">ESPN − BBM · rank gap</option>}
       <option value="fit">{forecastMode ? 'Completed-roster forecast' : 'Schedule + roster fit'}</option>
@@ -74,7 +76,7 @@ export function DraftCandidateTable({ catalog, library, report, board, seasonLoa
     <p className={styles.subtle} role="status">Showing {pagination.start}–{pagination.end} of {pagination.total} matching available players · Page {pagination.page} of {pagination.pageCount}{maxEspnRank !== null && !invalidRankLimit ? ` · ESPN rank ≤ ${maxEspnRank}` : ''} · {missingSource ? 'ESPN order until source ranks are available' : directionLabel}. Click a rank column to sort; click it again to reverse.</p>
     {!publicSourcesOnly && <p className={styles.subtle}>ESPN − BBM measures the rank gap: ESPN #80 and BBM #45 is <strong>+35</strong>. Bigger positive numbers highlight players BBM ranks earlier than ESPN. Sorting searches all players matching your ESPN rank limit, shown 15 per page; missing comparison ranks appear last in either direction.</p>}
     <p className={styles.subtle}>Player ranks are available before the draft and do not need team rosters. ESPN uses its imported ROTO draft rank, with the captured catalog as a fallback. {!publicSourcesOnly && 'BBM uses its supplied Rank column or your privately saved ranked list. '}Yahoo uses its published preseason rank. Ranks include drafted players and do not change when a player is picked. ESPN: {ranks.coverage.espn || 'no'}{!publicSourcesOnly && <> · BBM: {ranks.coverage.bbm || 'no'}</>} · Yahoo: {ranks.coverage.yahoo || 'no'} ranked players.</p>
-    <p className={styles.subtle}>ESPN after keepers numbers the full ESPN-ranked pool after removing revealed keepers. It stays fixed when players are drafted and when you filter or change pages. Unranked players show —.{!board?.keepersRevealedAt && ' This column becomes available when keepers are revealed.'}</p>
+    <p className={styles.subtle}>{publicSourcesOnly ? 'ESPN after keepers numbers the full ESPN-ranked pool' : 'ESPN after keepers and BBM after keepers number each source’s full ranked pool'} after removing revealed keepers. These ranks stay fixed when players are drafted and when you filter or change pages. Unranked players show —.{!board?.keepersRevealedAt && ' Keeper-adjusted ranks become available when keepers are revealed.'}</p>
     {!publicSourcesOnly && rankStatus && <p className={styles.subtle} role="status">{rankStatus}</p>}
     {!publicSourcesOnly && rankSnapshots?.['basketball-monster'] && <p className={styles.subtle}>Saved BBM ranked list: {new Date(rankSnapshots['basketball-monster'].importedAt).toLocaleDateString()}.</p>}
     {!publicSourcesOnly && library['basketball-monster'] && !ranks.coverage.bbm && <p className={styles.notice} role="status">Upload a Basketball Monster projection file with its Rank column to enable BBM rank and value comparisons. Your saved projections still work for win-rate estimates.</p>}
@@ -84,21 +86,21 @@ export function DraftCandidateTable({ catalog, library, report, board, seasonLoa
     {!seasonLoaded && <p className={styles.subtle} role="status">{analysisPending ? 'Updating estimates; source ranks remain available while the calculation runs.' : forecastMode ? 'Completed-roster estimates appear when the forecast is ready. Check the forecast status above.' : 'Season win rates and usable games will appear when the full-season schedule and analysis are ready.'}</p>}
     <div className={styles.tableWrap} tabIndex={0} role="region" aria-label="Available player ranks and value, scroll horizontally for all columns">
       <table className={`${styles.table} ${styles.candidateTable}`}>
-        <caption className="visually-hidden">{publicSourcesOnly ? 'Available players compared by ESPN rank, ESPN rank after keepers, and Yahoo preseason rank' : 'Available players compared by ESPN rank, ESPN rank after keepers, Basketball Monster supplied rank, Yahoo preseason rank, and ESPN minus BBM rank value'}</caption>
-        <thead><tr><th scope="col">Player</th><th scope="col">Position</th>{rankHeader('espn')}{rankHeader('espn-after-keepers')}{!publicSourcesOnly && rankHeader('bbm', 'Supplied rank')}{rankHeader('yahoo', 'Preseason')}{!publicSourcesOnly && rankHeader('bbm-value', 'Bigger is better')}<th scope="col">{forecastMode ? 'Completed-roster category share' : 'Season category win rate'}</th><th scope="col">{forecastMode ? 'Expected gain' : 'Gain'}</th><th scope="col">Usable / scheduled games<small>Full season</small></th><th scope="col">{forecastMode ? 'Available & retained' : 'Fit score'}{forecastMode && <small>Scenario count</small>}</th></tr></thead>
+        <caption className="visually-hidden">{publicSourcesOnly ? 'Available players compared by ESPN rank, ESPN rank after keepers, and Yahoo preseason rank' : 'Available players compared by ESPN rank, ESPN rank after keepers, Basketball Monster supplied rank, BBM rank after keepers, Yahoo preseason rank, and ESPN minus BBM rank value'}</caption>
+        <thead><tr><th scope="col">Player</th><th scope="col">Position</th>{rankHeader('espn')}{rankHeader('espn-after-keepers')}{!publicSourcesOnly && <>{rankHeader('bbm', 'Supplied rank')}{rankHeader('bbm-after-keepers')}</>}{rankHeader('yahoo', 'Preseason')}{!publicSourcesOnly && rankHeader('bbm-value', 'Bigger is better')}<th scope="col">{forecastMode ? 'Completed-roster category share' : 'Season category win rate'}</th><th scope="col">{forecastMode ? 'Expected gain' : 'Gain'}</th><th scope="col">Usable / scheduled games<small>Full season</small></th><th scope="col">{forecastMode ? 'Available & retained' : 'Fit score'}{forecastMode && <small>Scenario count</small>}</th></tr></thead>
         <tbody>{candidates.map(candidate => {
           const values = ranks.byPlayerId.get(candidate.player.id);
           const scenario = forecast?.candidateRanges.find(row => row.playerId === candidate.player.id);
           return <tr key={candidate.player.id}>
             <td><strong>{candidate.player.name}</strong><small>{candidate.player.nbaTeam}{candidate.hasProjection ? '' : ' · missing projection'}{candidate.blocked ? ' · not recommended' : ''}</small></td>
             <td>{candidate.player.eligiblePositions.join(' / ')}</td>
-            <td>{rankLabel(values?.espnRank)}</td><td>{rankLabel(ranks.espnAfterKeepersByPlayerId.get(candidate.player.id))}</td>{!publicSourcesOnly && <td>{rankLabel(values?.bbmRank)}</td>}<td>{rankLabel(values?.yahooRank)}</td>
+            <td>{rankLabel(values?.espnRank)}</td><td>{rankLabel(ranks.espnAfterKeepersByPlayerId.get(candidate.player.id))}</td>{!publicSourcesOnly && <><td>{rankLabel(values?.bbmRank)}</td><td>{rankLabel(ranks.bbmAfterKeepersByPlayerId.get(candidate.player.id))}</td></>}<td>{rankLabel(values?.yahooRank)}</td>
             {!publicSourcesOnly && <td className={values?.bbmValue == null || values.bbmValue === 0 ? undefined : values.bbmValue > 0 ? styles.gain : styles.negative}>{valueLabel(values?.bbmValue)}</td>}
             <td>{pct(seasonLoaded ? candidate.scheduleWinRate : null)}{seasonLoaded && scenario && <small>{pct(scenario.min)}–{pct(scenario.max)} scenario range</small>}</td><td className={(candidate.scheduleGain ?? 0) < 0 ? styles.negative : styles.gain}>{gain(seasonLoaded ? candidate.scheduleGain : null)}</td>
             <td>{seasonLoaded ? candidate.usableGames ?? '—' : '—'} / {seasonLoaded ? candidate.scheduledGames ?? '—' : '—'}</td>
             <td>{forecastMode ? <>{seasonLoaded && scenario ? `${scenario.availableScenarios} / ${scenario.scenarioCount}` : '—'}{seasonLoaded && scenario?.conditionalWinRate != null && <small>When available and retained: {pct(scenario.conditionalWinRate)} · {gain(scenario.conditionalGain)}</small>}</> : pct(seasonLoaded ? candidate.fitScore : null)}<small>{seasonLoaded ? candidate.reasons.join(' ') : 'Estimates pending.'}</small></td>
           </tr>;
-        })}{!candidates.length && <tr><td colSpan={publicSourcesOnly ? 9 : 11}>{invalidRankLimit ? 'Enter a valid ESPN rank limit to view players.' : report && maxEspnRank !== null && !filteredCandidates.length ? 'No available players match this ESPN rank limit. Increase it or leave it blank to show all players.' : order === 'fit' && report?.candidates.length ? forecastMode ? 'Completed-roster forecasts will appear when the calculation is ready.' : 'No available players currently have an eligible roster-fit score.' : 'Available candidates appear after the draft board loads.'}</td></tr>}</tbody>
+        })}{!candidates.length && <tr><td colSpan={publicSourcesOnly ? 9 : 12}>{invalidRankLimit ? 'Enter a valid ESPN rank limit to view players.' : report && maxEspnRank !== null && !filteredCandidates.length ? 'No available players match this ESPN rank limit. Increase it or leave it blank to show all players.' : order === 'fit' && report?.candidates.length ? forecastMode ? 'Completed-roster forecasts will appear when the calculation is ready.' : 'No available players currently have an eligible roster-fit score.' : 'Available candidates appear after the draft board loads.'}</td></tr>}</tbody>
       </table>
     </div>
     <nav className={styles.actions} aria-label="Available player pages">
