@@ -21,6 +21,7 @@ const pct = (value: number | null) => value === null ? '—' : `${(value * 100).
 const gain = (value: number | null) => value === null ? '—' : `${value >= 0 ? '+' : ''}${(value * 100).toFixed(1)} pp`;
 const rankLabel = (value: number | null | undefined) => value == null ? '—' : `#${value}`;
 const valueLabel = (value: number | null | undefined) => value == null ? '—' : `${value > 0 ? '+' : ''}${value}`;
+const normalizeSearch = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase().trim();
 
 export function DraftCandidateTable({ catalog, library, report, board, seasonLoaded, forecastMode = false, forecast, analysisPending = false, rankSnapshots, rankStatus, publicSourcesOnly = false }: {
   catalog: DraftPlayerCatalog; library: DraftCandidateRankLibrary; report: DraftAdvisorReport | null; board?: DraftBoard | null; seasonLoaded: boolean; rankSnapshots?: DraftCandidateRankSnapshots; rankStatus?: string;
@@ -29,12 +30,15 @@ export function DraftCandidateTable({ catalog, library, report, board, seasonLoa
   const [sort, setSort] = useState<{ order: DraftCandidateOrder; direction: DraftCandidateDirection }>(publicSourcesOnly ? { order: 'espn', direction: 'ascending' } : { order: 'bbm-value', direction: 'descending' });
   const [rankLimitInput, setRankLimitInput] = useState({ value: '150', badInput: false });
   const [page, setPage] = useState(1);
+  const [query, setQuery] = useState('');
+  const searchTerm = normalizeSearch(query);
   const { order, direction } = publicSourcesOnly && (sort.order === 'bbm' || sort.order === 'bbm-after-keepers' || sort.order === 'bbm-value')
     ? { order: 'espn' as const, direction: 'ascending' as const } : sort;
   const maxEspnRank = rankLimitInput.badInput ? NaN : rankLimitInput.value.trim() === '' ? null : Number(rankLimitInput.value);
   const invalidRankLimit = maxEspnRank !== null && (!Number.isSafeInteger(maxEspnRank) || maxEspnRank < 1);
   const ranks = useMemo(() => buildDraftCandidateRanks(catalog, publicSourcesOnly ? { espn: library.espn, yahoo: library.yahoo } : library, publicSourcesOnly ? undefined : rankSnapshots, board), [catalog, library, rankSnapshots, board, publicSourcesOnly]);
-  const filteredCandidates = useMemo(() => filterDraftCandidatesByEspnRank(report?.candidates ?? [], ranks, maxEspnRank), [report, ranks, maxEspnRank]);
+  const filteredCandidates = useMemo(() => filterDraftCandidatesByEspnRank(report?.candidates ?? [], ranks, maxEspnRank)
+    .filter(candidate => normalizeSearch(candidate.player.name).includes(searchTerm)), [report, ranks, maxEspnRank, searchTerm]);
   const sortedCandidates = useMemo(() => {
     const pool = order === 'fit' && !seasonLoaded ? [] : forecastMode && order === 'fit'
       ? filteredCandidates.map(candidate => ({ ...candidate, fitScore: candidate.scheduleWinRate })) : filteredCandidates;
@@ -60,6 +64,11 @@ export function DraftCandidateTable({ catalog, library, report, board, seasonLoa
   }
   return <section className={styles.panel} aria-labelledby="draft-candidates-title">
     <h3 id="draft-candidates-title">Available players · {forecastMode && order === 'fit' ? 'Completed-roster forecast' : labels[order]}</h3>
+    <div className={styles.toolbar}>
+      <label>Search available players<input type="search" value={query} placeholder="Search by player name" aria-describedby="draft-candidate-search-help" onChange={event => { setQuery(event.target.value); setPage(1); }}/></label>
+      {query && <button type="button" className="button button-subtle" onClick={() => { setQuery(''); setPage(1); }}>Clear search</button>}
+    </div>
+    <p id="draft-candidate-search-help" className={styles.subtle}>Search across all pages. The ESPN rank limit below still applies; leave it blank to search all available players.</p>
     <div className={`${styles.toolbar} ${styles.rankingToolbar}`}><div className={styles.rankingFields}><label>Player ranking<select aria-label="Player ranking" value={order} onChange={event => chooseOrder(event.target.value as DraftCandidateOrder)}>
       <option value="espn">ESPN rank</option>
       <option value="espn-after-keepers">ESPN after keepers</option>
@@ -74,7 +83,7 @@ export function DraftCandidateTable({ catalog, library, report, board, seasonLoa
     </select></label></div>
     {invalidRankLimit && <p id="draft-rank-limit-error" className={styles.error} role="alert">Enter a whole number of 1 or higher, or leave the ESPN rank limit blank.</p>}
     <p className={styles.subtle} role="status">Showing {pagination.start}–{pagination.end} of {pagination.total} matching available players · Page {pagination.page} of {pagination.pageCount}{maxEspnRank !== null && !invalidRankLimit ? ` · ESPN rank ≤ ${maxEspnRank}` : ''} · {missingSource ? 'ESPN order until source ranks are available' : directionLabel}. Click a rank column to sort; click it again to reverse.</p>
-    {!publicSourcesOnly && <p className={styles.subtle}>ESPN − BBM measures the rank gap: ESPN #80 and BBM #45 is <strong>+35</strong>. Bigger positive numbers highlight players BBM ranks earlier than ESPN. Sorting searches all players matching your ESPN rank limit, shown 15 per page; missing comparison ranks appear last in either direction.</p>}
+    {!publicSourcesOnly && <p className={styles.subtle}>ESPN − BBM measures the rank gap: ESPN #80 and BBM #45 is <strong>+35</strong>. Bigger positive numbers highlight players BBM ranks earlier than ESPN. Sorting includes all players matching your search and ESPN rank limit, shown 15 per page; missing comparison ranks appear last in either direction.</p>}
     <p className={styles.subtle}>Player ranks are available before the draft and do not need team rosters. ESPN uses its imported ROTO draft rank, with the captured catalog as a fallback. {!publicSourcesOnly && 'BBM uses its supplied Rank column or your privately saved ranked list. '}Yahoo uses its published preseason rank. Ranks include drafted players and do not change when a player is picked. ESPN: {ranks.coverage.espn || 'no'}{!publicSourcesOnly && <> · BBM: {ranks.coverage.bbm || 'no'}</>} · Yahoo: {ranks.coverage.yahoo || 'no'} ranked players.</p>
     <p className={styles.subtle}>{publicSourcesOnly ? 'ESPN after keepers numbers the full ESPN-ranked pool' : 'ESPN after keepers and BBM after keepers number each source’s full ranked pool'} after removing revealed keepers. These ranks stay fixed when players are drafted and when you filter or change pages. Unranked players show —.{!board?.keepersRevealedAt && ' Keeper-adjusted ranks become available when keepers are revealed.'}</p>
     {!publicSourcesOnly && rankStatus && <p className={styles.subtle} role="status">{rankStatus}</p>}
@@ -100,7 +109,7 @@ export function DraftCandidateTable({ catalog, library, report, board, seasonLoa
             <td>{seasonLoaded ? candidate.usableGames ?? '—' : '—'} / {seasonLoaded ? candidate.scheduledGames ?? '—' : '—'}</td>
             <td>{forecastMode ? <>{seasonLoaded && scenario ? `${scenario.availableScenarios} / ${scenario.scenarioCount}` : '—'}{seasonLoaded && scenario?.conditionalWinRate != null && <small>When available and retained: {pct(scenario.conditionalWinRate)} · {gain(scenario.conditionalGain)}</small>}</> : pct(seasonLoaded ? candidate.fitScore : null)}<small>{seasonLoaded ? candidate.reasons.join(' ') : 'Estimates pending.'}</small></td>
           </tr>;
-        })}{!candidates.length && <tr><td colSpan={publicSourcesOnly ? 9 : 12}>{invalidRankLimit ? 'Enter a valid ESPN rank limit to view players.' : report && maxEspnRank !== null && !filteredCandidates.length ? 'No available players match this ESPN rank limit. Increase it or leave it blank to show all players.' : order === 'fit' && report?.candidates.length ? forecastMode ? 'Completed-roster forecasts will appear when the calculation is ready.' : 'No available players currently have an eligible roster-fit score.' : 'Available candidates appear after the draft board loads.'}</td></tr>}</tbody>
+        })}{!candidates.length && <tr><td colSpan={publicSourcesOnly ? 9 : 12}>{invalidRankLimit ? 'Enter a valid ESPN rank limit to view players.' : report && searchTerm && !filteredCandidates.length ? `No available players match “${query.trim()}”${maxEspnRank !== null ? ' within this ESPN rank limit. Try another name, increase the limit, or leave it blank.' : '. Try another name or clear the search.'}` : report && maxEspnRank !== null && !filteredCandidates.length ? 'No available players match this ESPN rank limit. Increase it or leave it blank to show all players.' : order === 'fit' && report?.candidates.length ? forecastMode ? 'Completed-roster forecasts will appear when the calculation is ready.' : 'No available players currently have an eligible roster-fit score.' : 'Available candidates appear after the draft board loads.'}</td></tr>}</tbody>
       </table>
     </div>
     <nav className={styles.actions} aria-label="Available player pages">
