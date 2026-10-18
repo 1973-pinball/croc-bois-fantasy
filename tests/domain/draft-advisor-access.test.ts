@@ -6,6 +6,7 @@ import ts from 'typescript';
 import identities from '../../data/identities.json';
 import { validateDraftScheduleWindow } from '../../src/lib/draft-advisor-schedule';
 import * as projectionRanks from '../../src/lib/draft-projection-ranks';
+import * as draftToolAccess from '../../src/lib/draft-tool-access';
 import type { DraftProjectionDataset } from '../../src/lib/draft-projections';
 
 const require = createRequire(import.meta.url);
@@ -25,6 +26,7 @@ function moduleWithDependencies(path: string, dependencies: Record<string, unkno
 type FixtureOptions = {
   role?: string | null; userId?: string | null; active?: boolean; authError?: boolean; membershipError?: boolean; seasonError?: boolean; configured?: boolean; serviceError?: string;
   projectionDataset?: DraftProjectionDataset; rankSnapshot?: unknown; rpcError?: { code?: string; message: string }; rpcThrow?: boolean;
+  assignmentError?: boolean; assignment?: Partial<{ user_id: string; league_id: string; manager_id: string; franchise_id: string; effective_from: string; effective_to: string | null }> | null;
 };
 function fixture(options: FixtureOptions = {}) {
   const calls: string[] = [], filters: { table: string; values: Record<string, unknown> }[] = [];
@@ -32,11 +34,26 @@ function fixture(options: FixtureOptions = {}) {
   const db = {
     auth: { getUser: async () => { calls.push('auth'); return { data: { user: options.userId === null ? null : { id: options.userId ?? 'fixture-commissioner' } }, error: options.authError ? { message: 'Invalid auth' } : null }; } },
     from: (table: string) => {
-      assert.ok(['league_memberships', 'seasons'].includes(table), 'The private advisor must not write into another table.');
+      assert.ok(['league_memberships', 'manager_assignments', 'seasons'].includes(table), 'The private advisor must not write into another table.');
       const values: Record<string, unknown> = {}; filters.push({ table, values }); calls.push(table);
       const query = {
         select: (_fields: string) => query,
         eq: (key: string, value: unknown) => { values[key] = value; return query; },
+        lte: (key: string, value: unknown) => { values[`lte:${key}`] = value; return query; },
+        or: (value: string) => { values.or = value; return query; },
+        then: (resolve: (result: { data: unknown[]; error: { message: string } | null }) => unknown) => {
+          assert.equal(table, 'manager_assignments');
+          assert.equal(values.league_id, identities.leagueId);
+          assert.equal(values.user_id, options.userId ?? 'fixture-commissioner');
+          assert.equal(typeof values['lte:effective_from'], 'string');
+          assert.match(String(values.or), /^effective_to\.is\.null,effective_to\.gt\./);
+          const assignment = options.assignment === undefined || options.assignment === null ? null : {
+            user_id: options.userId ?? 'fixture-commissioner', league_id: identities.leagueId,
+            manager_id: draftToolAccess.DRAFT_TOOL_MANAGER_ID, franchise_id: draftToolAccess.DRAFT_TOOL_FRANCHISE_ID,
+            effective_from: '2026-01-01T00:00:00Z', effective_to: null, ...options.assignment,
+          };
+          return Promise.resolve(resolve({ data: assignment ? [assignment] : [], error: options.assignmentError ? { message: 'Unavailable' } : null }));
+        },
         maybeSingle: async () => {
           assert.equal(values.league_id, identities.leagueId);
           if (table === 'league_memberships') {
@@ -62,9 +79,13 @@ function fixture(options: FixtureOptions = {}) {
   const http = moduleWithDependencies('../../src/lib/supabase/http.ts', {
     'next/server': require('next/server'), './server': { createClient: async () => options.configured === false ? null : db }, './config': { SETUP_MESSAGE: 'Fixture setup is unavailable.' },
   });
+  const access = moduleWithDependencies('../../src/lib/draft-tool-access-server.ts', {
+    'server-only': {}, '../../data/identities.json': identities, './draft-tool-access': draftToolAccess,
+  });
   const service = (kind: string, output: unknown) => (args: unknown, serviceOptions?: unknown) => { calls.push(kind); if (options.serviceError) throw new Error(options.serviceError); return kind !== 'schedule' && options.projectionDataset ? options.projectionDataset : { ...output as object, args, ...(serviceOptions ? { serviceOptions } : {}) }; };
   const projections = moduleWithDependencies('../../src/app/api/draft-projections/route.ts', {
     zod: require('zod'), '../../../../data/identities.json': identities, '@/lib/supabase/http': http,
+    '@/lib/draft-tool-access-server': access,
     '@/lib/draft-projection-ranks': projectionRanks,
     '@/lib/draft-projection-service': { importEspnDraftProjections: service('espn', { marker: 'projection-result' }), importYahooDraftProjections: service('yahoo', { marker: 'projection-result' }), importDraftProjectionText: service('text', { marker: 'projection-result' }) },
   });
@@ -74,6 +95,7 @@ function fixture(options: FixtureOptions = {}) {
   });
   const schedule = moduleWithDependencies('../../src/app/api/draft-schedule/route.ts', {
     '../../../../data/identities.json': identities, '@/lib/supabase/http': http,
+    '@/lib/draft-tool-access-server': access,
     '@/lib/draft-advisor-schedule-server': { fetchDraftAdvisorSchedule: service('schedule', { marker: 'schedule-result' }) },
     '@/lib/draft-advisor-schedule': { validateDraftScheduleWindow },
   });
@@ -111,7 +133,8 @@ test('managers, inactive commissioners, and absent memberships receive 403 befor
     const app = fixture(options);
     assert.equal((await app.post(request())).status, 403);
     assert.equal((await app.get(scheduleRequest())).status, 403);
-    assert.deepEqual(app.calls, ['auth', 'league_memberships', 'auth', 'league_memberships']);
+    const expectedRead = options.role === 'manager' ? ['auth', 'league_memberships', 'manager_assignments'] : ['auth', 'league_memberships'];
+    assert.deepEqual(app.calls, [...expectedRead, ...expectedRead]);
   }
 });
 
@@ -151,6 +174,66 @@ test('revoking commissioner access blocks the next request even with the same au
   assert.equal((await app.post(request())).status, 403);
   assert.equal((await app.get(scheduleRequest())).status, 403);
   assert.equal(app.calls.filter(call => call === 'espn').length, 1);
+});
+
+test('Sebastian’s verified current assignment grants read access to direct projections and the complete schedule only', async () => {
+  const app = fixture({ role: 'manager', userId: draftToolAccess.DRAFT_TOOL_USER_ID, assignment: {} });
+  for (const action of ['espn', 'yahoo']) {
+    const response = await app.post(request({ ...body, action }));
+    assert.equal(response.status, 200); assert.equal(response.headers.get('Cache-Control'), 'private, no-store');
+    assert.equal((await response.json()).dataset.args, 2027);
+  }
+  const schedule = await app.get(scheduleRequest('seasonId=2027&scope=season'));
+  assert.equal(schedule.status, 200); assert.equal(schedule.headers.get('Cache-Control'), 'private, no-store');
+  assert.deepEqual((await schedule.json()).schedule.args, { seasonId: 2027, scope: 'season' });
+  for (const source of ['espn', 'yahoo', 'basketball-monster']) {
+    assert.equal((await app.post(request({ ...rankedImport, source }))).status, 403);
+  }
+  assert.equal((await app.get(scheduleRequest())).status, 403);
+  assert.equal((await app.getRanks(rankRequest())).status, 403);
+  assert.ok(!app.calls.includes('text'));
+  assert.ok(!app.rpcCalls.some(call => call.name === 'save_draft_provider_ranks'));
+});
+
+test('another manager, same-team co-manager, another franchise, and invalid assignment dates cannot obtain the restricted capability', async () => {
+  const assignments = [
+    null, { manager_id: 'another-manager' }, { franchise_id: identities.franchises['2'] }, { user_id: 'another-account' }, { league_id: 'another-league' },
+    { effective_from: '2099-01-01T00:00:00Z' }, { effective_from: 'invalid' }, { effective_to: '2026-01-01T00:00:00Z' }, { effective_to: 'invalid' },
+  ];
+  for (const assignment of assignments) {
+    const app = fixture({ role: 'manager', userId: draftToolAccess.DRAFT_TOOL_USER_ID, assignment });
+    assert.equal((await app.post(request())).status, 403);
+    assert.equal((await app.get(scheduleRequest('seasonId=2027&scope=season'))).status, 403);
+    assert.ok(!app.calls.some(call => ['espn', 'yahoo', 'text', 'schedule', 'seasons'].includes(call)));
+  }
+  for (const options of [{ role: 'viewer' }, { active: false }, { role: null }]) {
+    const app = fixture({ role: 'manager', userId: draftToolAccess.DRAFT_TOOL_USER_ID, assignment: {}, ...options });
+    assert.equal((await app.post(request())).status, 403);
+    assert.ok(!app.calls.includes('manager_assignments'));
+  }
+});
+
+test('revoking Sebastian’s assignment or membership blocks the next read and assignment failures fail closed', async () => {
+  for (const revoke of [(options: FixtureOptions) => { options.assignment = null; }, (options: FixtureOptions) => { options.active = false; }]) {
+    const options: FixtureOptions = { role: 'manager', userId: draftToolAccess.DRAFT_TOOL_USER_ID, assignment: {} }, app = fixture(options);
+    assert.equal((await app.post(request())).status, 200);
+    revoke(options);
+    assert.equal((await app.post(request())).status, 403);
+    assert.equal((await app.get(scheduleRequest('seasonId=2027&scope=season'))).status, 403);
+    assert.equal(app.calls.filter(call => call === 'espn').length, 1);
+  }
+  const unavailable = fixture({ role: 'manager', userId: draftToolAccess.DRAFT_TOOL_USER_ID, assignment: {}, assignmentError: true });
+  for (const response of [await unavailable.post(request()), await unavailable.get(scheduleRequest('seasonId=2027&scope=season'))]) {
+    assert.equal(response.status, 503); assert.equal(response.headers.get('Cache-Control'), 'private, no-store');
+  }
+  assert.ok(!unavailable.calls.some(call => ['espn', 'schedule', 'seasons'].includes(call)));
+});
+
+test('a different account cannot inherit Draft Tool access even if it is linked to Sebastian’s manager identity', async () => {
+  const app = fixture({ role: 'manager', userId: 'another-account', assignment: {} });
+  assert.equal((await app.post(request())).status, 403);
+  assert.equal((await app.get(scheduleRequest('seasonId=2027&scope=season'))).status, 403);
+  assert.ok(!app.calls.some(call => ['espn', 'schedule', 'seasons'].includes(call)));
 });
 
 test('text imports remain an explicit provider/basis request and oversized input never reaches the parser', async () => {

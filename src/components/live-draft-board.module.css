@@ -1,4 +1,8 @@
 .panel { min-width: 0; }
+.practicePanel { border: 2px solid #9b732e; }
+.practiceBanner { padding: 18px 24px; border-bottom: 1px solid #d4bd8a; background: #fbf1d9; color: #624c24; }
+.practiceBanner strong { font-size: 16px; }
+.practiceBanner p { margin: 8px 0 0; max-width: 940px; font-size: 14px; line-height: 1.7; }
 .panel :global(.panel-header) { gap: 16px; flex-wrap: wrap; }
 .liveStatus { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; color: var(--muted); font-size: 12px; }
 .liveStatus button { margin-left: 7px; font-size: 12px; }
@@ -199,3 +203,4 @@
 @media (max-width: 850px) { .playerPanel { padding: 20px; } .boardScroll { max-height: 640px; } .summary { padding: 18px; } .summary dl { gap: 24px; } .legend small { margin-left: 0; } }
 @media (max-width: 440px) { .layout { padding: 12px; } .orderFields, .readOnlyOrder { grid-template-columns: minmax(0, 1fr); } .playerPanel { padding: 16px; } .summary strong { font-size: 13px; } }
 @media (max-width: 700px) { .clockPanel { grid-template-columns: 1fr; padding: 16px; } .clockControls { justify-content: flex-start; } .clockReadout > strong { font-size: 42px; } }
+@media (max-width: 700px) { .practiceBanner { padding: 16px; } }

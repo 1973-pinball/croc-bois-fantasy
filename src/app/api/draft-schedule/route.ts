@@ -1,7 +1,7 @@
-import identities from '../../../../data/identities.json';
 import { fetchDraftAdvisorSchedule } from '@/lib/draft-advisor-schedule-server';
 import { validateDraftScheduleWindow } from '@/lib/draft-advisor-schedule';
 import { authenticatedClient, json } from '@/lib/supabase/http';
+import { readDraftToolAccess } from '@/lib/draft-tool-access-server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -10,13 +10,14 @@ export async function GET(request: Request) {
   try {
     const auth = await authenticatedClient();
     if ('response' in auth) return auth.response;
-    const membership = await auth.client.from('league_memberships').select('role').eq('league_id', identities.leagueId).eq('user_id', auth.user.id).eq('active', true).maybeSingle();
-    if (membership.error) return json({ error: 'ACCESS_UNAVAILABLE', message: 'Commissioner access could not be verified.' }, 503);
-    if (membership.data?.role !== 'commissioner') return json({ error: 'FORBIDDEN', message: 'Only the commissioner can use the private draft advisor.' }, 403);
+    const access = await readDraftToolAccess(auth.client, auth.user.id);
+    if (access.unavailable) return json({ error: 'ACCESS_UNAVAILABLE', message: 'Draft Tool access could not be verified.' }, 503);
+    if (!access.commissioner && !access.restricted) return json({ error: 'FORBIDDEN', message: 'Your account does not have Draft Tool access.' }, 403);
     const query = new URL(request.url).searchParams;
     const rawSeason = query.get('seasonId') ?? '';
     const seasonId = Number(rawSeason), startDate = query.get('startDate') ?? undefined;
     const scope = query.get('scope') ?? undefined;
+    if (!access.commissioner && (scope !== 'season' || startDate !== undefined)) return json({ error: 'FORBIDDEN', message: 'Your Draft Tool uses the complete season schedule.' }, 403);
     if (!/^\d{4}$/.test(rawSeason) || seasonId < 2001 || seasonId > 2100) return json({ error: 'INVALID_SEASON', message: 'Choose the NBA season ending year.' }, 400);
     if ((scope !== undefined && scope !== 'week' && scope !== 'season') || (scope === 'season' && startDate !== undefined)) return json({ error: 'INVALID_WINDOW', message: 'Choose the complete season without a single-week start date.' }, 400);
     try { if (startDate !== undefined) validateDraftScheduleWindow(seasonId, startDate); }

@@ -24,7 +24,7 @@ export function importDraftProjectionText(options: { seasonId: number; source: D
   return importDraftProjections({ ...options, catalog: playerCatalog });
 }
 
-/** Public-source cache only; each API request still checks commissioner access. */
+/** Public-source cache only; each API request still checks Draft Tool access. */
 export async function importYahooDraftProjections(seasonId: number, options: { refresh?: boolean } = {}): Promise<DraftProjectionDataset> {
   const cached = yahooCache.get(seasonId);
   if (!options.refresh && cached && cached.expiresAt > Date.now()) return cached.dataset;

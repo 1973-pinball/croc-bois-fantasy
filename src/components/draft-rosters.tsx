@@ -22,7 +22,7 @@ function RosterSlot({ slot, reserve = false }: { slot: DraftRosterSlot; reserve?
   </li>;
 }
 
-export function DraftRosters({ board, preferredFranchiseId, compact = false }: { board: DraftBoard; preferredFranchiseId?: string; compact?: boolean }) {
+export function DraftRosters({ board, preferredFranchiseId, compact = false, mode = 'live' }: { board: DraftBoard; preferredFranchiseId?: string; compact?: boolean; mode?: 'live' | 'practice' }) {
   const id = useId();
   // Keep the automatic default live as account access loads; only user choices are pinned.
   const [choice, setChoice] = useState<string | null>(null);
@@ -36,7 +36,7 @@ export function DraftRosters({ board, preferredFranchiseId, compact = false }: {
   const issues = [...new Set([...summary.issues, ...(team?.issues || [])])];
   const seasonLabel = `${settings.espnSeasonId - 1}–${String(settings.espnSeasonId).slice(-2)}`;
   return <section className={`panel ${styles.panel} ${compact ? styles.compact : ''}`} aria-labelledby={`${id}-title`}>
-    <div className={styles.header}><div><h2 id={`${id}-title`}>Draft rosters</h2><p>Public keepers and draft selections, fitted to ESPN’s roster slots.</p></div><label className={styles.teamSelect} style={franchiseColorStyle(selectedId)}>View team<select value={selectedId || ''} onChange={event => setChoice(event.target.value)}>{board.teams.map(item => <option key={item.franchiseId} value={item.franchiseId}>{item.displayName}</option>)}</select></label></div>
+    <div className={styles.header}><div><h2 id={`${id}-title`}>{mode === 'practice' ? 'Practice rosters' : 'Draft rosters'}</h2><p>{mode === 'practice' ? 'Starting snapshot and pretend selections, fitted to ESPN’s roster slots.' : 'Public keepers and draft selections, fitted to ESPN’s roster slots.'}</p></div><label className={styles.teamSelect} style={franchiseColorStyle(selectedId)}>View team<select value={selectedId || ''} onChange={event => setChoice(event.target.value)}>{board.teams.map(item => <option key={item.franchiseId} value={item.franchiseId}>{item.displayName}</option>)}</select></label></div>
     <div className={styles.body}>
       {(pendingOrder || pendingKeepers) && <p className={styles.notice}>{pendingKeepers ? 'Keeper rosters appear automatically once the deadline has passed and every team’s keepers are finalized and revealed.' : 'Keepers are already included. The draft order is still pending; player selections will fill the remaining roster slots.'} Counts show players currently visible on the public board, including recorded draft trades.</p>}
       {!summary.available && <p className={styles.notice}>{summary.unavailableReason || 'Verified ESPN roster settings are not available for this season.'}</p>}
@@ -50,7 +50,7 @@ export function DraftRosters({ board, preferredFranchiseId, compact = false }: {
         {team.reserveSlots.length > 0 && <div className={styles.ir}><h4>Reserve · separate from {team.normalCapacity} roster slots</h4><p className={styles.help}>IR placement depends on ESPN injury eligibility. Draft players are not automatically assigned to IR.</p><ul className={styles.slots} aria-label="ESPN reserve slots">{team.reserveSlots.map(slot => <RosterSlot key={slot.key} slot={slot} reserve/>)}</ul></div>}
       </>}
       {issues.length > 0 && <div className={styles.unplaced}><h4>Roster information to check</h4><ul>{issues.map(issue => <li key={issue}>{issue}</li>)}</ul></div>}
-      <p className={styles.source}><a href={settings.source.url} target="_blank" rel="noreferrer">ESPN {seasonLabel} roster settings</a> · updated <time dateTime={settings.source.capturedAt}>{new Date(settings.source.capturedAt).toLocaleString()}</time><span>Player eligibility updated <time dateTime={eligibility.source.capturedAt}>{new Date(eligibility.source.capturedAt).toLocaleString()}</time>. Rosters follow the live board’s public picks and current owners.</span></p>
+      <p className={styles.source}><a href={settings.source.url} target="_blank" rel="noreferrer">ESPN {seasonLabel} roster settings</a> · updated <time dateTime={settings.source.capturedAt}>{new Date(settings.source.capturedAt).toLocaleString()}</time><span>Player eligibility updated <time dateTime={eligibility.source.capturedAt}>{new Date(eligibility.source.capturedAt).toLocaleString()}</time>. {mode === 'practice' ? 'These rosters belong only to the local practice copy.' : 'Rosters follow the live board’s public picks and current owners.'}</span></p>
     </div>
   </section>;
 }

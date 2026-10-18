@@ -17,6 +17,7 @@ type Session = {
   user: { id: string; email?: string; displayName?: string } | null;
   memberships: { league_id: string; role: string }[];
   assignments: { franchise_id: string; league_id: string; role: string; effective_from: string; effective_to: string | null }[];
+  draftToolAccess?: { franchiseId: string } | null;
 };
 export type KeeperSubmission = {
   id: string; franchise_id: string; revision: number;
@@ -116,7 +117,7 @@ export function useLeagueAccount() {
     try {
       const body = await readResponse<Session>(await fetch('/api/session', { cache: 'no-store', credentials: 'same-origin' }));
       if (read !== sessionRead.current) return null;
-      const key = JSON.stringify([body.user?.id, body.memberships, body.assignments]);
+      const key = JSON.stringify([body.user?.id, body.memberships, body.assignments, body.draftToolAccess]);
       if (key !== permissionKey.current) {
         permissionKey.current = key; permissionVersion.current++;
         setSubmissions([]); setLateSubmissions([]); setSubmissionsLoaded(false);
@@ -159,6 +160,8 @@ export function useLeagueAccount() {
 
   const commissioner = Boolean(session?.user && session.memberships.some(item => item.league_id === identities.leagueId && item.role === 'commissioner'));
   const ownTeamIds = session?.user ? currentOwnTeamIds(identities.leagueId, session.memberships, session.assignments, live?.franchiseIds || identities.franchises).filter(id => data.teams.some(team => team.id === id)) : [];
+  const draftToolFranchiseId = session?.user && !commissioner && ownTeamIds.some(id => franchiseId(id) === session.draftToolAccess?.franchiseId)
+    ? session.draftToolAccess!.franchiseId : null;
   function franchiseId(teamId: number) { return live?.franchiseIds[String(teamId)] || identities.franchises[String(teamId)]; }
   function canManageTeam(teamId: number) {
     if (!session?.user) return false;
@@ -235,7 +238,7 @@ export function useLeagueAccount() {
     finally { setActionBusy(null); }
   }
 
-  return { data, lastLeagueCheckedAt, session, sessionLoading, sessionError, reloadSession, ownTeamIds, live, connection, connectionError, submissions, submissionsLoaded, loadingSubmissions, commissioner, actionBusy, actionError, actionNotice, reloadRequired, seasonId, keeperDeadlinePassed, keeperLateSubmissionOpen, keeperPlayersFrozen, allKeeperTeamsSubmitted, canManageTeam, franchiseId, officialPickId, toPlannerAssignments, submissionFor, refreshOfficial, runAction, openKeeperSelection, reloadLeague };
+  return { data, lastLeagueCheckedAt, session, sessionLoading, sessionError, reloadSession, ownTeamIds, live, connection, connectionError, submissions, submissionsLoaded, loadingSubmissions, commissioner, draftToolFranchiseId, actionBusy, actionError, actionNotice, reloadRequired, seasonId, keeperDeadlinePassed, keeperLateSubmissionOpen, keeperPlayersFrozen, allKeeperTeamsSubmitted, canManageTeam, franchiseId, officialPickId, toPlannerAssignments, submissionFor, refreshOfficial, runAction, openKeeperSelection, reloadLeague };
 }
 
 export type LeagueAccount = ReturnType<typeof useLeagueAccount>;

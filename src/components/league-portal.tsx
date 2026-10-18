@@ -24,6 +24,7 @@ import { SeasonReadinessPanel, SeasonScheduleNotice } from './season-readiness';
 import { LiveDraftBoard } from './live-draft-board';
 import { DraftLottery } from './draft-lottery';
 import { CommissionerStrategyTools } from './commissioner-strategy-tools';
+import { CommissionerPracticeDraft } from './commissioner-practice-draft';
 import heroStyles from './overview-hero.module.css';
 import rosterStyles from './roster-density.module.css';
 import commissionerNavStyles from './commissioner-nav.module.css';
@@ -137,7 +138,9 @@ export function LeaguePortal({ report, initialSearch = '' }: { report?: ReactNod
   const location = usePortalLocation(report ? 'audit' : 'overview', initialSearch);
   const { search, tradeSearch, allTeams, draftView } = location;
   const view = report ? 'audit' : location.view;
-  const [commissionerView, setCommissionerView] = useQueryFilter('commissionerView', 'tools');
+  const [requestedCommissionerView, setCommissionerView] = useQueryFilter('commissionerView', 'tools');
+  const canOpenCommissionerTools = account.commissioner || Boolean(account.draftToolFranchiseId);
+  const commissionerView = account.commissioner ? requestedCommissionerView : 'draft';
   useViewFocus(view);
   const commissionerTipId = useId();
   const leagueData = account.data;
@@ -214,10 +217,10 @@ export function LeaguePortal({ report, initialSearch = '' }: { report?: ReactNod
   }, [mobileOpen, mobile]);
 
   useEffect(() => {
-    if (!account.sessionLoading && account.connection !== 'loading' && view === 'commissioner' && !account.commissioner) {
+    if (!account.sessionLoading && account.connection !== 'loading' && view === 'commissioner' && !canOpenCommissionerTools) {
       location.update({ view: 'overview' }); setMobileOpen(false);
     }
-  }, [view, account.commissioner, account.sessionLoading, account.connection]);
+  }, [view, canOpenCommissionerTools, account.sessionLoading, account.connection]);
 
   useEffect(() => {
     if (account.sessionLoading || account.connection === 'loading' || !account.session?.user) return;
@@ -257,7 +260,7 @@ export function LeaguePortal({ report, initialSearch = '' }: { report?: ReactNod
 
   function closeMenu() { setMobileOpen(false); requestAnimationFrame(() => menuRef.current?.focus()); }
   function navigate(next: View, teamId?: number) {
-    if (next === 'commissioner' && !account.commissioner) return;
+    if (next === 'commissioner' && !canOpenCommissionerTools) return;
     if (next === view && teamId === undefined) { if (mobileOpen) closeMenu(); return; }
     const selected = teamId ?? (next === 'my-team' && account.ownTeamIds.length && !account.ownTeamIds.includes(activeTeam) ? account.ownTeamIds[0] : activeTeam);
     if (report || next === 'audit') { window.location.assign(location.href({ view: next, team: selected })); return; }
@@ -291,7 +294,7 @@ export function LeaguePortal({ report, initialSearch = '' }: { report?: ReactNod
       <a className="brand" href="/?view=overview" onClick={event => navigationClick(event, 'overview')} aria-label="Croc Bois league overview"><span className="brand-mark"><CrocMark/></span><span className="brand-name">CROC BOIS<span>FANTASY BASKETBALL</span></span></a>
       <button type="button" className="drawer-close" onClick={closeMenu} aria-label="Close navigation">Close ×</button>
       <div className="sidebar-season"><span className="live-dot"/> THE LEAGUE OFFICE <span className="season-year">{leagueData.season}</span></div>
-      <nav>{navigation.map(item => item.id === 'commissioner' && !account.commissioner
+      <nav>{navigation.map(item => item.id === 'commissioner' && !canOpenCommissionerTools
         ? <span key={item.id} className={commissionerNavStyles.locked} tabIndex={0} role="group" aria-label="Commissioner Tools requires commissioner access" aria-describedby={commissionerTipId}><button className="nav-item" disabled aria-describedby={commissionerTipId}><Icon name={item.icon}/><span>{item.label}</span></button><span id={commissionerTipId} role="tooltip" className={commissionerNavStyles.tooltip}>Commissioner access is required to manage league settings and reviews.</span></span>
         : <a key={item.id} href={location.href({ view: item.id })} className={'nav-item' + (view === item.id ? ' active' : '')} onClick={event => navigationClick(event, item.id)} aria-current={view === item.id ? 'page' : undefined}><Icon name={item.icon}/><span>{item.label}</span>{view === item.id && <span className="nav-active-dot"/>}</a>)}</nav>
       <div className="sidebar-bottom"><div className="sidebar-footer">EST. 2017 <span>KEEP IT CROC.</span></div></div>
@@ -363,10 +366,10 @@ export function LeaguePortal({ report, initialSearch = '' }: { report?: ReactNod
           <div className="charter-layout"><aside className="charter-index"><p className="eyebrow">IN THIS CHARTER</p>{leagueData.charter.map((section, index) => <a href={'#charter-' + index} key={index}><span>{String(index + 1).padStart(2, '0')}</span>{section.title}</a>)}</aside><div className="charter-content"><div className="charter-cover"><span className="hero-kicker">CROC BOIS FANTASY BASKETBALL</span><h2>A league of our own</h2><p>Shared rules. Long memories. A lot of basketball.</p><Icon name="ball" size={68}/></div><div className="info-banner"><Icon name="book"/><p>Current rules summary with commissioner clarifications; the original historical charter is preserved in migration records. Unresolved questions appear in the review queue.</p></div>{leagueData.charter.map((section, index) => <section className="charter-section" id={'charter-' + index} key={index}><span className="section-number">{String(index + 1).padStart(2, '0')}</span><h2>{section.title}</h2>{section.paragraphs.map((paragraph, pIndex) => <p key={pIndex}>{paragraph}</p>)}</section>)}</div></div>
         </>}
 
-        {view === 'commissioner' && account.commissioner && <>
-          <PageTitle eyebrow="THE COMMISSIONER’S DESK" title="Commissioner Tools" description="League administration and your private draft and keeper analysis."/>
-          <nav className="draft-view-tabs" aria-label="Commissioner workspaces">{([['tools', 'League administration'], ['draft', 'Draft Tool'], ['keepers', 'Keeper Suggestions']] as const).map(([mode, label]) => <a key={mode} href={location.href({ commissionerView: mode })} aria-current={commissionerView === mode ? 'page' : undefined} onClick={event => { if (event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); setCommissionerView(mode); }}>{label}</a>)}</nav>
-          {commissionerView === 'draft' || commissionerView === 'keepers' ? <CommissionerStrategyTools account={account} view={commissionerView}/> : <>
+        {view === 'commissioner' && canOpenCommissionerTools && <>
+          <PageTitle eyebrow="THE COMMISSIONER’S DESK" title="Commissioner Tools" description={account.commissioner ? 'League administration and your private draft and keeper analysis.' : 'Your team’s draft projections and recommended picks.'}/>
+          <nav className="draft-view-tabs" aria-label="Commissioner workspaces">{([['tools', 'League administration'], ['draft', 'Draft Tool'], ['keepers', 'Keeper Suggestions'], ['practice', 'Practice Draft']] as const).filter(([mode]) => account.commissioner || mode === 'draft').map(([mode, label]) => <a key={mode} href={location.href({ commissionerView: mode })} aria-current={commissionerView === mode ? 'page' : undefined} onClick={event => { if (event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); setCommissionerView(mode); }}>{label}</a>)}</nav>
+          {commissionerView === 'practice' && account.commissioner ? <CommissionerPracticeDraft account={account} onExit={() => setCommissionerView('tools')}/> : commissionerView === 'draft' || commissionerView === 'keepers' ? <CommissionerStrategyTools account={account} view={commissionerView}/> : <>
           <p className={commissionerToolsStyles.intro}>Expand a tool when you need it. Each tool starts collapsed.</p>
           <div className={commissionerToolsStyles.tools}>
           <CommissionerTool category="SEASON READINESS" title="Every team, every step"><SeasonReadinessPanel account={account}/></CommissionerTool>

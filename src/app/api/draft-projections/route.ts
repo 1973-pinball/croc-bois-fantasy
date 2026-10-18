@@ -3,6 +3,7 @@ import identities from '../../../../data/identities.json';
 import { importDraftProjectionText, importEspnDraftProjections, importYahooDraftProjections } from '@/lib/draft-projection-service';
 import { draftProjectionRankSnapshotSchema } from '@/lib/draft-projection-ranks';
 import { authenticatedClient, json, sameOrigin } from '@/lib/supabase/http';
+import { readDraftToolAccess } from '@/lib/draft-tool-access-server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -39,15 +40,16 @@ export async function POST(request: Request) {
   try {
     const auth = await authenticatedClient();
     if ('response' in auth) return auth.response;
-    const membership = await auth.client.from('league_memberships').select('role').eq('league_id', identities.leagueId).eq('user_id', auth.user.id).eq('active', true).maybeSingle();
-    if (membership.error) return json({ error: 'ACCESS_UNAVAILABLE', message: 'Commissioner access could not be checked.' }, 503);
-    if (membership.data?.role !== 'commissioner') return json({ error: 'FORBIDDEN', message: 'Only the commissioner can use the private draft tool.' }, 403);
+    const access = await readDraftToolAccess(auth.client, auth.user.id);
+    if (access.unavailable) return json({ error: 'ACCESS_UNAVAILABLE', message: 'Draft Tool access could not be checked.' }, 503);
+    if (!access.commissioner && !access.restricted) return json({ error: 'FORBIDDEN', message: 'Your account does not have Draft Tool access.' }, 403);
     let body: z.infer<typeof bodySchema>;
     try {
       const parsed = bodySchema.safeParse(await readImportBody(request));
       if (!parsed.success) return json({ error: 'INVALID_BODY', message: 'Choose a projection source, season, and per-game or totals format.' }, 400);
       body = parsed.data;
     } catch { return json({ error: 'INVALID_BODY', message: 'Import a valid CSV/TSV table under 2 MB.' }, 400); }
+    if (!access.commissioner && body.action === 'import') return json({ error: 'FORBIDDEN', message: 'Only the commissioner can import projection files.' }, 403);
     const season = await auth.client.from('seasons').select('draft_year').eq('id', body.seasonId).eq('league_id', identities.leagueId).maybeSingle();
     if (season.error) return json({ error: 'SEASON_UNAVAILABLE', message: 'The draft season could not be checked.' }, 503);
     if (!season.data || !Number.isInteger(season.data.draft_year)) return json({ error: 'INVALID_SEASON', message: 'Choose a draft season in this league.' }, 400);
@@ -58,7 +60,7 @@ export async function POST(request: Request) {
         : body.action === 'yahoo'
           ? await importYahooDraftProjections(espnSeasonId, { refresh: body.refresh })
           : importDraftProjectionText({ seasonId: espnSeasonId, source: body.source, text: body.text, basis: body.basis });
-      if (dataset.source === 'basketball-monster') {
+      if (access.commissioner && dataset.source === 'basketball-monster') {
         const ranks = dataset.players.flatMap(player => player.providerRank === undefined ? [] : [{ id: player.id, providerRank: player.providerRank }]);
         if (ranks.length) {
           const snapshot = draftProjectionRankSnapshotSchema.parse({ source: dataset.source, seasonId: dataset.seasonId, importedAt: dataset.importedAt, ranks });
