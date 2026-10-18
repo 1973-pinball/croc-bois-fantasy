@@ -49,6 +49,8 @@
  .candidateTable { min-width: 950px; }
  .candidateTable tbody td { padding-block: 8px; }
  .candidateTable td small { margin-top: 2px; line-height: 1.35; }
+ .candidateIdentity { display: flex; align-items: baseline; gap: 7px; }
+ .candidateTable .candidateIdentity small { margin: 0; white-space: nowrap; }
  .candidateGuide { margin-top: 8px; }
  .candidateGuide > summary, .candidateDetails > summary { padding: 2px 0; color: var(--green); font-size: 12px; font-weight: 500; cursor: pointer; }
  .candidateGuide > summary:focus-visible, .candidateDetails > summary:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }

@@ -103,14 +103,15 @@ export function DraftCandidateTable({ catalog, library, report, board, seasonLoa
           const values = ranks.byPlayerId.get(candidate.player.id);
           const scenario = forecast?.candidateRanges.find(row => row.playerId === candidate.player.id);
           return <tr key={candidate.player.id}>
-            <td><strong>{candidate.player.name}</strong><small>{candidate.player.nbaTeam}{candidate.hasProjection ? '' : ' · missing projection'}{candidate.blocked ? ' · not recommended' : ''}</small></td>
+            <td><div className={styles.candidateIdentity}><strong>{candidate.player.name}</strong><small>{candidate.player.nbaTeam}{candidate.hasProjection ? '' : ' · missing projection'}{candidate.blocked ? ' · not recommended' : ''}</small></div></td>
             <td>{candidate.player.eligiblePositions.join(' / ')}</td>
             <td>{rankLabel(values?.espnRank)}</td><td>{rankLabel(ranks.espnAfterKeepersByPlayerId.get(candidate.player.id))}</td>{!publicSourcesOnly && <><td>{rankLabel(values?.bbmRank)}</td><td>{rankLabel(ranks.bbmAfterKeepersByPlayerId.get(candidate.player.id))}</td></>}<td>{rankLabel(values?.yahooRank)}</td>
             {!publicSourcesOnly && <td className={values?.bbmValue == null || values.bbmValue === 0 ? undefined : values.bbmValue > 0 ? styles.gain : styles.negative}>{valueLabel(values?.bbmValue)}</td>}
-            <td>{pct(seasonLoaded ? candidate.scheduleWinRate : null)}{seasonLoaded && scenario && <small>{pct(scenario.min)}–{pct(scenario.max)} scenario range</small>}</td><td className={(candidate.scheduleGain ?? 0) < 0 ? styles.negative : styles.gain}>{gain(seasonLoaded ? candidate.scheduleGain : null)}</td>
+            <td>{pct(seasonLoaded ? candidate.scheduleWinRate : null)}</td><td className={(candidate.scheduleGain ?? 0) < 0 ? styles.negative : styles.gain}>{gain(seasonLoaded ? candidate.scheduleGain : null)}</td>
             <td>{seasonLoaded ? candidate.usableGames ?? '—' : '—'} / {seasonLoaded ? candidate.scheduledGames ?? '—' : '—'}</td>
             <td><div className={styles.candidateEstimate}><span>{forecastMode ? seasonLoaded && scenario ? `${scenario.availableScenarios} / ${scenario.scenarioCount}` : '—' : pct(seasonLoaded ? candidate.fitScore : null)}</span>
-              {seasonLoaded && (candidate.reasons.length > 0 || forecastMode && scenario?.conditionalWinRate != null) && <details className={styles.candidateDetails} key={`${candidate.player.id}-${forecastMode}`}><summary aria-label={`Estimate details for ${candidate.player.name}`}>Details</summary>
+              {seasonLoaded && (candidate.reasons.length > 0 || forecastMode && scenario) && <details className={styles.candidateDetails} key={`${candidate.player.id}-${forecastMode}`}><summary aria-label={`Estimate details for ${candidate.player.name}`}>Details</summary>
+                {forecastMode && scenario && <small>{pct(scenario.min)}–{pct(scenario.max)} scenario range</small>}
                 {forecastMode && scenario?.conditionalWinRate != null && <small>When available and retained: {pct(scenario.conditionalWinRate)} · {gain(scenario.conditionalGain)}</small>}
                 {candidate.reasons.length > 0 && <small>{candidate.reasons.join(' ')}</small>}
               </details>}
