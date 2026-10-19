@@ -31,7 +31,7 @@ type LiveLeague = {
   phase: string; participantCount: number; keepersRevealedAt: string | null; tradingOpenedAt: string | null;
   keeperDeadline?: string | null; draftAt?: string | null; seasonTimeZone?: string | null; scheduleRevision?: number;
   franchiseIds: Record<string, string>; data: LeagueData;
-  draftOrder?: number[]; usedPickIds?: string[]; draftStarted?: boolean;
+  draftOrder?: number[]; usedPickIds?: string[]; draftStarted?: boolean; draftFinalizedAt?: string | null;
   keeperPaymentInventory?: { deadline: string; capturedAt: string; picks: DraftPick[] } | null;
   revealedKeepers: { playerId: number; teamId: number; pickId: string; baseRound: number; paymentRound: number }[];
 };

@@ -25,6 +25,10 @@ const obligationLabels: Record<ObligationKind, string> = {
   loan_return: 'Loan return', conditional_pick: 'Conditional pick', espn_action: 'ESPN action', other: 'Other obligation',
 };
 const playerTradePause = 'Player trades are paused after keeper reveal until draft rosters are finalized.';
+function playerTradesPaused(account: LeagueAccount) {
+  const finalized = account.live?.phase === 'in_season' && Boolean(account.live.draftFinalizedAt);
+  return Boolean(account.live?.keepersRevealedAt || account.live?.phase === 'in_season') && !finalized;
+}
 function reusableTradePickIds(account: LeagueAccount) {
   return new Set(account.live?.draftStarted === false ? account.live.revealedKeepers.filter(keeper => account.data.picks.some(pick => pick.id === keeper.pickId && pick.season === account.data.season)).map(keeper => keeper.pickId) : []);
 }
@@ -45,7 +49,7 @@ function TradeComposer({ account, inventory, disabled, saving, onLog }: {
 }) {
   const id = useId();
   const draftKey = workflowDraftKey(account.session!.user!.id, account.seasonId, 'trade');
-  const { draft, updateDraft, discardDraft, clearSubmittedDraft, persisted } = useWorkflowDraft(draftKey, emptyTradeDraft(Boolean(account.live?.keepersRevealedAt)), isTradeComposerDraft);
+  const { draft, updateDraft, discardDraft, clearSubmittedDraft, persisted } = useWorkflowDraft(draftKey, emptyTradeDraft(playerTradesPaused(account)), isTradeComposerDraft);
   const { category, terms, legs, kind, fromTeam, toTeam, assetId, obligationKind, obligationTerms, dueAt } = draft;
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const setCategory = (value: TradeComposerDraft['category']) => updateDraft({ category: value });
@@ -62,7 +66,7 @@ function TradeComposer({ account, inventory, disabled, saving, onLog }: {
   const pickYear = draft.pickYear || String(account.data.season);
   const picks = inventory?.picks ?? [];
   const reusable = reusableTradePickIds(account);
-  const playersPaused = Boolean(account.live?.keepersRevealedAt);
+  const playersPaused = playerTradesPaused(account);
   const blockedPlayerLegs = playersPaused && legs.some(leg => leg.kind === 'player');
   const blockedCategory = playersPaused && category === 'player_only';
   const teamName = (teamId: number) => account.data.teams.find(t => t.id === teamId)?.shortName || 'League team';
@@ -264,7 +268,7 @@ function ScopedTradeWorkspace({ account }: { account: LeagueAccount }) {
   const readable = live && signedIn;
   const canLog = readable && (account.commissioner || account.ownTeamIds.length > 0);
   const seasonId = account.live?.seasonId;
-  const playersPaused = Boolean(account.live?.keepersRevealedAt);
+  const playersPaused = playerTradesPaused(account);
 
   const loadTrades = useCallback(async (signal?: AbortSignal) => {
     if (!readable || !seasonId) return null;
